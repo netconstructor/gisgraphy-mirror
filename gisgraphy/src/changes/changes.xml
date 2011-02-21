@@ -409,6 +409,10 @@ remove the ability to search for 'no name street'
 				Special char in queryString for fulltext service are removed, this avoid the use of nested queries 
 			</action>
 			
+			<action dev="David Masclet" type="add">
+				add the abbility that all words are not mandatory in fulltext search
+			</action>
+			
 			</release>
 			
 	</body>
