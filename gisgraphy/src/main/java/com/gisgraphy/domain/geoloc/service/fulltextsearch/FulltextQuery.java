@@ -66,6 +66,8 @@ public class FulltextQuery extends AbstractGisQuery {
 	 */
 	public final static Class[] ONLY_ADM_PLACETYPE = new Class[]{Adm.class};
 	protected static final String NESTED_QUERY_TEMPLATE= "_query_:\"{!dismax qf='all_name^1.1 iso_all_name^1 zipcode^1.1 all_adm1_name^0.5 all_adm2_name^0.5 all_country_name^0.5' pf=name^1.1 bf=population^2.0}%s\"";
+	protected static final String NESTED_QUERY_INTEXT_BASIC_TEMPLATE= "_query_:\"{! dismax qf='name^1.1 zipcode^1.1'  mm='1<-100% 2<-50% 3<-0%' bq='_val_:\"pow(population,0.3)\"' }%s";
+	protected static final String NESTED_QUERY_INTEXT_WITHSTATE_TEMPLATE= "_query_:\"{! dismax qf='name^1.1 zipcode^1.1 all_adm1_name^0.5 all_adm2_name^0.5'  mm='1<-100% 2<-50% 3<-0%' pf='all_adm1_name all_adm2_name' ps=6 bq='_val_:\"pow(population,0.3)\"' }\"";
 	protected static final String NESTED_QUERY_NUMERIC_TEMPLATE="_query_:\"{!dismax qf='feature_id^1.1 all_name^1.1 iso_all_name^1 zipcode^1.1 all_adm1_name^0.5 all_adm2_name^0.5 all_country_name^0.5' pf=name^1.1 bf=population^2.0}%s\"";
     public final static int QUERY_MAX_LENGTH = 200;
     
