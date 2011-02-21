@@ -22,6 +22,8 @@
  *******************************************************************************/
 package com.gisgraphy.webapp.action;
 
+import static com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +42,7 @@ import com.gisgraphy.domain.valueobject.GisgraphyConfig;
 import com.gisgraphy.domain.valueobject.Output;
 import com.gisgraphy.domain.valueobject.Pagination;
 import com.gisgraphy.domain.valueobject.SolrResponseDto;
+import com.gisgraphy.fulltext.Constants;
 import com.opensymphony.xwork2.Action;
 
 public class GeocodingActionTest {
@@ -145,7 +148,7 @@ public class GeocodingActionTest {
 	String cityName = "city";
 	FulltextQuery query = new FulltextQuery(cityName,
 		Pagination.DEFAULT_PAGINATION, Output.DEFAULT_OUTPUT,
-		FulltextQuery.ONLY_CITY_PLACETYPE, countryCode);
+		ONLY_CITY_PLACETYPE, countryCode);
 	EasyMock.expect(fullTextSearchEngine.executeQuery(query)).andStubReturn(new FulltextResultsDto());
 	EasyMock.replay(fullTextSearchEngine);
 	action.setFullTextSearchEngine(fullTextSearchEngine);
@@ -173,7 +176,7 @@ public class GeocodingActionTest {
 	String cityNameSearched = "city";
 	FulltextQuery query = new FulltextQuery(cityNameSearched,
 		Pagination.DEFAULT_PAGINATION, Output.DEFAULT_OUTPUT,
-		FulltextQuery.ONLY_CITY_PLACETYPE, countryCode);
+		ONLY_CITY_PLACETYPE, countryCode);
 	EasyMock.expect(fullTextSearchEngine.executeQuery(query)).andStubReturn(fulltextResultsDto);
 	EasyMock.replay(fullTextSearchEngine);
 	action.setFullTextSearchEngine(fullTextSearchEngine);
@@ -270,7 +273,7 @@ public class GeocodingActionTest {
 	String cityNameSearched = "city";
 	FulltextQuery query = new FulltextQuery(cityNameSearched,
 		Pagination.DEFAULT_PAGINATION, Output.DEFAULT_OUTPUT,
-		FulltextQuery.ONLY_CITY_PLACETYPE, countryCode);
+		ONLY_CITY_PLACETYPE, countryCode);
 	EasyMock.expect(fullTextSearchEngine.executeQuery(query)).andStubReturn(fulltextResultsDto);
 	EasyMock.replay(fullTextSearchEngine);
 	action.setFullTextSearchEngine(fullTextSearchEngine);
@@ -313,7 +316,7 @@ public class GeocodingActionTest {
 	String cityNameSearched = "city";
 	FulltextQuery query = new FulltextQuery(cityNameSearched,
 		Pagination.DEFAULT_PAGINATION, Output.DEFAULT_OUTPUT,
-		FulltextQuery.ONLY_CITY_PLACETYPE, countryCode);
+		ONLY_CITY_PLACETYPE, countryCode);
 	EasyMock.expect(fullTextSearchEngine.executeQuery(query)).andThrow(new RuntimeException());
 	EasyMock.replay(fullTextSearchEngine);
 	action.setFullTextSearchEngine(fullTextSearchEngine);

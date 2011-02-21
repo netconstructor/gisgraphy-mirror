@@ -59,7 +59,6 @@ public class FulltextServlet extends GisgraphyServlet {
     public static final String STYLE_PARAMETER = "style";
     public static final String PLACETYPE_PARAMETER = "placetype";
     public static final String QUERY_PARAMETER = "q";
-    public static final int DEFAULT_MAX_RESULTS = 10;
     public static final String SPELLCHECKING_PARAMETER = "spellchecking";
 
 

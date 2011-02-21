@@ -53,6 +53,7 @@ import com.gisgraphy.domain.geoloc.entity.Country;
 import com.gisgraphy.domain.geoloc.entity.GisFeature;
 import com.gisgraphy.domain.geoloc.entity.OpenStreetMap;
 import com.gisgraphy.domain.geoloc.entity.ZipCode;
+import com.gisgraphy.domain.geoloc.service.fulltextsearch.FulltextQuery;
 import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetType;
 import com.gisgraphy.domain.repository.IAdmDao;
 import com.gisgraphy.domain.repository.ICityDao;
@@ -737,7 +738,7 @@ public class GeolocTestHelper {
 	MockHttpServletRequest request = new MockHttpServletRequest();
 	request.addParameter(FulltextServlet.COUNTRY_PARAMETER, "FR");
 	request.addParameter(FulltextServlet.FROM_PARAMETER, "3");
-	request.addParameter(FulltextServlet.TO_PARAMETER, FulltextServlet.DEFAULT_MAX_RESULTS+20+"");
+	request.addParameter(FulltextServlet.TO_PARAMETER, FulltextQuery.DEFAULT_MAX_RESULTS+20+"");
 	request.addParameter(FulltextServlet.FORMAT_PARAMETER, "XML");
 	request.addParameter(FulltextServlet.STYLE_PARAMETER, "FULL");
 	request.addParameter(FulltextServlet.LANG_PARAMETER, "fr");

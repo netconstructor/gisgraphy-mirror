@@ -1,5 +1,6 @@
 package com.gisgraphy.domain.geoloc.service.fulltextsearch;
 
+import static com.gisgraphy.domain.geoloc.service.fulltextsearch.FulltextQuery.DEFAULT_MAX_RESULTS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -36,16 +37,16 @@ public class FulltextQueryHttpBuilderTest {
 	FulltextQuery query = buildQuery(request);
 	int firstPaginationIndex = 3;
 	assertEquals(firstPaginationIndex, query.getFirstPaginationIndex());
-	assertEquals(FulltextServlet.DEFAULT_MAX_RESULTS+firstPaginationIndex-1, query.getLastPaginationIndex());
+	assertEquals(DEFAULT_MAX_RESULTS+firstPaginationIndex-1, query.getLastPaginationIndex());
 	assertEquals("the pagination should be limit to "
-		+ FulltextServlet.DEFAULT_MAX_RESULTS,
-		FulltextServlet.DEFAULT_MAX_RESULTS, query
+		+ DEFAULT_MAX_RESULTS,
+		DEFAULT_MAX_RESULTS, query
 			.getMaxNumberOfResults());
 	assertEquals("FR", query.getCountryCode());
 	assertEquals(OutputFormat.XML, query.getOutputFormat());
 	assertEquals("FR", query.getOutputLanguage());
 	assertEquals(OutputStyle.FULL, query.getOutputStyle());
-	assertEquals(City.class, query.getPlaceType()[0]);
+	assertEquals(City.class, query.getPlaceTypes()[0]);
 	assertEquals("query", query.getQuery());
 	
 	//test trim
@@ -86,7 +87,7 @@ public class FulltextQueryHttpBuilderTest {
 	request = GeolocTestHelper.createMockHttpServletRequestForFullText();
 	request.removeParameter(FulltextServlet.TO_PARAMETER);
 	query = buildQuery(request);
-	 int expectedLastPagination = (FulltextServlet.DEFAULT_MAX_RESULTS+query.getFirstPaginationIndex()-1);
+	 int expectedLastPagination = (DEFAULT_MAX_RESULTS+query.getFirstPaginationIndex()-1);
 	    assertEquals(
 	           GisgraphyServlet.TO_PARAMETER
 		    + " is wrong when no "+GisgraphyServlet.TO_PARAMETER+" is specified ",
@@ -96,29 +97,29 @@ public class FulltextQueryHttpBuilderTest {
 		"When no "
 			+ FulltextServlet.TO_PARAMETER
 			+ " is specified, the  parameter should be set to limit results to "
-			+ FulltextServlet.DEFAULT_MAX_RESULTS,
-		FulltextServlet.DEFAULT_MAX_RESULTS, query
+			+ DEFAULT_MAX_RESULTS,
+		DEFAULT_MAX_RESULTS, query
 			.getMaxNumberOfResults());
 	// with a wrong value
 	request = GeolocTestHelper.createMockHttpServletRequestForFullText();
 	request.setParameter(FulltextServlet.TO_PARAMETER, "2");// to<from
 	query = buildQuery(request);
-	 expectedLastPagination = (FulltextServlet.DEFAULT_MAX_RESULTS+query.getFirstPaginationIndex()-1);
+	 expectedLastPagination = (DEFAULT_MAX_RESULTS+query.getFirstPaginationIndex()-1);
 	    assertEquals( GisgraphyServlet.TO_PARAMETER
 		    + " is wrong when wrong "+GisgraphyServlet.TO_PARAMETER+" is specified ",
 		    expectedLastPagination, query
 			    .getLastPaginationIndex());
 	assertEquals("When a wrong " + FulltextServlet.TO_PARAMETER
 		+ " is specified, the number of results should be "
-		+ FulltextServlet.DEFAULT_MAX_RESULTS,
-		FulltextServlet.DEFAULT_MAX_RESULTS, query.getMaxNumberOfResults());
+		+ DEFAULT_MAX_RESULTS,
+		DEFAULT_MAX_RESULTS, query.getMaxNumberOfResults());
 	assertEquals("a wrong to does not change the from value", 3, query
 		.getFirstPaginationIndex());
 	request = GeolocTestHelper.createMockHttpServletRequestForFullText();
 	//non numeric
 	request.setParameter(FulltextServlet.TO_PARAMETER, "a");
 	query = buildQuery(request);
-	expectedLastPagination = (FulltextServlet.DEFAULT_MAX_RESULTS+query.getFirstPaginationIndex()-1);
+	expectedLastPagination = (DEFAULT_MAX_RESULTS+query.getFirstPaginationIndex()-1);
 	assertEquals( GisgraphyServlet.TO_PARAMETER
 		    + " is wrong when non numeric "+GisgraphyServlet.TO_PARAMETER+" is specified ",
 		    expectedLastPagination, query
@@ -127,8 +128,8 @@ public class FulltextQueryHttpBuilderTest {
 		.getFirstPaginationIndex());
 	assertEquals("When a wrong " + FulltextServlet.TO_PARAMETER
 		+ " is specified, the numberOf results should be "
-		+ FulltextServlet.DEFAULT_MAX_RESULTS,
-		FulltextServlet.DEFAULT_MAX_RESULTS, query.getMaxNumberOfResults());
+		+ DEFAULT_MAX_RESULTS,
+		DEFAULT_MAX_RESULTS, query.getMaxNumberOfResults());
 
 	// test countrycode
 	// with no value specified
@@ -202,7 +203,7 @@ public class FulltextQueryHttpBuilderTest {
 	query = buildQuery(request);
 	assertNull("When no " + FulltextServlet.PLACETYPE_PARAMETER
 		+ " is specified, the  parameter should be set null ", query
-		.getPlaceType());
+		.getPlaceTypes());
 	// with wrong value
 	request = GeolocTestHelper.createMockHttpServletRequestForFullText();
 	request.removeParameter(FulltextServlet.PLACETYPE_PARAMETER);
@@ -210,14 +211,14 @@ public class FulltextQueryHttpBuilderTest {
 	query = buildQuery(request);
 	assertNull("When wrong " + FulltextServlet.PLACETYPE_PARAMETER
 		+ " is specified, the  parameter should be set null ", query
-		.getPlaceType()[0]);
+		.getPlaceTypes()[0]);
 	// test case sensitive
 	request = GeolocTestHelper.createMockHttpServletRequestForFullText();
 	request.setParameter(FulltextServlet.PLACETYPE_PARAMETER, "ciTy");
 	query = buildQuery(request);
 	assertEquals(FulltextServlet.PLACETYPE_PARAMETER
 		+ " should be case insensitive  ", City.class, query
-		.getPlaceType()[0]);
+		.getPlaceTypes()[0]);
 	
 	// test with multipleplacetype
 	request = GeolocTestHelper.createMockHttpServletRequestForFullText();
@@ -225,8 +226,8 @@ public class FulltextQueryHttpBuilderTest {
 	query = buildQuery(request);
 	assertEquals(FulltextServlet.PLACETYPE_PARAMETER
 		+ " should accept several placetype  ",2, query
-		.getPlaceType().length);
-	List<Class<? extends GisFeature>> placetypeList = Arrays.asList(query.getPlaceType());
+		.getPlaceTypes().length);
+	List<Class<?>> placetypeList = Arrays.asList(query.getPlaceTypes());
 
 	assertTrue(FulltextServlet.PLACETYPE_PARAMETER
 			+ " should accept several placetype  ", placetypeList.contains(City.class));
@@ -239,8 +240,8 @@ public class FulltextQueryHttpBuilderTest {
 	query = buildQuery(request);
 	assertEquals(FulltextServlet.PLACETYPE_PARAMETER
 		+ " should accept several placetype  ",2, query
-		.getPlaceType().length);
-	placetypeList = Arrays.asList(query.getPlaceType());
+		.getPlaceTypes().length);
+	placetypeList = Arrays.asList(query.getPlaceTypes());
 
 	assertTrue(FulltextServlet.PLACETYPE_PARAMETER
 			+ " should accept several placetype  ", placetypeList.contains(City.class));

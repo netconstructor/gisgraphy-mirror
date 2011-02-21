@@ -36,6 +36,7 @@ import com.gisgraphy.domain.valueobject.GisgraphyConfig;
 import com.gisgraphy.domain.valueobject.Output;
 import com.gisgraphy.domain.valueobject.Pagination;
 import com.gisgraphy.domain.valueobject.SolrResponseDto;
+import com.gisgraphy.fulltext.Constants;
 import com.opensymphony.xwork2.Action;
 import com.opensymphony.xwork2.ActionSupport;
 
@@ -102,7 +103,7 @@ public class GeocodingAction extends ActionSupport implements
 		}
 		FulltextQuery fulltextQuery = new FulltextQuery(city,
 			Pagination.DEFAULT_PAGINATION, Output.DEFAULT_OUTPUT,
-			FulltextQuery.ONLY_CITY_PLACETYPE, getCountryCode());
+			Constants.ONLY_CITY_PLACETYPE, getCountryCode());
 		ambiguousCities = fullTextSearchEngine.executeQuery(
 			fulltextQuery).getResults();
 		int numberOfPossibleCitiesThatMatches = ambiguousCities.size();

@@ -25,7 +25,6 @@
  */
 package com.gisgraphy.domain.geoloc.service.fulltextsearch;
 
-import static com.gisgraphy.domain.geoloc.service.fulltextsearch.FulltextQuery.ONLY_CITY_PLACETYPE;
 import static com.gisgraphy.domain.valueobject.Pagination.paginate;
 
 import java.io.File;
@@ -48,6 +47,7 @@ import com.gisgraphy.domain.valueobject.AlternateNameSource;
 import com.gisgraphy.domain.valueobject.Output;
 import com.gisgraphy.domain.valueobject.Pagination;
 import com.gisgraphy.domain.valueobject.Output.OutputStyle;
+import com.gisgraphy.fulltext.Constants;
 import com.gisgraphy.helper.FileHelper;
 import com.gisgraphy.serializer.OutputFormat;
 import com.gisgraphy.test.FeedChecker;
@@ -99,8 +99,8 @@ public class OutputstreamResponseWrapperTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr");
-	    server.query(fulltextQuery.parameterize());
+		    pagination, output, Constants.ONLY_CITY_PLACETYPE, "fr");
+	    server.query(FulltextQuerySolrHelper.parameterize(fulltextQuery));
 	} catch (MalformedURLException e) {
 	    fail();
 	} catch (SolrServerException e) {

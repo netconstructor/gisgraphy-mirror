@@ -22,7 +22,6 @@
  *******************************************************************************/
 package com.gisgraphy.domain.geoloc.service.fulltextsearch;
 
-import static com.gisgraphy.domain.geoloc.service.fulltextsearch.FulltextQuery.ONLY_CITY_PLACETYPE;
 import static com.gisgraphy.domain.valueobject.Pagination.paginate;
 
 import java.io.ByteArrayOutputStream;
@@ -187,7 +186,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr");
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr");
 	    List<? extends GisFeature> result = fullTextSearchEngine
 		    .executeQueryToDatabaseObjects(fulltextQuery);
 	    assertEquals(1, result.size());
@@ -244,7 +243,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr");
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr");
 	    fullTextSearchEngine.executeAndSerialize(fulltextQuery,
 		    outputStream);
 	} catch (FullTextSearchException e) {
@@ -282,7 +281,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr");
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr");
 	    String result = fullTextSearchEngine
 		    .executeQueryToString(fulltextQuery);
 	    FeedChecker.assertQ("The query return incorrect values", result,
@@ -394,7 +393,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("1001 ",
-		    pagination, output,ONLY_CITY_PLACETYPE, "fr");
+		    pagination, output,com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr");
 	    String result = fullTextSearchEngine
 		    .executeQueryToString(fulltextQuery);
 	    FeedChecker.assertQ("The query return incorrect values", result,
@@ -422,7 +421,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("1001",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr");
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr");
 	    String result = fullTextSearchEngine
 		    .executeQueryToString(fulltextQuery);
 	    FeedChecker.assertQ("The query return incorrect values", result,
@@ -450,7 +449,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr");
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr");
 	    String result = fullTextSearchEngine
 		    .executeQueryToString(fulltextQuery);
 	    FeedChecker.assertQ("The query return incorrect values", result,
@@ -484,8 +483,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("Saint André",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr").withSpellChecking();
-	    fulltextQuery.toQueryString();
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr").withSpellChecking();
 	    String result = fullTextSearchEngine
 		    .executeQueryToString(fulltextQuery);
 	    FeedChecker.assertQ("The query return incorrect values", result,
@@ -520,7 +518,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr");
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr");
 	    // don't know how to test php syntax
 	    String response = fullTextSearchEngine
 		    .executeQueryToString(fulltextQuery);
@@ -545,7 +543,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr");
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr");
 	    // don't know how to test php syntax
 	    String response = fullTextSearchEngine
 		    .executeQueryToString(fulltextQuery);
@@ -569,7 +567,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr");
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr");
 	    FulltextResultsDto results = fullTextSearchEngine
 		    .executeQuery(fulltextQuery);
 	    Assert.assertTrue("Qtime should be set", results.getQTime() != 0);
@@ -611,7 +609,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr").withSpellChecking();
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr").withSpellChecking();
 	    FulltextResultsDto result = fullTextSearchEngine
 		    .executeQuery(fulltextQuery);
 	    Map<String, Suggestion> suggestionMap = result.getSuggestionMap();
@@ -655,7 +653,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr").withSpellChecking();
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr").withSpellChecking();
 	    FulltextResultsDto result = fullTextSearchEngine
 		    .executeQuery(fulltextQuery);
 	    Map<String, Suggestion> suggestionMap = result.getSuggestionMap();
@@ -697,7 +695,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr").withSpellChecking();
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr").withSpellChecking();
 	    FulltextResultsDto result = fullTextSearchEngine
 		    .executeQuery(fulltextQuery);
 	    Map<String, Suggestion> suggestionMap = result.getSuggestionMap();
@@ -736,7 +734,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("noSpellresults",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr").withSpellChecking();
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr").withSpellChecking();
 	    FulltextResultsDto result = fullTextSearchEngine
 		    .executeQuery(fulltextQuery);
 	    Map<String, Suggestion> suggestionMap = result.getSuggestionMap();
@@ -761,7 +759,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		    pagination, output, ONLY_CITY_PLACETYPE, "fr");
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr");
 	    FulltextResultsDto results = fullTextSearchEngine
 		    .executeQuery(fulltextQuery);
 	    Assert.assertTrue("Qtime should be set", results.getQTime() != 0);
@@ -793,7 +791,7 @@ public class FulltextSearchEngineTest extends
 	Output output = Output.withFormat(OutputFormat.XML).withLanguageCode(
 		"FR").withStyle(OutputStyle.SHORT).withIndentation();
 	FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		pagination, output, ONLY_CITY_PLACETYPE, "fr");
+		pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr");
 	fullTextSearchEngine.executeQueryToDatabaseObjects(fulltextQuery);
 	assertEquals(new Long(1), statsUsageService
 		.getUsage(StatsUsageType.FULLTEXT));

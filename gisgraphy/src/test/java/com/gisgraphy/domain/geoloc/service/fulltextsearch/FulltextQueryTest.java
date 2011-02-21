@@ -25,33 +25,25 @@
  */
 package com.gisgraphy.domain.geoloc.service.fulltextsearch;
 
-import static com.gisgraphy.domain.geoloc.service.fulltextsearch.FulltextQuery.ONLY_ADM_PLACETYPE;
-import static com.gisgraphy.domain.geoloc.service.fulltextsearch.FulltextQuery.ONLY_CITY_PLACETYPE;
 import static com.gisgraphy.domain.valueobject.Pagination.paginate;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-
-import java.util.HashMap;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
-import com.gisgraphy.domain.geoloc.entity.Country;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.spell.SpellCheckerConfig;
-import com.gisgraphy.domain.valueobject.Constants;
 import com.gisgraphy.domain.valueobject.Output;
 import com.gisgraphy.domain.valueobject.Pagination;
 import com.gisgraphy.domain.valueobject.Output.OutputStyle;
 import com.gisgraphy.serializer.OutputFormat;
-import com.gisgraphy.test.GeolocTestHelper;
 
 public class FulltextQueryTest {
 
-    private static OutputStyleHelper outputStyleHelper = new OutputStyleHelper();
+   
 
     @Test
     public void testFulltextQueryStringPaginationOutputClassOfQextendsGisFeature() {
@@ -59,10 +51,10 @@ public class FulltextQueryTest {
 	Output output = Output.withFormat(OutputFormat.JSON).withLanguageCode(
 		"FR").withStyle(OutputStyle.FULL).withIndentation();
 	FulltextQuery fulltextQuery = new FulltextQuery("text", pagination,
-		output, ONLY_ADM_PLACETYPE, "fr");
+		output, com.gisgraphy.fulltext.Constants.ONLY_ADM_PLACETYPE, "fr");
 	assertEquals(pagination, fulltextQuery.getPagination());
 	assertEquals(output, fulltextQuery.getOutput());
-	Assert.assertArrayEquals(ONLY_ADM_PLACETYPE, fulltextQuery.getPlaceType());
+	Assert.assertArrayEquals(com.gisgraphy.fulltext.Constants.ONLY_ADM_PLACETYPE, fulltextQuery.getPlaceTypes());
 	assertEquals("text", fulltextQuery.getQuery());
 	assertTrue(fulltextQuery.isOutputIndented());
 	assertEquals("fr", fulltextQuery.getCountryCode());
@@ -77,7 +69,7 @@ public class FulltextQueryTest {
 	assertEquals(Output.DEFAULT_OUTPUT, fulltextQuery.getOutput());
 	assertEquals(Pagination.DEFAULT_PAGINATION, fulltextQuery
 		.getPagination());
-	assertNull(fulltextQuery.getPlaceType());
+	assertNull(fulltextQuery.getPlaceTypes());
 	assertEquals("text", fulltextQuery.getQuery());
     }
 
@@ -89,7 +81,7 @@ public class FulltextQueryTest {
 	try {
 	    new FulltextQuery(RandomStringUtils
 		    .random(FulltextQuery.QUERY_MAX_LENGTH) + 1, pagination,
-		    output,ONLY_ADM_PLACETYPE, "FR");
+		    output,com.gisgraphy.fulltext.Constants.ONLY_ADM_PLACETYPE, "FR");
 	    fail("query must have a maximmum length of "
 		    + FulltextQuery.QUERY_MAX_LENGTH);
 	} catch (IllegalArgumentException e) {
@@ -104,7 +96,7 @@ public class FulltextQueryTest {
 	Output output = Output.withFormat(OutputFormat.JSON).withLanguageCode(
 		"FR").withStyle(OutputStyle.FULL);
 	try {
-	    new FulltextQuery(null, pagination, output, ONLY_ADM_PLACETYPE, "FR");
+	    new FulltextQuery(null, pagination, output, com.gisgraphy.fulltext.Constants.ONLY_ADM_PLACETYPE, "FR");
 	    fail("Null query should throws");
 	} catch (IllegalArgumentException e) {
 
@@ -116,7 +108,7 @@ public class FulltextQueryTest {
 		Pagination pagination = paginate().from(2).to(7);
 		Output output = Output.withFormat(OutputFormat.JSON).withLanguageCode("FR").withStyle(OutputStyle.FULL);
 		try {
-			new FulltextQuery(" ", pagination, output, ONLY_ADM_PLACETYPE, "FR");
+			new FulltextQuery(" ", pagination, output, com.gisgraphy.fulltext.Constants.ONLY_ADM_PLACETYPE, "FR");
 			fail("empty query should throws");
 		} catch (IllegalArgumentException e) {
 
@@ -133,7 +125,7 @@ public class FulltextQueryTest {
 	public void testFulltextQueryWithPaginationShouldTrim() {
 		Pagination pagination = paginate().from(2).to(7);
 		Output output = Output.withFormat(OutputFormat.JSON).withLanguageCode("FR").withStyle(OutputStyle.FULL);
-			FulltextQuery query = new FulltextQuery(" t ", pagination, output, ONLY_ADM_PLACETYPE, "FR");
+			FulltextQuery query = new FulltextQuery(" t ", pagination, output, com.gisgraphy.fulltext.Constants.ONLY_ADM_PLACETYPE, "FR");
 			Assert.assertEquals("t", query.getQuery());
 	}
     
@@ -173,7 +165,7 @@ public class FulltextQueryTest {
 
     @Test
     public void testWithPlaceTypeShouldBeSetToNullIfNull() {
-	assertNull(new FulltextQuery("text").withPlaceTypes(null).getPlaceType());
+	assertNull(new FulltextQuery("text").withPlaceTypes(null).getPlaceTypes());
     }
 
     public void testLimitToCountryCodeShouldSetTheCountryCode() {
@@ -191,295 +183,15 @@ public class FulltextQueryTest {
     @Test
     public void testWithPlaceTypeShouldSetTheplaceType() {
 	FulltextQuery fulltextQuery = new FulltextQuery("text");
-	fulltextQuery.withPlaceTypes(ONLY_ADM_PLACETYPE);
-	assertEquals(ONLY_ADM_PLACETYPE, fulltextQuery.getPlaceType());
+	fulltextQuery.withPlaceTypes(com.gisgraphy.fulltext.Constants.ONLY_ADM_PLACETYPE);
+	assertEquals(com.gisgraphy.fulltext.Constants.ONLY_ADM_PLACETYPE, fulltextQuery.getPlaceTypes());
     }
 
+   
     
-    @Test
-    public void testToQueryStringShouldreturnCorrectParamsForBasicQuery() {
-	Country france = GeolocTestHelper.createCountryForFrance();
-	Pagination pagination = paginate().from(3).to(10);
-	Output output = Output.withFormat(OutputFormat.JSON).withLanguageCode(
-		"FR").withStyle(OutputStyle.SHORT).withIndentation();
-	String searchTerm = "Saint-André";
-	FulltextQuery fulltextQuery = new FulltextQuery(searchTerm,
-		pagination, output, null, null);
-	// split parameters
-	HashMap<String, String> parameters = GeolocTestHelper.splitURLParams(
-		fulltextQuery.toQueryString(), "&");
-	// check parameters
-	assertEquals(outputStyleHelper.getFulltextFieldList(Output.OutputStyle.SHORT,"FR"), parameters
-		.get(Constants.FL_PARAMETER));
-	assertEquals("wrong indent parameter found", "on", parameters
-		.get(Constants.INDENT_PARAMETER));
-	assertEquals("wrong echoparams parameter found", "none", parameters
-		.get(Constants.ECHOPARAMS_PARAMETER));
-	assertEquals("wrong start parameter found", "2", parameters
-		.get(Constants.START_PARAMETER));
-	assertEquals("wrong rows parameter found", "8", parameters
-		.get(Constants.ROWS_PARAMETER));
-	assertEquals("wrong output format parameter found", OutputFormat.JSON
-		.getParameterValue(), parameters
-		.get(Constants.OUTPUT_FORMAT_PARAMETER));
-	assertEquals("wrong query type parameter found",
-		Constants.SolrQueryType.standard.toString(), parameters
-			.get(Constants.QT_PARAMETER));
-	assertEquals("wrong query parameter found ",searchTerm,
-		parameters
-			.get(Constants.QUERY_PARAMETER));
-	assertNull("spellchecker query should not be set when standard query",parameters
-		.get(Constants.SPELLCHECKER_QUERY_PARAMETER));   
-	}
+  
     
-    @Test
-    public void testToQueryStringShouldreturnCorrectParamsForBasicNumericQuery() {
-	Pagination pagination = paginate().from(3).to(10);
-	Output output = Output.withFormat(OutputFormat.JSON).withLanguageCode(
-		"FR").withStyle(OutputStyle.SHORT).withIndentation();
-	String searchTerm = "1001";
-	FulltextQuery fulltextQuery = new FulltextQuery(searchTerm,
-		pagination, output, null, null);
-	// split parameters
-	HashMap<String, String> parameters = GeolocTestHelper.splitURLParams(
-		fulltextQuery.toQueryString(), "&");
-	// check parameters
-	assertEquals(outputStyleHelper.getFulltextFieldList(Output.OutputStyle.SHORT,"FR"), parameters
-		.get(Constants.FL_PARAMETER));
-	assertEquals("wrong indent parameter found", "on", parameters
-		.get(Constants.INDENT_PARAMETER));
-	assertEquals("wrong echoparams parameter found", "none", parameters
-		.get(Constants.ECHOPARAMS_PARAMETER));
-	assertEquals("wrong start parameter found", "2", parameters
-		.get(Constants.START_PARAMETER));
-	assertEquals("wrong rows parameter found", "8", parameters
-		.get(Constants.ROWS_PARAMETER));
-	assertEquals("wrong output format parameter found", OutputFormat.JSON
-		.getParameterValue(), parameters
-		.get(Constants.OUTPUT_FORMAT_PARAMETER));
-	assertEquals("wrong query type parameter found",
-		Constants.SolrQueryType.standard.toString(), parameters
-			.get(Constants.QT_PARAMETER));
-	assertEquals("wrong query parameter found ",searchTerm,
-		parameters
-			.get(Constants.QUERY_PARAMETER));
-	assertEquals("wrong query parameter",searchTerm,
-	parameters
-		.get(Constants.QUERY_PARAMETER));
-	
-	assertNull("spellchecker query should not be set when standard query",parameters
-		.get(Constants.SPELLCHECKER_QUERY_PARAMETER));    }
-    
-    
-    @Test
-    public void testToQueryStringShouldreturnCorrectParamsForAdvancedNumericQuery() {
-	Pagination pagination = paginate().from(3).to(10);
-	    Output output = Output.withFormat(OutputFormat.JSON)
-		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
-		    .withIndentation();
-	    FulltextQuery fulltextQuery = new FulltextQuery("1001",
-		    pagination, output, ONLY_CITY_PLACETYPE, "FR");
-	// split parameters
-	HashMap<String, String> parameters = GeolocTestHelper.splitURLParams(
-		fulltextQuery.toQueryString(), "&");
-	// check parameters
-	assertEquals(outputStyleHelper.getFulltextFieldList(Output.OutputStyle.SHORT,"FR"), parameters
-		.get(Constants.FL_PARAMETER));
-	assertEquals("wrong indent parameter found", "on", parameters
-		.get(Constants.INDENT_PARAMETER));
-	assertEquals("wrong echoparams parameter found", "none", parameters
-		.get(Constants.ECHOPARAMS_PARAMETER));
-	assertEquals("wrong start parameter found", "2", parameters
-		.get(Constants.START_PARAMETER));
-	assertEquals("wrong rows parameter found", "8", parameters
-		.get(Constants.ROWS_PARAMETER));
-	assertEquals("wrong output format parameter found", OutputFormat.JSON
-		.getParameterValue(), parameters
-		.get(Constants.OUTPUT_FORMAT_PARAMETER));
-	assertEquals("wrong query type parameter found",
-		Constants.SolrQueryType.advanced.toString(), parameters
-			.get(Constants.QT_PARAMETER));
-	assertTrue("wrong query parameter found '"+FullTextFields.PLACETYPE.getValue()+":' is expected in query but was "+parameters
-			.get(Constants.QUERY_PARAMETER),
-		parameters
-			.get(Constants.QUERY_PARAMETER).contains(FullTextFields.PLACETYPE.getValue()+":"));
-
-
-	assertTrue("wrong nested parameter found, actual : "+parameters
-		.get(Constants.QUERY_PARAMETER),
-	parameters
-		.get(Constants.QUERY_PARAMETER).contains(String.format(FulltextQuery.NESTED_QUERY_NUMERIC_TEMPLATE, "1001")));
-	
-	
-	assertTrue("wrong query parameter found '"+FullTextFields.COUNTRYCODE.getValue()+":' is expected in query but was "+parameters
-			.get(Constants.QUERY_PARAMETER),
-			parameters
-				.get(Constants.QUERY_PARAMETER).contains(FullTextFields.COUNTRYCODE.getValue()+":"));
-	assertNull("spellchecker query should not be set when standard query",parameters
-		.get(Constants.SPELLCHECKER_QUERY_PARAMETER));    }
-
-    
-    @Test
-    public void testToQueryStringShouldreturnCorrectParamsForAdvancedNonNumeric() {
-	Pagination pagination = paginate().from(3).to(10);
-	Output output = Output.withFormat(OutputFormat.JSON).withLanguageCode(
-		"FR").withStyle(OutputStyle.SHORT).withIndentation();
-	String searchTerm = "Saint-André";
-	FulltextQuery fulltextQuery = new FulltextQuery(searchTerm,
-		pagination, output, ONLY_ADM_PLACETYPE, "fr");
-	// split parameters
-	HashMap<String, String> parameters = GeolocTestHelper.splitURLParams(
-		fulltextQuery.toQueryString(), "&");
-	// check parameters
-	assertEquals(outputStyleHelper.getFulltextFieldList(Output.OutputStyle.SHORT,"FR"), parameters
-		.get(Constants.FL_PARAMETER));
-	assertEquals("wrong indent parameter found", "on", parameters
-		.get(Constants.INDENT_PARAMETER));
-	assertEquals("wrong echoparams parameter found", "none", parameters
-		.get(Constants.ECHOPARAMS_PARAMETER));
-	assertEquals("wrong start parameter found", "2", parameters
-		.get(Constants.START_PARAMETER));
-	assertEquals("wrong rows parameter found", "8", parameters
-		.get(Constants.ROWS_PARAMETER));
-	assertEquals("wrong output format parameter found", OutputFormat.JSON
-		.getParameterValue(), parameters
-		.get(Constants.OUTPUT_FORMAT_PARAMETER));
-	assertEquals("wrong query type parameter found",
-		Constants.SolrQueryType.advanced.toString(), parameters
-			.get(Constants.QT_PARAMETER));
-	assertTrue("wrong nested parameter found actual : "+parameters
-		.get(Constants.QUERY_PARAMETER),
-		parameters
-			.get(Constants.QUERY_PARAMETER).contains(String.format(FulltextQuery.NESTED_QUERY_TEMPLATE, searchTerm)));
-	assertTrue("wrong query parameter found '"+FullTextFields.PLACETYPE.getValue()+":' expected in query but was "+parameters
-			.get(Constants.QUERY_PARAMETER),
-		parameters
-			.get(Constants.QUERY_PARAMETER).contains(FullTextFields.PLACETYPE.getValue()+":"));
-	assertTrue("wrong query parameter found '"+FullTextFields.COUNTRYCODE.getValue()+":' expected in query but was "+parameters
-			.get(Constants.QUERY_PARAMETER),
-			parameters
-				.get(Constants.QUERY_PARAMETER).contains(FullTextFields.COUNTRYCODE.getValue()+":"));
-	assertNotNull("spellchecker query should not be set when standard query",parameters
-		.get(Constants.SPELLCHECKER_QUERY_PARAMETER));  
-    }
-
-    @Test
-    public void testToQueryStringShouldreturnCorrectParamsForGeoRSS() {
-	Pagination pagination = paginate().from(3).to(10);
-	Output output = Output.withFormat(OutputFormat.GEORSS)
-		.withLanguageCode("FR").withStyle(OutputStyle.SHORT)
-		.withIndentation();
-	FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		pagination, output, ONLY_ADM_PLACETYPE, "fr");
-	// split parameters
-	HashMap<String, String> parameters = GeolocTestHelper.splitURLParams(
-		fulltextQuery.toQueryString(), "&");
-	// check parameters
-	assertEquals("wrong field list", outputStyleHelper.getFulltextFieldList(Output.OutputStyle.MEDIUM,"FR"), parameters.get(Constants.FL_PARAMETER));
-	assertEquals("wrong indent parameter found", "on", parameters
-		.get(Constants.INDENT_PARAMETER));
-	assertEquals("wrong echoparams parameter found", "none", parameters
-		.get(Constants.ECHOPARAMS_PARAMETER));
-	assertEquals("wrong start parameter found", "2", parameters
-		.get(Constants.START_PARAMETER));
-	assertEquals("wrong rows parameter found", "8", parameters
-		.get(Constants.ROWS_PARAMETER));
-	assertEquals("wrong output format parameter found", OutputFormat.GEORSS
-		.getParameterValue(), parameters
-		.get(Constants.OUTPUT_FORMAT_PARAMETER));
-	assertEquals("wrong stylesheet", Constants.GEORSS_STYLESHEET,
-		parameters.get(Constants.STYLESHEET_PARAMETER));
-	assertEquals("wrong query type parameter found",
-		Constants.SolrQueryType.advanced.toString(), parameters
-			.get(Constants.QT_PARAMETER));
-	assertTrue("wrong query parameter found '"+FullTextFields.PLACETYPE.getValue()+":' expected in query but was "+parameters
-			.get(Constants.QUERY_PARAMETER),
-		parameters
-			.get(Constants.QUERY_PARAMETER).contains(FullTextFields.PLACETYPE.getValue()+":"));
-	assertTrue("wrong query parameter found '"+FullTextFields.COUNTRYCODE.getValue()+":' expected in query but was "+parameters
-			.get(Constants.QUERY_PARAMETER),
-			parameters
-				.get(Constants.QUERY_PARAMETER).contains(FullTextFields.COUNTRYCODE.getValue()+":"));
-    }
-
-    @Test
-    public void testToQueryStringShouldreturnCorrectParamsForAtom() {
-	Pagination pagination = paginate().from(3).to(10);
-	Output output = Output.withFormat(OutputFormat.ATOM).withLanguageCode(
-		"FR").withStyle(OutputStyle.SHORT).withIndentation();
-	FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		pagination, output, ONLY_ADM_PLACETYPE, "fr");
-	// split parameters
-	HashMap<String, String> parameters = GeolocTestHelper.splitURLParams(
-		fulltextQuery.toQueryString(), "&");
-	// check parameters
-	assertEquals("wrong field list",outputStyleHelper.getFulltextFieldList(Output.OutputStyle.MEDIUM,"FR"), parameters.get(Constants.FL_PARAMETER));
-	assertEquals("wrong indent parameter found", "on", parameters
-		.get(Constants.INDENT_PARAMETER));
-	assertEquals("wrong echoparams parameter found", "none", parameters
-		.get(Constants.ECHOPARAMS_PARAMETER));
-	assertEquals("wrong start parameter found", "2", parameters
-		.get(Constants.START_PARAMETER));
-	assertEquals("wrong rows parameter found", "8", parameters
-		.get(Constants.ROWS_PARAMETER));
-	assertEquals("wrong output format parameter found", OutputFormat.GEORSS
-		.getParameterValue(), parameters
-		.get(Constants.OUTPUT_FORMAT_PARAMETER));
-	assertEquals("wrong stylesheet", Constants.ATOM_STYLESHEET, parameters
-		.get(Constants.STYLESHEET_PARAMETER));
-	assertEquals("wrong query type parameter found",
-		Constants.SolrQueryType.advanced.toString(), parameters
-			.get(Constants.QT_PARAMETER));
-	assertTrue("wrong query parameter found '"+FullTextFields.PLACETYPE.getValue()+":' expected in query but was "+parameters
-			.get(Constants.QUERY_PARAMETER),
-		parameters
-			.get(Constants.QUERY_PARAMETER).contains(FullTextFields.PLACETYPE.getValue()+":"));
-	assertTrue("wrong query parameter found '"+FullTextFields.COUNTRYCODE.getValue()+":' expected in query but was "+parameters
-			.get(Constants.QUERY_PARAMETER),
-			parameters
-				.get(Constants.QUERY_PARAMETER).contains(FullTextFields.COUNTRYCODE.getValue()+":"));
-    }
-    
-    @Test
-    public void testToQueryStringShouldreturnCorrectParamsForSpellChecking() {
-    	boolean savedSpellCheckingValue = SpellCheckerConfig.activeByDefault;
-    	try {
-	SpellCheckerConfig.activeByDefault= true;
-	SpellCheckerConfig.enabled = false;
-	Pagination pagination = paginate().from(3).to(10);
-	Output output = Output.withFormat(OutputFormat.ATOM).withLanguageCode(
-		"FR").withStyle(OutputStyle.SHORT).withIndentation();
-	FulltextQuery fulltextQuery = new FulltextQuery("Saint-André",
-		pagination, output, ONLY_ADM_PLACETYPE, "fr").withSpellChecking();
-	// split parameters
-	HashMap<String, String> parameters = GeolocTestHelper.splitURLParams(
-		fulltextQuery.toQueryString(), "&");
-	// check parameters
-	assertTrue("the fulltextquery should have spellchecking enabled even if spellchecker is disabled", fulltextQuery.hasSpellChecking());
-	assertTrue("spellchecker should not be listed if spellchecker is disabled", !parameters
-		.containsKey(Constants.SPELLCHECKER_ENABLED_PARAMETER));
-	//active spellchecker and re test
-	SpellCheckerConfig.enabled = true;
-	fulltextQuery = new FulltextQuery("Saint-André",
-			pagination, output, ONLY_ADM_PLACETYPE, "fr").withSpellChecking();
-	parameters = GeolocTestHelper.splitURLParams(
-			fulltextQuery.toQueryString(), "&");
-	assertTrue("the fulltextquery should have spellchecking enabled when spellchecker is enabled", fulltextQuery.hasSpellChecking());
-	assertEquals("spellchecker should be enabled", "true", parameters
-			.get(Constants.SPELLCHECKER_ENABLED_PARAMETER));
-	assertEquals("spellchecker should be enabled", String.valueOf(SpellCheckerConfig.collateResults), parameters
-			.get(Constants.SPELLCHECKER_COLLATE_RESULTS_PARAMETER));
-	assertEquals("spellchecker should be enabled",  String.valueOf(SpellCheckerConfig.numberOfSuggestion), parameters
-			.get(Constants.SPELLCHECKER_NUMBER_OF_SUGGESTION_PARAMETER));
-	assertEquals("spellchecker should be enabled", SpellCheckerConfig.spellcheckerDictionaryName.toString(), parameters
-			.get(Constants.SPELLCHECKER_DICTIONARY_NAME_PARAMETER));
-    	} catch (RuntimeException e) {
-		fail(e.getMessage());
-	} finally {
-	    SpellCheckerConfig.activeByDefault = savedSpellCheckingValue;
-	}
-    }
-    
+       
     @Test
     public void testQueryShouldHaveSpellcheckingCorrectDefaultValue(){
     	boolean savedSpellCheckingValue = SpellCheckerConfig.activeByDefault;
@@ -499,6 +211,20 @@ public class FulltextQueryTest {
 	FulltextQuery query = new FulltextQuery("{!dismax qf=population} paris");
 	query.cleanQueryString();
 	Assert.assertEquals("dismax qfpopulation paris", query.getQuery());
+    }
+    
+    @Test
+    public void testIsALlWordsRequiredShouldBeTrueByDefault(){
+    	FulltextQuery query = new FulltextQuery("foo");
+    	Assert.assertTrue(query.isAllwordsRequired());
+    }
+    
+    @Test
+    public void testwithAllWordsRequired(){
+    	FulltextQuery query = new FulltextQuery("foo");
+    	Assert.assertTrue(query.isAllwordsRequired());
+    	query.withAllwordsRequired(false);
+    	Assert.assertFalse(query.isAllwordsRequired());
     }
     
 }

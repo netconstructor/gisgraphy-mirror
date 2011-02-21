@@ -27,24 +27,14 @@ package com.gisgraphy.domain.geoloc.service.fulltextsearch;
 
 import java.util.regex.Pattern;
 
-import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.params.ModifiableSolrParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
-import com.gisgraphy.domain.geoloc.entity.Adm;
-import com.gisgraphy.domain.geoloc.entity.City;
-import com.gisgraphy.domain.geoloc.entity.GisFeature;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.spell.SpellCheckerConfig;
-import com.gisgraphy.domain.valueobject.Constants;
-import com.gisgraphy.domain.valueobject.GisgraphyConfig;
 import com.gisgraphy.domain.valueobject.Output;
 import com.gisgraphy.domain.valueobject.Pagination;
-import com.gisgraphy.domain.valueobject.Output.OutputStyle;
-import com.gisgraphy.serializer.OutputFormat;
 import com.gisgraphy.service.AbstractGisQuery;
-import com.gisgraphy.servlet.FulltextServlet;
 
 /**
  * A fulltext Query
@@ -55,27 +45,16 @@ import com.gisgraphy.servlet.FulltextServlet;
  * @author <a href="mailto:david.masclet@gisgraphy.com">David Masclet</a>
  */
 public class FulltextQuery extends AbstractGisQuery {
-    
-    private static OutputStyleHelper outputStyleHelper = new OutputStyleHelper();
-	/**
-	 * convenence placetype for only city
-	 */
-	public final static Class[] ONLY_CITY_PLACETYPE = new Class[]{City.class};
-	/**
-	 * convenence placetype for only adm
-	 */
-	public final static Class[] ONLY_ADM_PLACETYPE = new Class[]{Adm.class};
-	protected static final String NESTED_QUERY_TEMPLATE= "_query_:\"{!dismax qf='all_name^1.1 iso_all_name^1 zipcode^1.1 all_adm1_name^0.5 all_adm2_name^0.5 all_country_name^0.5' pf=name^1.1 bf=population^2.0}%s\"";
-	protected static final String NESTED_QUERY_INTEXT_BASIC_TEMPLATE= "_query_:\"{! dismax qf='name^1.1 zipcode^1.1'  mm='1<-100% 2<-50% 3<-0%' bq='_val_:\"pow(population,0.3)\"' }%s";
-	protected static final String NESTED_QUERY_INTEXT_WITHSTATE_TEMPLATE= "_query_:\"{! dismax qf='name^1.1 zipcode^1.1 all_adm1_name^0.5 all_adm2_name^0.5'  mm='1<-100% 2<-50% 3<-0%' pf='all_adm1_name all_adm2_name' ps=6 bq='_val_:\"pow(population,0.3)\"' }\"";
-	protected static final String NESTED_QUERY_NUMERIC_TEMPLATE="_query_:\"{!dismax qf='feature_id^1.1 all_name^1.1 iso_all_name^1 zipcode^1.1 all_adm1_name^0.5 all_adm2_name^0.5 all_country_name^0.5' pf=name^1.1 bf=population^2.0}%s\"";
+	
+	public static final int DEFAULT_MAX_RESULTS = 10;
+	
     public final static int QUERY_MAX_LENGTH = 200;
     
     /**
      * The logger
      */
     public static final Logger logger = LoggerFactory
-	    .getLogger(GisgraphyConfig.class);
+	    .getLogger(FulltextQuery.class);
 
     /**
      * Constructor needed by CGLib
@@ -88,11 +67,12 @@ public class FulltextQuery extends AbstractGisQuery {
     /**
      * The type of GIS to search , if null : search for all place type.
      */
-    private Class<? extends GisFeature>[] placeTypes = null;
+    private Class<?>[] placeTypes = null;
 
 
     private String query = "";
     private String countryCode;
+    private boolean allWordsRequired = true;
     
     private boolean spellchecking = SpellCheckerConfig.activeByDefault;
 
@@ -118,7 +98,7 @@ public class FulltextQuery extends AbstractGisQuery {
      *                 empty string
      */
     public FulltextQuery(String query, Pagination pagination, Output output,
-	    Class<? extends GisFeature>[] placeType, String countryCode) {
+	    Class<?>[] placeType, String countryCode) {
 	super(pagination, output);
 	Assert.notNull(query, "Query must not be empty");
 	
@@ -183,21 +163,14 @@ public class FulltextQuery extends AbstractGisQuery {
 	return output.isIndented();
     }
 
-    private boolean isNumericQuery() {
-	try {
-	    Integer.parseInt(this.query);
-	    return true;
-	} catch (NumberFormatException e) {
-	    return false;
-	}
-    }
+   
 
     /**
      * @return the placeType : it limits the search to object of one or more specifics
      *         class, if the array contains null values it is the responsibility
      *                 of the client to take it into account
      */
-    public Class<? extends GisFeature>[] getPlaceType() {
+    public Class<?>[] getPlaceTypes() {
 	return this.placeTypes;
     }
 
@@ -208,7 +181,7 @@ public class FulltextQuery extends AbstractGisQuery {
      *                 of the client to take it into account
      * @return The current query to chain methods
      */
-    public FulltextQuery withPlaceTypes(Class<? extends GisFeature>[] placeTypes) {
+    public FulltextQuery withPlaceTypes(Class<?>[] placeTypes) {
 	this.placeTypes = placeTypes;
 	return this;
     }
@@ -265,120 +238,11 @@ public class FulltextQuery extends AbstractGisQuery {
     	return this.spellchecking; 
     }
 
-    /**
-     * @return A query string for the specified parameter (starting with '?')
-     *         the name of the parameters are defined in {@link Constants}
-     */
-    public String toQueryString() {
-    	return ClientUtils.toQueryString(parameterize(), false);
-    }
-
-    /**
-     * @return A Representation of all the needed parameters
-     */
-    public ModifiableSolrParams parameterize() {
-	ModifiableSolrParams parameters = new ModifiableSolrParams();
-	
-	parameters.set(Constants.INDENT_PARAMETER, isOutputIndented() ? "on"
-		: "off");
-	parameters.set(Constants.ECHOPARAMS_PARAMETER, "none");
-	parameters.set(Constants.START_PARAMETER, String
-		.valueOf(getFirstPaginationIndex() - 1));// sub
-	// 1
-	// because
-	// solr
-	// start
-	// at 0
-	parameters.set(Constants.ROWS_PARAMETER, String.valueOf(getPagination()
-		.getMaxNumberOfResults()));
-	if (getOutputFormat() == OutputFormat.ATOM) {
-	    parameters.set(Constants.STYLESHEET_PARAMETER,
-		    Constants.ATOM_STYLESHEET);
-	} else if (getOutputFormat() == OutputFormat.GEORSS) {
-	    parameters.set(Constants.STYLESHEET_PARAMETER,
-		    Constants.GEORSS_STYLESHEET);
-	}
-	parameters.set(Constants.OUTPUT_FORMAT_PARAMETER, getOutputFormat()
-		.getParameterValue());
-	// force Medium style if ATOM or Geo RSS
-	if (getOutputFormat() == OutputFormat.ATOM
-		|| getOutputFormat() == OutputFormat.GEORSS) {
-	    parameters.set(Constants.FL_PARAMETER,outputStyleHelper.getFulltextFieldList(OutputStyle.MEDIUM, getOutput().getLanguageCode()));
-	} else {
-	    parameters.set(Constants.FL_PARAMETER, outputStyleHelper.getFulltextFieldList(getOutput()));
-	}
-	boolean isAdvancedQuery = (this.countryCode!=null || this.placeTypes != null);
-	boolean isNumericQuery = isNumericQuery();
-	StringBuffer query ;
-	if (isAdvancedQuery){
-	    if (isNumericQuery){
-		 query = new StringBuffer(String.format(NESTED_QUERY_NUMERIC_TEMPLATE,getQuery()));
-	    } else {
-		query = new StringBuffer(String.format(NESTED_QUERY_TEMPLATE,getQuery()));
-		
-	    }
-	    parameters.set(Constants.QT_PARAMETER, Constants.SolrQueryType.advanced
-			.toString());
-	    if (this.countryCode != null) {
-		    query.append(" AND ").append(FullTextFields.COUNTRYCODE.getValue()+":"+countryCode);
-
-		}
-	    if (this.placeTypes != null && containsOtherThingsThanNull(this.placeTypes)) {
-	    	 query.append(" AND (");
-	    	 boolean firstAppend=false;
-	    	for (int i=0;i< this.placeTypes.length;i++){
-	    		if (placeTypes[i] != null){
-	    			if (firstAppend){
-	    				query.append(" OR ");
-	    			}
-	    		query.append(FullTextFields.PLACETYPE.getValue()+":"+placeTypes[i].getSimpleName());
-	    		firstAppend=true;
-	    	}
-		}
-	    	query.append(") ");
-	    }
-	    parameters.set(Constants.QUERY_PARAMETER, query.toString());
-	}  else if (isNumericQuery) {
-	    parameters.set(Constants.QT_PARAMETER, Constants.SolrQueryType.standard
-			.toString());
-	    parameters.set(Constants.QUERY_PARAMETER, getQuery());
-	} else {
-		    // we overide the query type
-		    parameters.set(Constants.QT_PARAMETER,
-			    Constants.SolrQueryType.standard.toString());
-		    parameters.set(Constants.QUERY_PARAMETER, getQuery());
-	}
-
-	
-	
-	
-	if (SpellCheckerConfig.enabled && this.hasSpellChecking()&& !isNumericQuery){
-		parameters.set(Constants.SPELLCHECKER_ENABLED_PARAMETER,"true");
-		if(isAdvancedQuery){
-		    parameters.set(Constants.SPELLCHECKER_QUERY_PARAMETER, getQuery());
-		}
-		parameters.set(Constants.SPELLCHECKER_COLLATE_RESULTS_PARAMETER,SpellCheckerConfig.collateResults);
-		parameters.set(Constants.SPELLCHECKER_NUMBER_OF_SUGGESTION_PARAMETER,SpellCheckerConfig.numberOfSuggestion);
-		parameters.set(Constants.SPELLCHECKER_DICTIONARY_NAME_PARAMETER,SpellCheckerConfig.spellcheckerDictionaryName.toString());
-	}
-
-	return parameters;
-    }
-
-    
-    private boolean containsOtherThingsThanNull(Class[] array){
-    	if (array!=null){
-    		for (int i=0;i<=array.length;i++){
-    			if (array[i]!= null){
-    				return true;
-    			}
-    		}
-    	} return false;
-    }
+   
     
     @Override
     public int getMaxLimitResult() {
-    	return FulltextServlet.DEFAULT_MAX_RESULTS;
+    	return DEFAULT_MAX_RESULTS;
     }
 
     /* (non-Javadoc)
@@ -434,6 +298,23 @@ public class FulltextQuery extends AbstractGisQuery {
 	   this.query =  Pattern.compile("([\\{\\}\\(\\)\\=\\!]*)").matcher(this.query).replaceAll("");
 	} 
     }
+
+	/**
+	 * wether all the query terms are mandatory or not
+	 * @return the allRequired
+	 */
+	public boolean isAllwordsRequired() {
+		return allWordsRequired;
+	}
+
+	/**
+	 * @param allRequired if all the query terms are mandatory
+	 * @return The current query to chain methods
+	 */
+	public FulltextQuery withAllwordsRequired(boolean allWordsRequired) {
+		this.allWordsRequired = allWordsRequired;
+		return this;
+	}
     
 
 }

@@ -121,14 +121,14 @@ public class FullTextSearchEngine implements IFullTextSearchEngine {
 	try {
 	    logger.info(query.toString());
 
-	    ModifiableSolrParams params = query.parameterize();
+	    ModifiableSolrParams params = FulltextQuerySolrHelper.parameterize(query);
 	    CommonsHttpSolrServer server = new CommonsHttpSolrServer(solrClient
 		    .getURL(), this.httpClient,
 		    new OutputstreamResponseWrapper(outputStream, params
 			    .get(Constants.OUTPUT_FORMAT_PARAMETER)));
 	    server.query(params);
 	} catch (SolrServerException e) {
-	    logger.error("Can not execute query " + query.toQueryString()
+	    logger.error("Can not execute query " + FulltextQuerySolrHelper.toQueryString(query)
 		    + "for URL : " + solrClient.getURL() + " : "
 		    + e.getCause().getMessage());
 	    throw new FullTextSearchException(e.getCause().getMessage());
@@ -169,7 +169,7 @@ public class FullTextSearchEngine implements IFullTextSearchEngine {
 	    FulltextQuery query) throws ServiceException {
 	statsUsageService.increaseUsage(StatsUsageType.FULLTEXT);
 	Assert.notNull(query, "Can not execute a null query");
-	ModifiableSolrParams params = query.parameterize();
+	ModifiableSolrParams params = FulltextQuerySolrHelper.parameterize(query);
 	List<GisFeature> gisFeatureList = new ArrayList<GisFeature>();
 	QueryResponse results = null;
 	try {
@@ -200,7 +200,7 @@ public class FullTextSearchEngine implements IFullTextSearchEngine {
 	    throws ServiceException {
 	statsUsageService.increaseUsage(StatsUsageType.FULLTEXT);
 	Assert.notNull(query, "Can not execute a null query");
-	ModifiableSolrParams params = query.parameterize();
+	ModifiableSolrParams params = FulltextQuerySolrHelper.parameterize(query);
 	QueryResponse response = null;
 	try {
 	    response = solrClient.getServer().query(params);
