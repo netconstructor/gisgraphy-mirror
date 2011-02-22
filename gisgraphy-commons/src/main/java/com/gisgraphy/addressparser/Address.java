@@ -8,9 +8,11 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = Constants.ADDRESS_ROOT_JAXB_NAME)
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Address {
+	
 
     private Double lng;
     private Double lat;
+    private GeocodingLevels geocodingLevel =GeocodingLevels.NONE;
     private String recipientName;
 	
     private String houseNumber;
@@ -328,6 +330,20 @@ public class Address {
 	    PostOfficeBox = postOfficeBox;
 	}
 
+	
+	/**
+	 * @return the geocodingLevel
+	 */
+	public GeocodingLevels getGeocodingLevel() {
+		return geocodingLevel;
+	}
+
+	/**
+	 * @param geocodingLevel the geocodingLevel to set
+	 */
+	public void setGeocodingLevel(GeocodingLevels geocodingLevel) {
+		this.geocodingLevel = geocodingLevel;
+	}
 	@Override
 	public int hashCode() {
 	    final int prime = 31;
@@ -514,6 +530,8 @@ public class Address {
 		return false;
 	    return true;
 	}
+
+
 
 	
 
