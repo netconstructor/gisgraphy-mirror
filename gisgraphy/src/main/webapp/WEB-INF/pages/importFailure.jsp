@@ -13,7 +13,7 @@
 <br/>
 <strong><fmt:message key="import.failure.see.status"><fmt:param>/admin/import!status.html</fmt:param></fmt:message></strong>
 <br/><br/>
-<fmt:message key="import.failure.instructions"><fmt:param>http://localhost:8080/admin/resetimport.html</fmt:param></fmt:message>
+<fmt:message key="import.failure.instructions"><fmt:param>/admin/resetimport.html</fmt:param></fmt:message>
 <br/><br/>
 
 <div class="tip greentip">
