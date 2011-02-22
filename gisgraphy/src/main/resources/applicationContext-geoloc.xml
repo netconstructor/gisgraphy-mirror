@@ -260,6 +260,11 @@
 		<property name="alternateNameCountryFileName" value="${importerConfig.alternateNameCountryFileName}"/>
 	</bean>
 	
+	<bean id="addressParser" class="${addressParser.class}">
+		<constructor-arg>
+					<value>${addressParser.url}</value>
+		</constructor-arg>
+	</bean>
 	 
 	<!-- EVENT -->
  	 
