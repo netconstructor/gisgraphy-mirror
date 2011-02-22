@@ -37,8 +37,8 @@ public interface IRepositoryStrategy {
      *                 RepositoryException if no dao is found for the specified
      *                 placetype
      */
-    public abstract IGisDao<? extends GisFeature> getDao(
-	    Class<? extends GisFeature> placeType);
+    public abstract IGisDao<?> getDao(
+	    Class<?> placeType);
 
     /**
      * @return all the availables daos. never return null but an empty Arraylist

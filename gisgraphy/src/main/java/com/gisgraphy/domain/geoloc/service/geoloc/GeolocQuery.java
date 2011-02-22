@@ -24,9 +24,9 @@ package com.gisgraphy.domain.geoloc.service.geoloc;
 
 import javax.persistence.Transient;
 
+
 import org.springframework.util.Assert;
 
-import com.gisgraphy.domain.geoloc.entity.GisFeature;
 import com.gisgraphy.domain.valueobject.GisgraphyConfig;
 import com.gisgraphy.domain.valueobject.Output;
 import com.gisgraphy.domain.valueobject.Pagination;
@@ -43,6 +43,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class GeolocQuery extends AbstractGisQuery {
 
+    public static final int DEFAULT_MAX_RESULTS = 10;
    
 
     /* (non-Javadoc)
@@ -104,7 +105,7 @@ public class GeolocQuery extends AbstractGisQuery {
     /**
      * The type of gis to search , if null : search for all place type.
      */
-    private Class<? extends GisFeature> placeType = GisgraphyConfig.defaultGeolocSearchPlaceTypeClass;
+    private Class<?> placeType = GisgraphyConfig.defaultGeolocSearchPlaceTypeClass;
 
     /**
      * Default radius in meters
@@ -134,7 +135,7 @@ public class GeolocQuery extends AbstractGisQuery {
      *                 {@link IllegalArgumentException} if the point is null
      */
     public GeolocQuery(Point point, double radius, Pagination pagination,
-	    Output output, Class<? extends GisFeature> placeType) {
+	    Output output, Class<?> placeType) {
 	super(pagination, output);
 	Assert.notNull(point, "point must not be null");
 	this.point = point;
@@ -256,7 +257,7 @@ public class GeolocQuery extends AbstractGisQuery {
      * @return the placeType : it limits the search to an object of a specific
      *         class
      */
-    public Class<? extends GisFeature> getPlaceType() {
+    public Class<?> getPlaceType() {
 	return this.placeType;
     }
 
@@ -265,14 +266,14 @@ public class GeolocQuery extends AbstractGisQuery {
      *                The placeType to set, if null, search for all placetype
      * @return The current query to chain methods
      */
-    public GeolocQuery withPlaceType(Class<? extends GisFeature> placeType) {
+    public GeolocQuery withPlaceType(Class<?> placeType) {
 	this.placeType = placeType;
 	return this;
     }
 
     @Override
     public int getMaxLimitResult() {
-    	return GeolocServlet.DEFAULT_MAX_RESULTS;
+    	return DEFAULT_MAX_RESULTS;
     }
 
     /**

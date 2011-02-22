@@ -1014,9 +1014,9 @@ Here is a description of all the output fields,  :<br/>
 <tr><td><span color="red">error</span></td><td>A String only present if an error occured (e.g : empty Latitude or longitude)</td><td>When error occured</td></tr>
 <tr><td>numFound</td><td>The number of results display with this query (it takes the pagination into account)</td><td></td></tr>
 <tr><td>QTime</td><td>The execution time of the query in ms</td><td></td></tr>
-<tr><td>Query</td><td>The name of the street that has been search (aka : name)</td><td></td></tr>
+<tr><td>query</td><td>The name of the street that has been search (aka : name)</td><td></td></tr>
 <tr><td>distance</td><td>The distance beetween the point and the nearest point to the street in meters</td><td></td></tr>
-<tr><td>Name</td><td>The name of the feature</td><td></td></tr>
+<tr><td>name</td><td>The name of the feature</td><td></td></tr>
 <tr><td>gid</td><td>Unique id of the street</td><td></td></tr>
 <tr><td>streetType</td><td>The type of the street (see <a href="#streettype">street type list</a>)</td><td></td></tr>
 <tr><td>oneWay</td><td>Whether the street is a one way street or not</td><td></td></tr>
@@ -1283,7 +1283,7 @@ Here is a description of all the output fields :<br/>
 <th>Field</th><th>Description</th><th>Available from style</th>
 <tr><td><span color="red">error</span></td><td>A String only present if an error occured (e.g : empty query)<br/>The field 'error' appears in the path response/responseHeader/error </td><td><span color="red">ERROR</span></td></tr>
 <tr><td>feature_id</td><td>A unique id that identify the feature</td><td>SHORT</td></tr>
-<tr><td>Name</td><td>The name of the feature</td><td>SHORT</td></tr>
+<tr><td>name</td><td>The name of the feature</td><td>SHORT</td></tr>
 <tr><td>fully_qualified_name</td><td>A name of the form : (adm1Name et adm2Name are printed) Paris, D&eacute;partement de Ville-De-Paris, Ile-De-France, (FR)</td><td>SHORT</td></tr>
 <tr><td>placetype</td><td>The <a href="placetype.htm">place Type</a> of the Feature</td><td>SHORT</td></tr>
 <tr><td>country_code</td><td>The <a href="http://en.wikipedia.org/wiki/ISO_3166">ISO 3166</a> country code</td><td>SHORT</td></tr>
@@ -1583,7 +1583,7 @@ Here is a description of all the output fields, some fields are specific to cert
 <tr><td>numFound</td><td>The number of results display with this query (it takes the pagination into account)</td><td>All placetype</td></tr>
 <tr><td>QTime</td><td>The execution time of the query in ms</td><td>All placetype</td></tr>
 <tr><td>distance</td><td>The distance beetween the point and the gisFeature in meters</td><td>All placetype</td></tr>
-<tr><td>Name</td><td>The name of the feature</td><td>All placetype</td></tr>
+<tr><td>name</td><td>The name of the feature</td><td>All placetype</td></tr>
 <tr><td>asciiName</td><td>The ASCII name of the feature</td><td>All placetype</td></tr>
 <tr><td>feature_id</td><td>A unique id that identify the feature</td><td>All placetype</td></tr>
 <tr><td>countryCode</td><td>The <a href="http://en.wikipedia.org/wiki/ISO_3166">ISO 3166</a> country code</td><td>All placetype</td></tr>

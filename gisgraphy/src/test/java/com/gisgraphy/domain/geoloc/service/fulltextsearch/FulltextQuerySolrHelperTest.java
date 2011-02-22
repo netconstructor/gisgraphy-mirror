@@ -89,7 +89,7 @@ public class FulltextQuerySolrHelperTest {
 		.getParameterValue(), parameters
 		.get(Constants.OUTPUT_FORMAT_PARAMETER));
 	assertEquals("wrong query type parameter found",
-		Constants.SolrQueryType.standard.toString(), parameters
+		Constants.SolrQueryType.numeric.toString(), parameters
 			.get(Constants.QT_PARAMETER));
 	assertEquals("wrong query parameter found ",searchTerm,
 		parameters
@@ -98,7 +98,7 @@ public class FulltextQuerySolrHelperTest {
 	parameters
 		.get(Constants.QUERY_PARAMETER));
 	
-	assertNull("spellchecker query should not be set when standard query",parameters
+	assertNull("spellchecker query should not be set when basic numeric query",parameters
 		.get(Constants.SPELLCHECKER_QUERY_PARAMETER));
 	}
     
@@ -149,12 +149,12 @@ public class FulltextQuerySolrHelperTest {
 			.get(Constants.QUERY_PARAMETER),
 			parameters
 				.get(Constants.QUERY_PARAMETER).contains(FullTextFields.COUNTRYCODE.getValue()+":"));
-	assertNull("spellchecker query should not be set when numeric query",parameters
+	assertNull("spellchecker query should not be set when advanced numeric query",parameters
 		.get(Constants.SPELLCHECKER_QUERY_PARAMETER)); 
 	}
     
     @Test
-    public void testToQueryStringShouldreturnCorrectParamswhenAllRequiredIsFalse() {
+    public void testToQueryStringShouldreturnCorrectParamsWhenAllRequiredIsFalse() {
 	Pagination pagination = paginate().from(1).to(10);
 	    Output output = Output.withFormat(OutputFormat.JSON)
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
@@ -242,7 +242,7 @@ public class FulltextQuerySolrHelperTest {
 			.get(Constants.QUERY_PARAMETER),
 			parameters
 				.get(Constants.QUERY_PARAMETER).contains(FullTextFields.COUNTRYCODE.getValue()+":"));
-	assertNotNull("spellchecker query should not be set when numeric query",parameters
+	assertNotNull("spellchecker query should be set when numeric query",parameters
 		.get(Constants.SPELLCHECKER_QUERY_PARAMETER));  
     }
 
@@ -325,7 +325,8 @@ public class FulltextQuerySolrHelperTest {
     
     @Test
     public void testToQueryStringShouldreturnCorrectParamsForSpellChecking() {
-    	boolean savedSpellCheckingValue = SpellCheckerConfig.activeByDefault;
+    	boolean savedSpellCheckingActiveByDefaultValue = SpellCheckerConfig.activeByDefault;
+    	boolean savedSpellCheckerConfigEnabled = SpellCheckerConfig.enabled;
     	try {
 	SpellCheckerConfig.activeByDefault= true;
 	SpellCheckerConfig.enabled = false;
@@ -359,7 +360,8 @@ public class FulltextQuerySolrHelperTest {
     	} catch (RuntimeException e) {
 		fail(e.getMessage());
 	} finally {
-	    SpellCheckerConfig.activeByDefault = savedSpellCheckingValue;
+	    SpellCheckerConfig.activeByDefault = savedSpellCheckingActiveByDefaultValue;
+	    SpellCheckerConfig.enabled=savedSpellCheckerConfigEnabled;
 	}
     }
 

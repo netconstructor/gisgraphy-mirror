@@ -85,10 +85,9 @@ public class FulltextQuerySolrHelper {
 	if (isAdvancedQuery){
 	    if (isNumericQuery){
 	    	querybuffer = new StringBuffer(String.format(NESTED_QUERY_NUMERIC_TEMPLATE,query.getQuery()));
-	    }else if (!query.isAllwordsRequired()){
+	    } else if (!query.isAllwordsRequired()){
 	    	querybuffer = new StringBuffer(String.format(NESTED_QUERY_INTEXT_WITHSTATE_TEMPLATE,query.getQuery()));
-	    }
-	    else {
+	    } else {
 	    	querybuffer = new StringBuffer(String.format(NESTED_QUERY_TEMPLATE,query.getQuery()));
 		
 	    }
@@ -114,7 +113,7 @@ public class FulltextQuerySolrHelper {
 	    }
 	    parameters.set(Constants.QUERY_PARAMETER, querybuffer.toString());
 	}  else if (isNumericQuery) {
-	    parameters.set(Constants.QT_PARAMETER, Constants.SolrQueryType.standard
+	    parameters.set(Constants.QT_PARAMETER, Constants.SolrQueryType.numeric
 			.toString());
 	    parameters.set(Constants.QUERY_PARAMETER, query.getQuery());
 	} else {

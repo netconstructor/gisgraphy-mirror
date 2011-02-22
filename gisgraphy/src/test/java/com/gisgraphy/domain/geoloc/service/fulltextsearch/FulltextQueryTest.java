@@ -187,23 +187,20 @@ public class FulltextQueryTest {
 	assertEquals(com.gisgraphy.fulltext.Constants.ONLY_ADM_PLACETYPE, fulltextQuery.getPlaceTypes());
     }
 
-   
-    
-  
-    
-       
     @Test
     public void testQueryShouldHaveSpellcheckingCorrectDefaultValue(){
     	boolean savedSpellCheckingValue = SpellCheckerConfig.activeByDefault;
-    	try {
-			FulltextQuery query = new FulltextQuery("test");
-			assertEquals(savedSpellCheckingValue, query.hasSpellChecking());
-			SpellCheckerConfig.activeByDefault = ! SpellCheckerConfig.activeByDefault;
-			query = new FulltextQuery("test2");
-			assertEquals(SpellCheckerConfig.activeByDefault, query.hasSpellChecking());
-		} catch (RuntimeException e) {
-			SpellCheckerConfig.activeByDefault = savedSpellCheckingValue;
-		}
+	try {
+	    FulltextQuery query = new FulltextQuery("test");
+	    assertEquals(savedSpellCheckingValue, query.hasSpellChecking());
+	    SpellCheckerConfig.activeByDefault = !SpellCheckerConfig.activeByDefault;
+	    query = new FulltextQuery("test2");
+	    assertEquals(SpellCheckerConfig.activeByDefault, query.hasSpellChecking());
+	} catch (RuntimeException e) {
+
+	} finally {
+	    SpellCheckerConfig.activeByDefault = savedSpellCheckingValue;
+	}
     }
 
     @Test

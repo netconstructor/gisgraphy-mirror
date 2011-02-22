@@ -87,8 +87,8 @@ public class GeolocSearchEngine implements IGeolocSearchEngine {
 	statsUsageService.increaseUsage(StatsUsageType.GEOLOC);
 	Assert.notNull(query, "Can not execute a null query");
 	long start = System.currentTimeMillis();
-	Class<? extends GisFeature> placetype = query.getPlaceType();
-	IGisDao<? extends GisFeature> dao = repositoryStrategy
+	Class<?> placetype = query.getPlaceType();
+	IGisDao<?> dao = repositoryStrategy
 		.getDao(GisFeature.class);
 	if (placetype != null) {
 	    dao = repositoryStrategy.getDao(placetype);

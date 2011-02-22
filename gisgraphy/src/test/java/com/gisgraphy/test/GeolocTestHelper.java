@@ -54,6 +54,7 @@ import com.gisgraphy.domain.geoloc.entity.GisFeature;
 import com.gisgraphy.domain.geoloc.entity.OpenStreetMap;
 import com.gisgraphy.domain.geoloc.entity.ZipCode;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.FulltextQuery;
+import com.gisgraphy.domain.geoloc.service.geoloc.GeolocQuery;
 import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetType;
 import com.gisgraphy.domain.repository.IAdmDao;
 import com.gisgraphy.domain.repository.ICityDao;
@@ -752,7 +753,7 @@ public class GeolocTestHelper {
     public static MockHttpServletRequest createMockHttpServletRequestForGeoloc() {
 	MockHttpServletRequest request = new MockHttpServletRequest();
 	request.addParameter(GisgraphyServlet.FROM_PARAMETER, "3");
-	request.addParameter(GisgraphyServlet.TO_PARAMETER, GeolocServlet.DEFAULT_MAX_RESULTS+20+"");
+	request.addParameter(GisgraphyServlet.TO_PARAMETER, GeolocQuery.DEFAULT_MAX_RESULTS+20+"");
 	request.addParameter(GisgraphyServlet.FORMAT_PARAMETER, "XML");
 	request.addParameter(GeolocServlet.PLACETYPE_PARAMETER, "city");
 	request.addParameter(GeolocServlet.LAT_PARAMETER, "1.0");

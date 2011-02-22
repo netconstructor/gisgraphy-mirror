@@ -1,5 +1,6 @@
 package com.gisgraphy.domain.geoloc.service.geoloc;
 
+import static com.gisgraphy.domain.geoloc.service.geoloc.GeolocQuery.DEFAULT_MAX_RESULTS;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -13,6 +14,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import com.gisgraphy.domain.geoloc.entity.City;
 import com.gisgraphy.domain.geoloc.entity.Country;
 import com.gisgraphy.domain.geoloc.entity.GisFeature;
+import com.gisgraphy.domain.geoloc.service.fulltextsearch.FulltextQuery;
 import com.gisgraphy.domain.valueobject.GisgraphyConfig;
 import com.gisgraphy.domain.valueobject.Output;
 import com.gisgraphy.domain.valueobject.Pagination;
@@ -35,10 +37,10 @@ public class GeolocQueryHttpBuilderTest {
 		    GeolocQuery query = buildQuery(request);
 		    int firstPaginationIndex = 3;
 		    assertEquals(firstPaginationIndex, query.getFirstPaginationIndex());
-		    assertEquals(GeolocServlet.DEFAULT_MAX_RESULTS+firstPaginationIndex-1, query.getLastPaginationIndex());
+		    assertEquals(DEFAULT_MAX_RESULTS+firstPaginationIndex-1, query.getLastPaginationIndex());
 		    assertEquals("the pagination should be limit to "
-			    + GeolocServlet.DEFAULT_MAX_RESULTS,
-			    GeolocServlet.DEFAULT_MAX_RESULTS, query
+			    + DEFAULT_MAX_RESULTS,
+			    DEFAULT_MAX_RESULTS, query
 				    .getMaxNumberOfResults());
 		    assertEquals(OutputFormat.XML, query.getOutputFormat());
 		    assertEquals(null, query.getOutputLanguage());
@@ -80,7 +82,7 @@ public class GeolocQueryHttpBuilderTest {
 		    request.removeParameter(GisgraphyServlet.TO_PARAMETER);
 		    query = buildQuery(request);
 		    // non specify
-		    int expectedLastPagination = (GeolocServlet.DEFAULT_MAX_RESULTS+query.getFirstPaginationIndex()-1);
+		    int expectedLastPagination = (DEFAULT_MAX_RESULTS+query.getFirstPaginationIndex()-1);
 	   	    assertEquals(
 		           GisgraphyServlet.TO_PARAMETER
 			    + " is wrong when no "+GisgraphyServlet.TO_PARAMETER+" is specified ",
@@ -90,22 +92,22 @@ public class GeolocQueryHttpBuilderTest {
 			    "When no "
 				    + GisgraphyServlet.TO_PARAMETER
 				    + " is specified, the  parameter should be set to limit results to "
-				    + GeolocServlet.DEFAULT_MAX_RESULTS,
-				    GeolocServlet.DEFAULT_MAX_RESULTS, query
+				    + DEFAULT_MAX_RESULTS,
+				    DEFAULT_MAX_RESULTS, query
 				    .getMaxNumberOfResults());
 		    // with a wrong value
 		    request = GeolocTestHelper.createMockHttpServletRequestForGeoloc();
 		    request.setParameter(GisgraphyServlet.TO_PARAMETER, "2");// to<from
 		    query = buildQuery(request);
-		    expectedLastPagination = (GeolocServlet.DEFAULT_MAX_RESULTS+query.getFirstPaginationIndex()-1);
+		    expectedLastPagination = (DEFAULT_MAX_RESULTS+query.getFirstPaginationIndex()-1);
 		    assertEquals( GisgraphyServlet.TO_PARAMETER
 			    + " is wrong when wrong "+GisgraphyServlet.TO_PARAMETER+" is specified ",
 			    expectedLastPagination, query
 				    .getLastPaginationIndex());
 		    assertEquals("When a wrong " + GisgraphyServlet.TO_PARAMETER
 			    + " is specified, the numberOf results should be "
-			    + GeolocServlet.DEFAULT_MAX_RESULTS,
-			    GeolocServlet.DEFAULT_MAX_RESULTS, query
+			    + DEFAULT_MAX_RESULTS,
+			    DEFAULT_MAX_RESULTS, query
 				    .getMaxNumberOfResults());
 		    assertEquals("a wrong to does not change the from value", 3, query
 			    .getFirstPaginationIndex());
@@ -115,15 +117,15 @@ public class GeolocQueryHttpBuilderTest {
 		    query = buildQuery(request);
 		    assertEquals("a wrong to does not change the from value", 3, query
 			    .getFirstPaginationIndex());
-		    expectedLastPagination = (GeolocServlet.DEFAULT_MAX_RESULTS+query.getFirstPaginationIndex()-1);
+		    expectedLastPagination = (DEFAULT_MAX_RESULTS+query.getFirstPaginationIndex()-1);
 		    assertEquals( GisgraphyServlet.TO_PARAMETER
 			    + " is wrong when non numeric "+GisgraphyServlet.TO_PARAMETER+" is specified ",
 			    expectedLastPagination, query
 				    .getLastPaginationIndex());
 		    assertEquals("When a wrong " + GisgraphyServlet.TO_PARAMETER
 			    + " is specified, the numberOf results should be "
-			    + GeolocServlet.DEFAULT_MAX_RESULTS,
-			    GeolocServlet.DEFAULT_MAX_RESULTS, query
+			    + DEFAULT_MAX_RESULTS,
+			    DEFAULT_MAX_RESULTS, query
 				    .getMaxNumberOfResults());
 
 		    // test indentation

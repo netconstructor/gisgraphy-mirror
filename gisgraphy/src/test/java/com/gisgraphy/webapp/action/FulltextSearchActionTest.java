@@ -178,7 +178,7 @@ public class FulltextSearchActionTest {
     
     @Test
     public void isSpellCheckingShouldHaveDefaultValue() {
-	boolean savevalue = SpellCheckerConfig.activeByDefault;
+	boolean savedvalue = SpellCheckerConfig.activeByDefault;
 	try {
 	    SpellCheckerConfig.activeByDefault = false;
 	    FulltextSearchAction action = new FulltextSearchAction();
@@ -187,7 +187,7 @@ public class FulltextSearchActionTest {
 	    action = new FulltextSearchAction();
 	    assertTrue(action.isSpellchecking());
 	} finally{
-	    SpellCheckerConfig.activeByDefault = savevalue;
+	    SpellCheckerConfig.activeByDefault = savedvalue;
 	}
 
     }

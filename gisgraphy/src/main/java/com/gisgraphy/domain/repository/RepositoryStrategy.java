@@ -82,7 +82,7 @@ public class RepositoryStrategy implements IRepositoryStrategy {
      * @see com.gisgraphy.domain.repository.IRepositoryStrategy#GetDao(java.lang.Class)
      */
     public IGisDao<? extends GisFeature> getDao(
-	    Class<? extends GisFeature> placeType) {
+	    Class<?> placeType) {
 	IGisDao<? extends GisFeature> dao = daoMap.get(GisFeature.class);
 	if (placeType != null) {
 	    dao = daoMap.get(placeType);
