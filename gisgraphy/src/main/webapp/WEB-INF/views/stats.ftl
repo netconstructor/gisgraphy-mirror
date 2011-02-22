@@ -31,7 +31,7 @@
 <li><a href="http://www.google.fr/search?as_q=gisgraphy&hl=fr&num=10&btnG=Recherche+Google&as_epq=&as_oq=&as_eq=&lr=&cr=&as_ft=i&as_filetype=&as_qdr=w&as_occt=any&as_dt=i&as_sitesearch=&as_rights=&safe=off" target="statsgis">New links to gisgraphy</a></li>
 <br/>
 In the clouds : 
-<li><a href="https://appengine.google.com/">appengine</a></li>
+<li><a href="https://appengine.google.com/" target="statsgis">appengine</a></li>
 </ul>
  <br/>
 </body>
