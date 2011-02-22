@@ -21,7 +21,7 @@ public class AddressParserClientTest {
     
     @Test
     public void getBaseUrlShouldReturnTheConstructor(){
-	String baseURL="baseURL";
+	String baseURL="http://www.url.com/addressparser";
 	AddressParserClient service = new AddressParserClient(baseURL);
 	Assert.assertEquals(baseURL, service.getBaseURL());
     }
@@ -30,6 +30,16 @@ public class AddressParserClientTest {
     public void defaultConstructor(){
 	AddressParserClient service = new AddressParserClient();
 	Assert.assertEquals(AddressParserClient.DEFAULT_ADDRESS_PARSER_BASE_URL, service.getBaseURL());
+    }
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void ConstructorWithNullURL(){
+	 new AddressParserClient(null);
+    }
+    
+    @Test(expected=IllegalArgumentException.class)
+    public void constructorWithMalformedURL(){
+	 new AddressParserClient("malformedURL");
     }
     
     @Test

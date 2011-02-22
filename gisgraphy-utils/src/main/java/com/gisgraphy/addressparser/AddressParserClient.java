@@ -3,6 +3,8 @@ package com.gisgraphy.addressparser;
 import java.io.ByteArrayOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLEncoder;
 
 import org.slf4j.Logger;
@@ -28,6 +30,15 @@ public class AddressParserClient implements IAddressParserService {
     }
     
     public AddressParserClient(String baseURL){
+    	
+    	if (baseURL==null){
+    		throw new IllegalArgumentException("the address parser client needs an url"); 
+    	}
+    	try {
+			new URL(baseURL);
+		} catch (MalformedURLException e) {
+			throw new IllegalArgumentException("the address parser client needs a well formed url"); 
+		}
 	this.baseURL =baseURL;
     }
     
