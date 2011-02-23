@@ -5,6 +5,14 @@ import java.io.OutputStream;
 
 import com.gisgraphy.addressparser.exception.AddressParserException;
 
+/**
+ * 
+ * do a textual annalyse of a raw address, it doesn't care if the street, city, and so on exists, it is based on address patterns 
+ * of the universal postal union recommandations
+ * 
+ * @author <a href="mailto:david.masclet@gisgraphy.com">David Masclet</a>
+ *
+ */
 public interface IAddressParserService {
     
     /**
