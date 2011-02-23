@@ -117,18 +117,18 @@ public class StreetSearchQueryTest  {
 	Output output = Output.withFormat(OutputFormat.JSON).withLanguageCode(
 		"FR").withStyle(OutputStyle.FULL);
 	try {
-	    new GeolocQuery(null, 3D, pagination, output, Adm.class);
-	    fail("Query with null point should throws");
+	    new StreetSearchQuery(null, 3D, pagination, output, Adm.class);
 	} catch (IllegalArgumentException e) {
+	    fail("Query with null point should not throws");
 
 	}
 
 	try {
-	    new GeolocQuery(null, 5D);
-	    fail("Query with null point should throws");
+	    new StreetSearchQuery(null, 5D);
 	} catch (RuntimeException e) {
-
+	    fail("Query with null point should not throws");
 	}
+	
     }
 
     @Test

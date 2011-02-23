@@ -46,6 +46,8 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class GeolocQueryHttpBuilder {
 	
+    
+  
 	private static GeolocQueryHttpBuilder instance = new GeolocQueryHttpBuilder();
 	
 	public static GeolocQueryHttpBuilder getInstance() {
@@ -60,41 +62,53 @@ public class GeolocQueryHttpBuilder {
     public GeolocQuery buildFromHttpRequest(HttpServletRequest req) {
     
 	// point
-	Float latitude;
-	Float longitude;
+	Float latitude=null;
+	Float longitude=null;
 	// lat
 	try {
 	    latitude = GeolocHelper.parseInternationalDouble(req
 		    .getParameter(GeolocServlet.LAT_PARAMETER));
 	} catch (Exception e) {
-	    throw new GeolocSearchException("latitude is not correct or empty");
+	    if (isPointRequired()){
+		throw new GeolocSearchException("latitude is not correct or empty");
+	    }
 	}
 	if (latitude == null) {
-	    throw new GeolocSearchException("latitude is not correct or empty");
+	    if (isPointRequired()){
+		throw new GeolocSearchException("latitude is not correct or empty");
+	    }
 	}
 	// long
 	try {
 	    longitude = GeolocHelper.parseInternationalDouble(req
 		    .getParameter(GeolocServlet.LONG_PARAMETER));
 	} catch (Exception e) {
+	    if (isPointRequired()){
 	    throw new GeolocSearchException(
 		    "longitude is not correct or empty");
+	    }
 	}
 	if (longitude == null) {
+	    if (isPointRequired()){
 	    throw new GeolocSearchException(
 		    "longitude is not correct or empty");
+	    }
 	}
 	
 	// point
 	
-	Point point ;
+	Point point = null ;
 	try {
 	    point = GeolocHelper.createPoint(longitude, latitude);
 	} catch (RuntimeException e1) {
-	    throw new GeolocSearchException(e1.getMessage());
+	    if (isPointRequired()){
+		throw new GeolocSearchException(e1.getMessage());
+	    }
 	}
 	if (point == null) {
-	    throw new GeolocSearchException("can not determine Point");
+	    if (isPointRequired()){
+		throw new GeolocSearchException("can not determine Point");
+	    }
 	}
 	// radius
 	double radius;
@@ -182,4 +196,11 @@ public class GeolocQueryHttpBuilder {
 		GeolocQuery geolocQuery = new GeolocQuery(point,radius);
 		return geolocQuery;
 	}
+	
+	/**
+	 * @return true if the point is required
+	 */
+	protected boolean isPointRequired(){
+		return  true;
+	    }
 }

@@ -112,7 +112,8 @@ public class StreetServlet extends GisgraphyServlet {
 	    format = setResponseContentType(req, resp);
 	    // check empty query
 	    if (HTMLHelper
-		    .isParametersEmpty(req, LAT_PARAMETER, LONG_PARAMETER)) {
+		    .isParametersEmpty(req, LAT_PARAMETER, LONG_PARAMETER) && HTMLHelper
+		    .isParametersEmpty(req, NAME_PARAMETER)) {
 		sendCustomError(ResourceBundle.getBundle(
 			Constants.BUNDLE_ERROR_KEY).getString(
 			"error.emptyLatLong"), format, resp,req);

@@ -76,7 +76,13 @@ public class StreetSearchQueryHttpBuilder extends GeolocQueryHttpBuilder {
     }
 
 	
-
+       /**
+	 * @return true if the point is required
+	 */
+    @Override
+	protected boolean isPointRequired(){
+		return  false;
+	    }
    
 
 	

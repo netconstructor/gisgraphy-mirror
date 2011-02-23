@@ -22,6 +22,8 @@
  *******************************************************************************/
 package com.gisgraphy.domain.geoloc.service.geoloc;
 
+import org.springframework.util.Assert;
+
 import com.gisgraphy.domain.geoloc.entity.GisFeature;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.StreetSearchMode;
 import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetType;
@@ -46,23 +48,37 @@ public class StreetSearchQuery extends GeolocQuery {
      * @param output
      * @param placeType
      */
-    public StreetSearchQuery(Point point, double radius, Pagination pagination, Output output, Class<? extends GisFeature> placeType) {
-	super(point, radius, pagination, output, placeType);
+    public StreetSearchQuery(Point point, double radius, Pagination pagination, Output output, Class<?> placeType) {
+	withPagination(pagination);
+	withOutput(output);
+	this.point = point;
+	withRadius(radius);
+	withPlaceType(placeType);
     }
 
+   
+    
     /**
      * @param point
      * @param radius
      */
     public StreetSearchQuery(Point point, double radius) {
-	super(point, radius);
+	this.point = point;
+	withRadius(radius);
     }
 
     /**
      * @param point
      */
     public StreetSearchQuery(Point point) {
-	super(point);
+	this.point=point;
+    }
+    
+    /**
+     * @param point
+     */
+    public StreetSearchQuery(String name) {
+	this.name=name;
     }
 
     public final static int NAME_MAX_LENGTH = 200;
@@ -76,6 +92,8 @@ public class StreetSearchQuery extends GeolocQuery {
     private StreetSearchMode streetSearchMode = StreetSearchMode.getDefault();
     
 
+
+    
    
 
     /**

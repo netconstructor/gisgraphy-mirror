@@ -233,7 +233,7 @@ public class StreetServletTest extends AbstractIntegrationHttpSolrTestCase {
 	try {
 	    jsTester = new JsTester();
 	    jsTester.onSetUp();
-	    queryString = "format=" + format.getParameterValue();
+	    queryString = StreetServlet.FORMAT_PARAMETER+"="+ format.getParameterValue();
 	    HttpClient client = new HttpClient();
 	    get = new GetMethod(url);
 
@@ -273,7 +273,7 @@ public class StreetServletTest extends AbstractIntegrationHttpSolrTestCase {
 	OutputFormat format = OutputFormat.XML;
 	GetMethod get = null;
 	try {
-	    queryString = "format=" + format.getParameterValue();
+	    queryString = StreetServlet.FORMAT_PARAMETER+"=" + format.getParameterValue();
 	    HttpClient client = new HttpClient();
 	    get = new GetMethod(url);
 
@@ -287,6 +287,102 @@ public class StreetServletTest extends AbstractIntegrationHttpSolrTestCase {
 	    FeedChecker.assertQ("The XML error is not correct", result, "//error[.='"
 		    + expected + "']");
 	} catch (IOException e) {
+	    fail("An exception has occured " + e.getMessage());
+	} finally {
+	    if (get != null) {
+		get.releaseConnection();
+	    }
+	}
+
+    }
+    
+    @Test
+    public void testLatLongOrNameIsRequired() {
+
+	String url = streetServletUrl + STREET_SERVLET_CONTEXT + "/streetsearch";
+
+	String result;
+	String queryString;
+	OutputFormat format = OutputFormat.XML;
+	GetMethod get = null;
+	try {
+	    // wo lat/long/name
+	    HttpClient client = new HttpClient();
+	    get = new GetMethod(url);
+	    client.executeMethod(get);
+	    assertEquals("you could only set name ", 500, get.getStatusCode());
+	    result = get.getResponseBodyAsString().trim();
+	    String missingParameterErrorMessage = ResourceBundle.getBundle(Constants.BUNDLE_ERROR_KEY).getString("error.emptyLatLong");
+	    FeedChecker.assertQ("The XML error is not correct", result, "//error[.='" + missingParameterErrorMessage + "']");
+	    if (get != null) {
+		get.releaseConnection();
+	    }
+
+	    // only long
+	    queryString = StreetServlet.LONG_PARAMETER + "=1";
+	    get = new GetMethod(url);
+	    get.setQueryString(queryString);
+	    client.executeMethod(get);
+	    assertEquals("only long should throws", 500, get.getStatusCode());
+	    result = get.getResponseBodyAsString().trim();
+	    FeedChecker.assertQ("The XML error is not correct", result, "//error[.='" + missingParameterErrorMessage + "']");
+	    if (get != null) {
+		get.releaseConnection();
+	    }
+
+	    // only lat
+	    queryString = StreetServlet.LAT_PARAMETER + "=1";
+	    get = new GetMethod(url);
+	    get.setQueryString(queryString);
+	    client.executeMethod(get);
+	    assertEquals("only lat should throws", 500, get.getStatusCode());
+	    result = get.getResponseBodyAsString().trim();
+	    FeedChecker.assertQ("The XML error is not correct", result, "//error[.='" + missingParameterErrorMessage + "']");
+	    if (get != null) {
+		get.releaseConnection();
+	    }
+
+	    // only name
+	    queryString = StreetServlet.NAME_PARAMETER + "=foo";
+	    get = new GetMethod(url);
+	    get.setQueryString(queryString);
+	    client.executeMethod(get);
+	    result = get.getResponseBodyAsString().trim();
+	    Assert.assertFalse(result.contains(missingParameterErrorMessage));
+	    // assertEquals("only name should not throws",200
+	    // ,get.getStatusCode());
+	    if (get != null) {
+		get.releaseConnection();
+	    }
+
+	    // lat long
+	    queryString = StreetServlet.LONG_PARAMETER + "=1&" + StreetServlet.LAT_PARAMETER + "=1";
+	    get = new GetMethod(url);
+	    get.setQueryString(queryString);
+	    client.executeMethod(get);
+	    // assertEquals("only lat long should not throws",200
+	    // ,get.getStatusCode());
+	    result = get.getResponseBodyAsString().trim();
+	    Assert.assertFalse(result.contains(missingParameterErrorMessage));
+	    if (get != null) {
+		get.releaseConnection();
+	    }
+
+	    // lat name
+	    queryString = StreetServlet.LONG_PARAMETER + "=1&" + StreetServlet.NAME_PARAMETER + "=foo";
+	    get = new GetMethod(url);
+	    get.setQueryString(queryString);
+	    client.executeMethod(get);
+	    // assertEquals("only lat long should not throws",200
+	    // ,get.getStatusCode());
+	    result = get.getResponseBodyAsString().trim();
+	    Assert.assertFalse(result.contains(missingParameterErrorMessage));
+
+	    if (get != null) {
+		get.releaseConnection();
+	    }
+
+	} catch (Exception e) {
 	    fail("An exception has occured " + e.getMessage());
 	} finally {
 	    if (get != null) {

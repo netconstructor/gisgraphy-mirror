@@ -29,7 +29,7 @@ public class GeocodingService implements IGeocodingService {
 		 * if address==null=>
          *		findcityIntext
          *			if city =null
-         *				return null
+         *				return null OR fulltext woposition
          *			else
          *				find street with fulltext optionnal
          *					if null

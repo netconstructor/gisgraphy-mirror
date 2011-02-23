@@ -98,7 +98,7 @@ public class GeolocQuery extends AbstractGisQuery {
      * needed by CGlib
      */
     @SuppressWarnings("unused")
-    private GeolocQuery() {
+    protected GeolocQuery() {
 	super();
     }
 
@@ -112,7 +112,7 @@ public class GeolocQuery extends AbstractGisQuery {
      */
     public static final double DEFAULT_RADIUS = 10000;
 
-    private Point point;
+    protected Point point;
     private double radius = DEFAULT_RADIUS;
     private boolean distanceField = true;
 
@@ -137,7 +137,7 @@ public class GeolocQuery extends AbstractGisQuery {
     public GeolocQuery(Point point, double radius, Pagination pagination,
 	    Output output, Class<?> placeType) {
 	super(pagination, output);
-	Assert.notNull(point, "point must not be null");
+	Assert.notNull(point, "point(lat and long) must not be null");
 	this.point = point;
 	withRadius(radius);
 	withPlaceType(placeType);
@@ -210,7 +210,7 @@ public class GeolocQuery extends AbstractGisQuery {
      *                radius, if the radius is <=0 , it will be set to the
      *                default radius.
      */
-    private GeolocQuery withRadius(double radius) {
+    protected GeolocQuery withRadius(double radius) {
 	if (radius <= 0) {
 	    this.radius = DEFAULT_RADIUS;
 	} else {
