@@ -3,6 +3,7 @@ package com.gisgraphy.geocoding;
 import java.util.List;
 
 import com.gisgraphy.addressparser.Address;
+import com.gisgraphy.addressparser.AddressResultsDto;
 
 /**
  * 
@@ -14,16 +15,16 @@ public interface IGeocodingService {
 	
 	/**
 	 * 
-	 * The address will be parsed via the address parser and the geocoded
+	 * parsed and geocode a raw address
 	 * @param rawAddress an address as string
-	 * @return a list of geocoded address or null if the address can not be parsed
+	 * @return A list of geocoded address in an {@link AddressResultsDto} or null if the address can not be parsed
 	 */
-	public List<Address> geocode(String rawAddress);
+	public AddressResultsDto geocode(String rawAddress);
 	
 	/**
 	 * @param address the address to geocode
-	 * @return a list of geocoded address with the lat and long field
+	 * @return  A list of geocoded address in an {@link AddressResultsDto} with the lat and long field
 	 */
-	public List<Address> geocode(Address address);
+	public AddressResultsDto geocode(Address address);
 
 }
