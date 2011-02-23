@@ -66,50 +66,43 @@ public class GeolocQueryHttpBuilder {
 	Float longitude=null;
 	// lat
 	try {
-	    latitude = GeolocHelper.parseInternationalDouble(req
-		    .getParameter(GeolocServlet.LAT_PARAMETER));
-	} catch (Exception e) {
-	    if (isPointRequired()){
-		throw new GeolocSearchException("latitude is not correct or empty");
-	    }
-	}
-	if (latitude == null) {
-	    if (isPointRequired()){
-		throw new GeolocSearchException("latitude is not correct or empty");
-	    }
-	}
+			String latParameter = req.getParameter(GeolocServlet.LAT_PARAMETER);
+				if (latParameter!=null){
+					latitude = GeolocHelper.parseInternationalDouble(latParameter);
+				} else if(isPointRequired()) {
+					throw new GeolocSearchException("latitude is empty");
+				} 
+		} catch (Exception e) {
+			throw new GeolocSearchException("latitude is not correct");
+		}
+
 	// long
 	try {
-	    longitude = GeolocHelper.parseInternationalDouble(req
-		    .getParameter(GeolocServlet.LONG_PARAMETER));
+	    String longParameter = req
+		    .getParameter(GeolocServlet.LONG_PARAMETER);
+	    if (longParameter!=null){
+	    	longitude = GeolocHelper.parseInternationalDouble(longParameter);
+	    } else if(isPointRequired()){
+	    		throw new GeolocSearchException(
+	    		"longitude is empty");
+	    	}
 	} catch (Exception e) {
-	    if (isPointRequired()){
 	    throw new GeolocSearchException(
-		    "longitude is not correct or empty");
-	    }
+		    "longitude is not correct ");
 	}
-	if (longitude == null) {
-	    if (isPointRequired()){
-	    throw new GeolocSearchException(
-		    "longitude is not correct or empty");
-	    }
-	}
+	
 	
 	// point
 	
 	Point point = null ;
 	try {
+		if (latitude!=null && longitude!=null ){
 	    point = GeolocHelper.createPoint(longitude, latitude);
+		} 
 	} catch (RuntimeException e1) {
-	    if (isPointRequired()){
-		throw new GeolocSearchException(e1.getMessage());
-	    }
+	    	throw new GeolocSearchException("can not determine Point");
 	}
-	if (point == null) {
-	    if (isPointRequired()){
-		throw new GeolocSearchException("can not determine Point");
-	    }
-	}
+	
 	// radius
 	double radius;
 	try {

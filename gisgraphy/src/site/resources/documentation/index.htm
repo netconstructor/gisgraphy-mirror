@@ -799,7 +799,7 @@ Never re-run an import before cleaning the database and restart the web applicat
 <div align="right"><a href="#top">[top]</a></div>
 <h3>Description</h3>
 <br/>
-The street / geocoding service allows to search for street around earth location.<br/>
+The street / geocoding service allows to search for street by name or GPS position (or both).<br/>
 you can : 
 <ul>
 	<li> Specify GPS position</li>
@@ -834,18 +834,18 @@ The following languages are supported :
 <h3>Parameters</h3>
 <ul>
 <a name="latitudestreet"></a>
-<li>The latitude (required) (north-south) for the location point to search around. The value is a float and can be negative. It use GPS coordinates.
+<li>The latitude (north-south) for the location point to search around. The value is a float, between -90 and +90. It use GPS coordinates. could be optional but need to be valid if specified
 <br/> Examples : 
 <ul>
 <li>-4.2</li>
-<li>-4,2</li>
+<li>+4,2</li>
 </ul>
 </li>
 <br/>
 
 
 <a name="longitudestreet"></a>
-<li>The longitude (required) (east-West) for the location point to search around. The value is a float and can be negative. It use GPS coordinates.
+<li>The longitude (east-West) for the location point to search around. The value is a float between -180 and +180. It use GPS coordinates. could be optional but need to be valid if specified
 <br/> Examples : 
 <ul>
 <li>3.6</li>

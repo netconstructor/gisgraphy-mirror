@@ -336,15 +336,15 @@ public class StreetSearchQueryHttpBuilderTest {
 		    request.removeParameter(StreetServlet.LAT_PARAMETER);
 		    try {
 			query = buildQuery(request);
-			fail("When there is no latitude, query should throw");
 		    } catch (RuntimeException e) {
+		    	fail("lattitude should be optionnal");
 		    }
 		    // with empty lat
 		    request = GeolocTestHelper.createMockHttpServletRequestForStreetGeoloc();
 		    request.setParameter(StreetServlet.LAT_PARAMETER, "");
 		    try {
 			query = buildQuery(request);
-			fail("When there is empty latitude, query should throw");
+			fail("Even if latitude is optional, it should be valid when specified");
 		    } catch (RuntimeException e) {
 		    }
 		    // With wrong lat
@@ -352,7 +352,7 @@ public class StreetSearchQueryHttpBuilderTest {
 		    request.setParameter(StreetServlet.LAT_PARAMETER, "a");
 		    try {
 			query = buildQuery(request);
-			fail("A null lat should throw");
+			fail("A wrong lat should throw");
 		    } catch (RuntimeException e) {
 		    }
 		    // With too small lat
@@ -378,15 +378,15 @@ public class StreetSearchQueryHttpBuilderTest {
 		    request.removeParameter(StreetServlet.LONG_PARAMETER);
 		    try {
 			query = buildQuery(request);
-			fail("When there is no latitude, query should throw");
 		    } catch (RuntimeException e) {
+		    	fail("longitude should be optional");
 		    }
 		    // with empty long
 		    request = GeolocTestHelper.createMockHttpServletRequestForStreetGeoloc();
 		    request.setParameter(StreetServlet.LONG_PARAMETER, "");
 		    try {
 			query = buildQuery(request);
-			fail("When there is empty longitude, query should throw");
+			fail("longitude should be valid even if optional");
 		    } catch (RuntimeException e) {
 		    }
 		    // With wrong Long
@@ -394,7 +394,7 @@ public class StreetSearchQueryHttpBuilderTest {
 		    request.setParameter(StreetServlet.LONG_PARAMETER, "a");
 		    try {
 			query = buildQuery(request);
-			fail("A null lat should throw");
+			fail("Even if latitude is optional, it should be valid when specified");
 		    } catch (RuntimeException e) {
 		    }
 
