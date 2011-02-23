@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.gisgraphy.addressparser.Address;
+import com.gisgraphy.addressparser.AddressResultsDto;
 import com.gisgraphy.addressparser.IAddressParserService;
 
 /**
@@ -21,7 +22,7 @@ public class GeocodingService implements IGeocodingService {
 	/* (non-Javadoc)
 	 * @see com.gisgraphy.geocoding.IGeocodingService#geocode(java.lang.String)
 	 */
-	public List<Address> geocode(String rawAddress) {
+	public AddressResultsDto geocode(String rawAddress) {
 		/*
 		 * if rawAddress == null throw
 		 * parseAddress()
@@ -48,7 +49,7 @@ public class GeocodingService implements IGeocodingService {
 	/* (non-Javadoc)
 	 * @see com.gisgraphy.geocoding.IGeocodingService#geocode(com.gisgraphy.addressparser.Address)
 	 */
-	public List<Address> geocode(Address address) {
+	public AddressResultsDto geocode(Address address) {
 		/*
 		 * if address==null=>throw
 		 * if pobox
