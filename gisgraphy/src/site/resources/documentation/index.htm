@@ -803,10 +803,11 @@ The street / geocoding service allows to search for street around earth location
 you can : 
 <ul>
 	<li> Specify GPS position</li>
-	<li> Give the begining of the name of the street</li>
+	<li> Give the begining or a part of the name of the street(useful for autocompletion)</li>
 	<li> Limit the results to a specific type (e.g : Pedestrian, highway, residential, ... 25 type availables)</li>
 	<li> Limit the results to a specified radius</li>
 	<li> Limit the results to one way street</li>
+	<li> Choose beetween a fulltext search or a partial name search</li>
 	<li> Paginate the results</li>
 	<li> Tells if you want the output to be indented (currently, apply only for XML, not json for performance reasons. may change in next version) </li> 
 </ul>
@@ -853,7 +854,7 @@ The following languages are supported :
 </li>
 <br/>
 <a name="namestreet"></a>
-<li>The begining of the name of the street (optional) : limit the search to the street that starts with the specified name (WITHOUT STREET NUMBER). You must put the name and the type. example : 'Boulevard Paul'.the search is case insensitive. default : search for all street</li>
+<li>a part of the name of the street (optional) or the name of the street (depends on what you want fulltext or auto- completion) : limit the search to the street that starts/contains with the specified name (WITHOUT STREET NUMBER). You must put the name and the type. Example : 'Boulevard Paul'.the search is case insensitive.</li>
 <br/>
 
 
