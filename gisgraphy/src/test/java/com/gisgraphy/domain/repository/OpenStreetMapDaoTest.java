@@ -116,7 +116,7 @@ public class OpenStreetMapDaoTest extends AbstractIntegrationHttpSolrTestCase{
 	
 	List<StreetDistance> nearestStreet = openStreetMapDao.getNearestAndDistanceFrom(searchPoint, 10000, 1, 1, null,null, null,null,true);
 	assertEquals(1,nearestStreet.size());
-	assertEquals("the street is not the expected one, there is probably a problem with the distance",streetOSM2.getGid(),nearestStreet.get(0).getGid());
+	assertEquals("The street is not the expected one, there is probably a problem with the distance",streetOSM2.getGid(),nearestStreet.get(0).getGid());
 	//test distance 
 	//the following line test the distance when the nearest point is taken, with distance_sphere
 	Assert.assertEquals("There is probably a problem with the distance",14.7, nearestStreet.get(0).getDistance(),0.1);
@@ -127,7 +127,7 @@ public class OpenStreetMapDaoTest extends AbstractIntegrationHttpSolrTestCase{
 	
 	//test hasdistance field
 	nearestStreet = openStreetMapDao.getNearestAndDistanceFrom(searchPoint, 10000, 1, 1, null,null, null,null,false);
-	Assert.assertNull("When includeDistance distance should not be included ",nearestStreet.get(0).getDistance());
+	Assert.assertNull("When includeDistance=false, distance should not be included ",nearestStreet.get(0).getDistance());
 	
 	//test streettype
 	assertEquals(0,openStreetMapDao.getNearestAndDistanceFrom(searchPoint, 10000, 1, 1, StreetType.UNCLASSIFIED,null, null,null,true).size());
@@ -180,6 +180,13 @@ public class OpenStreetMapDaoTest extends AbstractIntegrationHttpSolrTestCase{
 	Double firstDist = nearestStreet.get(0).getDistance();
 	Double secondDist = nearestStreet.get(1).getDistance();
 	assertTrue("result should be sorted by distance : "+firstDist +"  should be < " +secondDist ,firstDist < secondDist);
+	
+	//test nullpoint
+	nearestStreet = openStreetMapDao.getNearestAndDistanceFrom(null, 10000, 1, 1, null, null,"John",StreetSearchMode.CONTAINS,true);
+	assertEquals(1,nearestStreet.size());
+	assertEquals(streetOSM2.getGid(),nearestStreet.get(0).getGid());
+	Assert.assertNull("When the point is null, distance field should be null",nearestStreet.get(0).getDistance());
+	
     
     }
 

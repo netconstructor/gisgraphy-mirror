@@ -410,7 +410,11 @@ remove the ability to search for 'no name street'
 			</action>
 			
 			<action dev="David Masclet" type="add">
-				add the abbility that all words are not mandatory in fulltext search
+				Add the abbility that all words are not mandatory in fulltext search
+			</action>
+			
+			<action dev="David Masclet" type="add">
+				The location (point with lat/long) is not required anymore. that allow to do a fulltextsearch on all street
 			</action>
 			
 			</release>

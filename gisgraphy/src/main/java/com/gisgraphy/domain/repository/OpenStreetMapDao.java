@@ -91,7 +91,6 @@ public class OpenStreetMapDao extends GenericDao<OpenStreetMap, Long> implements
 	    final int firstResult, final int maxResults,
 	    final StreetType streetType, final Boolean oneWay ,final String name, final StreetSearchMode streetSearchMode,final boolean includeDistanceField) {
 	
-	Assert.notNull(point);
 	if (name != null && streetSearchMode==null){
 		throw new IllegalArgumentException("streetSearchmode can not be null if name is provided");
 	}
@@ -108,17 +107,15 @@ public class OpenStreetMapDao extends GenericDao<OpenStreetMap, Long> implements
 
 			ProjectionList projections = ProjectionBean.fieldList(
 				fieldList,false);
-				if (includeDistanceField){
-				    if (includeDistanceField){
+				if (includeDistanceField && point!=null){
 				projections.add(
 //				SpatialProjection.distance_sphere(point, GisFeature.LOCATION_COLUMN_NAME).as(
 //					"distance"));
 						SpatialProjection.distance_pointToLine(point, OpenStreetMap.SHAPE_COLUMN_NAME).as(
 						"distance"));
 				}
-				}
 			criteria.setProjection(projections);
-			if (includeDistanceField){
+			if (includeDistanceField && point !=null){
 			    criteria.addOrder(new ProjectionOrder("distance"));
 			}
 			if (maxResults > 0) {
@@ -127,9 +124,10 @@ public class OpenStreetMapDao extends GenericDao<OpenStreetMap, Long> implements
 			if (firstResult >= 1) {
 			    criteria = criteria.setFirstResult(firstResult - 1);
 			}
-			
-			Polygon polygonBox = GeolocHelper.createPolygonBox(point.getX(), point.getY(), distance);
-			criteria = criteria.add(new IntersectsRestriction(OpenStreetMap.SHAPE_COLUMN_NAME, polygonBox));
+			if (point!=null){
+			    Polygon polygonBox = GeolocHelper.createPolygonBox(point.getX(), point.getY(), distance);
+			    criteria = criteria.add(new IntersectsRestriction(OpenStreetMap.SHAPE_COLUMN_NAME, polygonBox));
+			}
 			if (name != null) {
 					if (streetSearchMode==StreetSearchMode.CONTAINS){
 					    	criteria = criteria.add(Restrictions.isNotNull("name"));//optimisation!
@@ -153,7 +151,7 @@ public class OpenStreetMapDao extends GenericDao<OpenStreetMap, Long> implements
 			
 			if (queryResults != null && queryResults.size()!=0){
 			    String[] propertiesNameArray ;
-			    if (includeDistanceField){
+			    if (includeDistanceField && point!=null){
 			propertiesNameArray = (String[]) ArrayUtils
 			    	.add(
 			    		IntrospectionHelper
