@@ -180,7 +180,7 @@ php_value auto_append_file "footer.inc"
 ServerName services.gisgraphy.com
 ServerAdmin davidmasclet@gisgraphy.com
 
-ErrorDocument 403 "You don't have permission to access this, or you've reached the maximum number of requests allowed. (you'll be block for a short period)"
+ErrorDocument 403 "You don't have permission to access this, or you've reached the maximum number of requests allowed or you abuse the service. (you'll be block for a short period)"
 
 CustomLog /var/log/apache2/access-services.log combined
 ErrorLog /var/log/apache2/error-services.log
