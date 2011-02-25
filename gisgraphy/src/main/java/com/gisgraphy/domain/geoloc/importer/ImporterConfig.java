@@ -131,10 +131,14 @@ public class ImporterConfig {
 	private String geonamesDir;
 
 	private String openStreetMapDir;
+	
+	private String geonamesZipDir;
 
 	private String openstreetMapDownloadURL;
 
 	private String geonamesDownloadURL;
+	
+	private String geonamesZipDownloadURL;
 
 	private boolean retrieveFiles = false;
 
@@ -530,14 +534,30 @@ public class ImporterConfig {
 		}
 		logger.debug("set openStreetMapDir to " + this.openStreetMapDir);
 	}
-
+	
 	/**
-	 * @return The option
-	 * @see #setGeonamesDir(String)
+	 * The directory where the openStreetMap files will be retrieved and processed.
+	 * It must ends with / or \ according to the System
+	 * 
+	 * @param importeropenStreetMapDir
+	 *                the option
 	 */
-	public String getGeonamesDir() {
-		return this.geonamesDir;
+	@Required
+	public void setGeonamesZipDir(String geonamesZipDir) {
+		if (!geonamesZipDir.endsWith(File.separator)) {
+			logger.debug(geonamesZipDir + " does not end with " + File.separator);
+			this.geonamesZipDir = geonamesZipDir + File.separator;
+		} else {
+			this.geonamesZipDir = geonamesZipDir;
+		}
+		logger.debug("set geonamesZipDir to " + this.geonamesZipDir);
 	}
+	
+	public String getGeonamesZipDir() {
+	    return geonamesZipDir;
+	}
+
+	
 
 	/**
 	 * The directory where the Geonames files will be retrieved and processed.
@@ -555,6 +575,14 @@ public class ImporterConfig {
 			this.geonamesDir = importerGeonamesDir;
 		}
 		logger.debug("set geonamesDir to " + this.geonamesDir);
+	}
+	
+	/**
+	 * @return The option
+	 * @see #setGeonamesDir(String)
+	 */
+	public String getGeonamesDir() {
+		return this.geonamesDir;
 	}
 
 	/**
@@ -603,6 +631,30 @@ public class ImporterConfig {
 			this.geonamesDownloadURL = importerGeonamesDownloadURL;
 		}
 		logger.debug("set geonamesDownloadURL to " + this.geonamesDownloadURL);
+	}
+	
+	/**
+	 * @return The option
+	 * @see #setGeonamesDownloadURL(String)
+	 */
+	public String getGeonamesZipDownloadURL() {
+		return geonamesZipDownloadURL;
+	}
+
+	/**
+	 * The HTTP URL of the directory Where Geonames zip files are to be download from
+	 * 
+	 * @param importerGeonamesDownloadURL
+	 *                The option
+	 */
+	@Required
+	public void setGeonamesZipDownloadURL(String geonamesZipDownloadURL) {
+		if (!geonamesZipDownloadURL.endsWith("/")) {
+			this.geonamesZipDownloadURL = geonamesZipDownloadURL + "/";
+		} else {
+			this.geonamesZipDownloadURL = geonamesZipDownloadURL;
+		}
+		logger.debug("set geonamesZipDownloadURL to " + this.geonamesZipDownloadURL);
 	}
 
 	/**
@@ -973,6 +1025,8 @@ public class ImporterConfig {
 	public void setAlternateNameCountryFileName(String alternateNameCountryFileName) {
 		this.alternateNameCountryFileName = alternateNameCountryFileName;
 	}
+
+	
 
 	
 }

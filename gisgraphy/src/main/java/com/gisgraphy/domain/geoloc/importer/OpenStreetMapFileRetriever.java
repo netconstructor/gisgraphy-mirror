@@ -102,4 +102,9 @@ public class OpenStreetMapFileRetriever extends AbstractFileRetriever {
 	return ImporterHelper.listTarFiles(getDownloadDirectory());
     }
 
+    @Override
+    public boolean isFileNotFoundTolerant() {
+	return false;
+    }
+
 }

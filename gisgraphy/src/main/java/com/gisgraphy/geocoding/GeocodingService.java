@@ -29,7 +29,7 @@ public class GeocodingService implements IGeocodingService {
 		 * if address==null=>
          *		findcityIntext
          *			if city =null
-         *				return null OR fulltext woposition
+         *				fulltext street wo position
          *			else
          *				find street with fulltext optionnal
          *					if null
@@ -54,11 +54,19 @@ public class GeocodingService implements IGeocodingService {
 		 * if address==null=>throw
 		 * if pobox
 		 * 	
-		 * if intersecion
-		 * 
 		 * else
-		 * pour toute les ville de meme nom exactement
-		 * 
+		 * 	if intersection
+		 * 		find city zip+name+state si pas null
+		 * 	else 
+		 * 		if city || zip ==null
+        		 * 		find street in fulltext
+        		 * 	else find city (city state zip)
+        		 * 			if not null
+                                        		 * pour toute les ville de meme nom exactement
+                        		 * 				find street in fulltext
+                        		 * 		  			if null
+                        		 * 	if null 					find street in contains
+                		 * 			find street in fulltext
 		 * 
 		 */
 		// TODO Auto-generated method stub

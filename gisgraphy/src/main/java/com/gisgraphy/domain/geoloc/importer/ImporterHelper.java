@@ -28,6 +28,7 @@ package com.gisgraphy.domain.geoloc.importer;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -225,7 +226,7 @@ public class ImporterHelper {
      * @param localFileName
      *            the local file name (with absolute path)
      */
-    public static void download(String address, String localFileName) {
+    public static void download(String address, String localFileName) throws  FileNotFoundException{
 	logger.info("download file " + address + " to " + localFileName);
 	OutputStream out = null;
 	HttpURLConnection conn = null;
@@ -244,7 +245,7 @@ public class ImporterHelper {
 		case 500:
 		    throw new RuntimeException("Sorry, the server return an 500 status code for "+address+", an internal error has occured");
 		case 404:
-		    throw new RuntimeException("Sorry, the server return an 404 status code for "+address+", the file probably not exists or the URL is not correct");
+		    throw new FileNotFoundException("Sorry, the server return an 404 status code for "+address+", the file probably not exists or the URL is not correct");
 		default:
 		    break;
 		}

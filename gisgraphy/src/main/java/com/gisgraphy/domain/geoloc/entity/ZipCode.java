@@ -45,74 +45,74 @@ import org.hibernate.annotations.Index;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 @SequenceGenerator(name = "zipcode", sequenceName = "zipcode_sequence")
 public class ZipCode {
-	
-	private Long id;
-	 
-	private String code;
-	
-	private GisFeature gisFeature;
-	
-	
-	
-	 /**
-	 *  /**
-     * Default Constructor
+
+    private Long id;
+
+    private String code;
+
+    private GisFeature gisFeature;
+
+    /**
+     * /** Default Constructor
      */
-	public ZipCode() {
-	}
+    public ZipCode() {
+    }
 
-	/**
-	 * @param code the code of the zipcode
-	 */
-	public ZipCode(String code) {
-		 if (code!= null){
-			 this.code = code;
-		 }
-		 else {
-			 throw new IllegalArgumentException("Can not create a zip code with null code");
-		 }
+    /**
+     * @param code
+     *            the code of the zipcode
+     */
+    public ZipCode(String code) {
+	if (code != null) {
+	    this.code = code;
+	} else {
+	    throw new IllegalArgumentException("Can not create a zip code with null code");
 	}
+    }
 
-	/**
+    /**
      * The datastore id
      * 
      * @return The datastore id, it is not a domain value, just a technical One
      */
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "zipcode")
-	public Long getId() {
-		return id;
-	}
-
-	/**
-	 * @param id the id to set
-	 */
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-	/**
-	 * @return the code
-	 */
-	@Column(nullable = false, length = 80)
-	public String getCode() {
-		return code;
-	}
-
-	/**
-	 * @param code the code to set
-	 */
-	public void setCode(String code) {
-		this.code = code;
-	} 
-	
-	 /**
-     * @param gisFeature the gisfeature of the zipcode
-     */
-    public void setGisFeature(GisFeature gisFeature){
-    	this.gisFeature = gisFeature;
+    public Long getId() {
+	return id;
     }
-    
+
+    /**
+     * @param id
+     *            the id to set
+     */
+    public void setId(Long id) {
+	this.id = id;
+    }
+
+    /**
+     * @return the code
+     */
+    @Column(nullable = false, length = 80)
+    public String getCode() {
+	return code;
+    }
+
+    /**
+     * @param code
+     *            the code to set
+     */
+    public void setCode(String code) {
+	this.code = code;
+    }
+
+    /**
+     * @param gisFeature
+     *            the gisfeature of the zipcode
+     */
+    public void setGisFeature(GisFeature gisFeature) {
+	this.gisFeature = gisFeature;
+    }
+
     /**
      * @return the gisFeature associated to this zip code
      */
@@ -120,45 +120,48 @@ public class ZipCode {
     @JoinColumn(nullable = true, name = "gisFeature")
     @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
     @Index(name = "zipcodefeatureidindex")
-    public GisFeature getGisFeature(){
-    	return this.gisFeature;
+    public GisFeature getGisFeature() {
+	return this.gisFeature;
     }
-    
+
     @Override
     public String toString() {
-    	return this.code;
+	return this.code;
     }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((code == null) ? 0 : code.hashCode());
-		return result;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#hashCode()
+     */
+    @Override
+    public int hashCode() {
+	final int prime = 31;
+	int result = 1;
+	result = prime * result + ((code == null) ? 0 : code.hashCode());
+	return result;
+    }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		final ZipCode other = (ZipCode) obj;
-		if (code == null) {
-			if (other.code != null)
-				return false;
-		} else if (!code.equals(other.code))
-			return false;
-		return true;
-	}
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    @Override
+    public boolean equals(Object obj) {
+	if (this == obj)
+	    return true;
+	if (obj == null)
+	    return false;
+	if (getClass() != obj.getClass())
+	    return false;
+	final ZipCode other = (ZipCode) obj;
+	if (code == null) {
+	    if (other.code != null)
+		return false;
+	} else if (!code.equals(other.code))
+	    return false;
+	return true;
+    }
 
-	
 }

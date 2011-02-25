@@ -26,6 +26,7 @@
 package com.gisgraphy.domain.geoloc.importer;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -109,10 +110,29 @@ public abstract class AbstractFileRetriever implements IImporterProcessor {
 	for (String file : downloadFileList) {
 	    this.fileIndex++;
 	    this.currentFileName = file;
-	    ImporterHelper.download(getDownloadBaseUrl()
-		    + file, getDownloadDirectory() + file);
+	    try {
+		downloadFile(file);
+	    } catch (FileNotFoundException e) {
+		if (isFileNotFoundTolerant()){
+		    logger.error(getDownloadBaseUrl()
+		    + file+" can not be downloaded" );
+		} else {
+		 throw new RuntimeException(e);    
+		}
+		}
 	}
     }
+
+    protected void downloadFile(String file) throws FileNotFoundException {
+	ImporterHelper.download(getDownloadBaseUrl()
+	    + file, getDownloadDirectory() + file);
+    }
+    
+    /**
+     * @return false if download files that doesn't exists on the remote server
+     *         should throw
+     */
+    public abstract boolean isFileNotFoundTolerant();
 
     /**
      * @return A list of file to be download

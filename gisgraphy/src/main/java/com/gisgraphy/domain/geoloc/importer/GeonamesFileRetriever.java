@@ -105,4 +105,9 @@ public class GeonamesFileRetriever extends AbstractFileRetriever {
 	return ImporterHelper.listZipFiles(getDownloadDirectory());
     }
 
+    @Override
+    public boolean isFileNotFoundTolerant() {
+	return false;
+    }
+
 }

@@ -240,7 +240,9 @@
 			value="${importerConfig.importGisFeatureEmbededAlternateNames}" />
 		<property name="geonamesDir" value="${importer.geonames.dir}"/>
 		<property name="openStreetMapDir" value="${importer.openstreetmap.dir}"/>
+		<property name="geonamesZipDir" value="${importer.geoname.zip.dir}"/>
 		<property name="geonamesDownloadURL" value="${importer.geonames.downloadURL}"/>
+		<property name="geonamesZipDownloadURL" value="${importer.geonames.zip.downloadURL}"/>
 		<property name="retrieveFiles" value="${importer.retrieveFiles}"/>
 		<property name="geonamesFilesToDownload" value="${importer.geonamesfilesToDownload}"/>
 		<property name="openStreetMapFilesToDownload" value="${importer.openstreetmapfilesToDownload}"/>
