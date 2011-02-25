@@ -20,14 +20,32 @@
  *  
  *  
  *******************************************************************************/
-package com.gisgraphy.domain.valueobject;
+package com.gisgraphy.domain.repository;
 
-/**
- * List of source for the gisFeatures. it tells from which files/gazetteers it
- * has been imported
- * 
- * @author <a href="mailto:david.masclet@gisgraphy.com">David Masclet</a>
- */
-public enum GISSource {
-    PERSONAL, GEONAMES, GEONAMES_ZIP
+import java.util.List;
+
+import com.gisgraphy.domain.geoloc.entity.ZipCode;
+
+public interface IZipCodeDao extends IDao<ZipCode, java.lang.Long> {
+
+	
+	/**
+	 * @param code the zipcode to search
+	 * @param countryCode
+     *                The ISO 3166 Alpha 2 code in upper case
+	 * @return the zipcode
+	 */
+	public ZipCode getByCodeAndCountry(String code,String countryCode);
+	
+	/**
+	 * @param code The zipcode to search
+	 * @return a list of all zipcode where the given code matches or an empty list if no result
+	 */
+	public List<ZipCode> listByCode(String code);
+	
+	
+   
+	
+    
+    
 }
