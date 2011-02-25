@@ -101,7 +101,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	// check that the csv file line is in a correct format
 	checkNumberOfColumn(fields);
 	
-	String country = null 
+	String country = null ;
 	String code = null;
 	String name = null;
 	String adm1Name = null;
@@ -145,7 +145,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	getgisfeature =>add zipcode
 	*/
 	
-	if (featureCode_ != null) {
+	/*if (featureCode_ != null) {
 	    GisFeature featureObject = (GisFeature) featureCode_.getObject();
 	    logger.debug(featureClass + "_" + featureCode
 		    + " have an entry in " + FeatureCode.class.getSimpleName()
@@ -163,7 +163,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 		    + " and will be considered as a GisFeature");
 	    this.gisFeatureDao.save(gisFeature);
 	}
-	// }
+	// }*/
 
     }
     
@@ -422,8 +422,6 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
     @Override
     public void setup() {
 	super.setup();
-	acceptedPatterns = ImporterHelper.compileRegex(importerConfig
-		.getAcceptRegExString());
     }
 
     /*
