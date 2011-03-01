@@ -132,13 +132,13 @@ public class ImporterConfig {
 
 	private String openStreetMapDir;
 	
-	private String geonamesZipDir;
+	private String geonamesZipCodeDir;
 
 	private String openstreetMapDownloadURL;
 
 	private String geonamesDownloadURL;
 	
-	private String geonamesZipDownloadURL;
+	private String geonamesZipCodeDownloadURL;
 
 	private boolean retrieveFiles = false;
 
@@ -539,22 +539,22 @@ public class ImporterConfig {
 	 * The directory where the openStreetMap files will be retrieved and processed.
 	 * It must ends with / or \ according to the System
 	 * 
-	 * @param importeropenStreetMapDir
+	 * @param geonamesZipCodeDir
 	 *                the option
 	 */
 	@Required
-	public void setGeonamesZipDir(String geonamesZipDir) {
-		if (!geonamesZipDir.endsWith(File.separator)) {
-			logger.debug(geonamesZipDir + " does not end with " + File.separator);
-			this.geonamesZipDir = geonamesZipDir + File.separator;
+	public void setGeonamesZipCodeDir(String geonamesZipCodeDir) {
+		if (!geonamesZipCodeDir.endsWith(File.separator)) {
+			logger.debug(geonamesZipCodeDir + " does not end with " + File.separator);
+			this.geonamesZipCodeDir = geonamesZipCodeDir + File.separator;
 		} else {
-			this.geonamesZipDir = geonamesZipDir;
+			this.geonamesZipCodeDir = geonamesZipCodeDir;
 		}
-		logger.debug("set geonamesZipDir to " + this.geonamesZipDir);
+		logger.debug("set geonamesZipCodeDir to " + this.geonamesZipCodeDir);
 	}
 	
-	public String getGeonamesZipDir() {
-	    return geonamesZipDir;
+	public String getGeonamesZipCodeDir() {
+	    return geonamesZipCodeDir;
 	}
 
 	
@@ -637,24 +637,24 @@ public class ImporterConfig {
 	 * @return The option
 	 * @see #setGeonamesDownloadURL(String)
 	 */
-	public String getGeonamesZipDownloadURL() {
-		return geonamesZipDownloadURL;
+	public String getGeonamesZipCodeDownloadURL() {
+		return geonamesZipCodeDownloadURL;
 	}
 
 	/**
 	 * The HTTP URL of the directory Where Geonames zip files are to be download from
 	 * 
-	 * @param importerGeonamesDownloadURL
+	 * @param geonamesZipDownloadURL
 	 *                The option
 	 */
 	@Required
-	public void setGeonamesZipDownloadURL(String geonamesZipDownloadURL) {
-		if (!geonamesZipDownloadURL.endsWith("/")) {
-			this.geonamesZipDownloadURL = geonamesZipDownloadURL + "/";
+	public void setGeonamesZipCodeDownloadURL(String geonamesZipCodeDownloadURL) {
+		if (!geonamesZipCodeDownloadURL.endsWith("/")) {
+			this.geonamesZipCodeDownloadURL = geonamesZipCodeDownloadURL + "/";
 		} else {
-			this.geonamesZipDownloadURL = geonamesZipDownloadURL;
+			this.geonamesZipCodeDownloadURL = geonamesZipCodeDownloadURL;
 		}
-		logger.debug("set geonamesZipDownloadURL to " + this.geonamesZipDownloadURL);
+		logger.debug("set geonamesZipCodeDownloadURL to " + this.geonamesZipCodeDownloadURL);
 	}
 
 	/**

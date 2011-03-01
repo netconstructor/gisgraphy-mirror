@@ -43,7 +43,7 @@ public class GeonamesZipCodeFileRetriever extends AbstractFileRetriever {
      * getDownloadDirectory()
      */
     public String getDownloadDirectory() {
-	return importerConfig.getGeonamesZipDir();
+	return importerConfig.getGeonamesZipCodeDir();
     }
 
     /*
@@ -54,7 +54,7 @@ public class GeonamesZipCodeFileRetriever extends AbstractFileRetriever {
      * ()
      */
     public String getDownloadBaseUrl() {
-	return importerConfig.getGeonamesZipDownloadURL();
+	return importerConfig.getGeonamesZipCodeDownloadURL();
     }
 
 
