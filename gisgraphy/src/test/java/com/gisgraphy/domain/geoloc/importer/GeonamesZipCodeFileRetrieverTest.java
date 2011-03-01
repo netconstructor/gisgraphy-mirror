@@ -43,11 +43,11 @@ import com.gisgraphy.helper.FileHelper;
 import com.gisgraphy.service.IInternationalisationService;
 import com.gisgraphy.test.GeolocTestHelper;
 
-public class GeonamesFileRetrieverTest {
+public class GeonamesZipCodeFileRetrieverTest {
 
     @Test
     public void rollbackShouldRollback() {
-	GeonamesFileRetriever geonamesFileRetriever = new GeonamesFileRetriever();
+	GeonamesZipCodeFileRetriever geonamesZipCodeFileRetriever = new GeonamesZipCodeFileRetriever();
 	ImporterConfig importerConfig = new ImporterConfig();
 	File tempDir = FileHelper.createTempDir(this.getClass()
 		.getSimpleName());
@@ -59,10 +59,10 @@ public class GeonamesFileRetrieverTest {
 	    fail("Can not create file " + file.getAbsolutePath());
 	}
 
-	importerConfig.setGeonamesDir(tempDir.getAbsolutePath());
+	importerConfig.setGeonamesZipDir(tempDir.getAbsolutePath());
 	importerConfig.setGeonamesFilesToDownload("FR.zip");
-	geonamesFileRetriever.setImporterConfig(importerConfig);
-	List<NameValueDTO<Integer>> list = geonamesFileRetriever.rollback();
+	geonamesZipCodeFileRetriever.setImporterConfig(importerConfig);
+	List<NameValueDTO<Integer>> list = geonamesZipCodeFileRetriever.rollback();
 	assertEquals(1, list.size());
 	assertFalse("The importable file should have been deleted", file
 		.exists());
@@ -76,14 +76,14 @@ public class GeonamesFileRetrieverTest {
     @Test
     public void shouldBeSkipShouldReturnCorrectValue(){
 	ImporterConfig importerConfig = new ImporterConfig();
-	GeonamesFileRetriever geonamesFileRetriever = new GeonamesFileRetriever();
-	geonamesFileRetriever.setImporterConfig(importerConfig);
+	GeonamesZipCodeFileRetriever geonamesZipCodeFileRetriever = new GeonamesZipCodeFileRetriever();
+	geonamesZipCodeFileRetriever.setImporterConfig(importerConfig);
 	
 	importerConfig.setGeonamesImporterEnabled(false);
-	Assert.assertTrue(geonamesFileRetriever.shouldBeSkipped());
+	Assert.assertTrue(geonamesZipCodeFileRetriever.shouldBeSkipped());
 	
 	importerConfig.setGeonamesImporterEnabled(true);
-	Assert.assertFalse(geonamesFileRetriever.shouldBeSkipped());
+	Assert.assertFalse(geonamesZipCodeFileRetriever.shouldBeSkipped());
 	
     }
     
@@ -94,17 +94,17 @@ public class GeonamesFileRetrieverTest {
 	List<String> filesToDownload =new ArrayList<String>();
 	filesToDownload.add(fileTobeDownload);
 	importerConfig.setGeonamesFilesToDownload(fileTobeDownload);
-	GeonamesFileRetriever geonamesFileRetriever = new GeonamesFileRetriever();
-	geonamesFileRetriever.setImporterConfig(importerConfig);
-	Assert.assertEquals("getFilesToDownload should return the importerConfig Option",filesToDownload, geonamesFileRetriever.getFilesToDownload());
+	GeonamesZipCodeFileRetriever geonamesZipCodeFileRetriever = new GeonamesZipCodeFileRetriever();
+	geonamesZipCodeFileRetriever.setImporterConfig(importerConfig);
+	Assert.assertEquals("getFilesToDownload should return the importerConfig Option",filesToDownload, geonamesZipCodeFileRetriever.getFilesToDownload());
     }
     
     @Test
     public void processWithNotExistingFiles() {
-	GeonamesFileRetriever geonamesFileRetriever = new GeonamesFileRetriever();
-	geonamesFileRetriever.setInternationalisationService(createMockInternationalisationService());
+	GeonamesZipCodeFileRetriever geonamesZipCodeFileRetriever = new GeonamesZipCodeFileRetriever();
+	geonamesZipCodeFileRetriever.setInternationalisationService(createMockInternationalisationService());
 	ImporterConfig importerConfig = new ImporterConfig();
-	importerConfig.setGeonamesDownloadURL("http://download.geonames.org/export/dump/");
+	importerConfig.setGeonamesZipDownloadURL("http://download.geonames.org/export/zip/");
 	
 	// create a temporary directory to download files
 	File tempDir = FileHelper.createTempDir(this.getClass()
@@ -117,16 +117,11 @@ public class GeonamesFileRetrieverTest {
 	importerConfig.setGeonamesFilesToDownload(fileTobeDownload);
 	importerConfig.setRetrieveFiles(true);
 
-	importerConfig.setGeonamesDir(tempDir.getAbsolutePath());
-	geonamesFileRetriever.setImporterConfig(importerConfig);
+	importerConfig.setGeonamesZipDir(tempDir.getAbsolutePath());
+	geonamesZipCodeFileRetriever.setImporterConfig(importerConfig);
 
 
-	try {
-	    geonamesFileRetriever.process();
-	    fail("all the files specify should exists");
-	} catch (ImporterException e) {
-	    Assert.assertEquals(FileNotFoundException.class, e.getCause().getCause().getClass());
-	}
+	    geonamesZipCodeFileRetriever.process();
 	// delete temp dir
 	assertTrue("The tempDir has not been deleted", GeolocTestHelper
 		.DeleteNonEmptyDirectory(tempDir));
@@ -137,10 +132,10 @@ public class GeonamesFileRetrieverTest {
     
     @Test
     public void process() {
-	GeonamesFileRetriever geonamesFileRetriever = new GeonamesFileRetriever();
-	geonamesFileRetriever.setInternationalisationService(createMockInternationalisationService());
+	GeonamesZipCodeFileRetriever geonamesZipCodeFileRetriever = new GeonamesZipCodeFileRetriever();
+	geonamesZipCodeFileRetriever.setInternationalisationService(createMockInternationalisationService());
 	ImporterConfig importerConfig = new ImporterConfig();
-	importerConfig.setGeonamesDownloadURL("http://download.geonames.org/export/dump/");
+	importerConfig.setGeonamesZipDownloadURL("http://download.geonames.org/export/zip/");
 	
 	// create a temporary directory to download files
 	File tempDir = FileHelper.createTempDir(this.getClass()
@@ -153,54 +148,54 @@ public class GeonamesFileRetrieverTest {
 	importerConfig.setGeonamesFilesToDownload(fileTobeDownload);
 	importerConfig.setRetrieveFiles(true);
 
-	importerConfig.setGeonamesDir(tempDir.getAbsolutePath());
+	importerConfig.setGeonamesZipDir(tempDir.getAbsolutePath());
 
 	// check that the directory is ending with the / or \ according to the
 	// System
-	Assert.assertTrue("geonamesDir must ends with" + File.separator,
-		importerConfig.getGeonamesDir().endsWith(File.separator));
+	Assert.assertTrue("geonamesZipDir must ends with" + File.separator,
+		importerConfig.getGeonamesZipDir().endsWith(File.separator));
 	
-	geonamesFileRetriever.setImporterConfig(importerConfig);
-	geonamesFileRetriever.process();
+	geonamesZipCodeFileRetriever.setImporterConfig(importerConfig);
+	geonamesZipCodeFileRetriever.process();
 
 	// check that geonamesDownloadURL ends with '/' : normally "/" is added
 	// if not
 	Assert.assertTrue("GeonamesDownloadURL must ends with '/' but was "
-		+ importerConfig.getGeonamesDownloadURL(), importerConfig
-		.getGeonamesDownloadURL().endsWith("/"));
+		+ importerConfig.getGeonamesZipDownloadURL(), importerConfig
+		.getGeonamesZipDownloadURL().endsWith("/"));
 
 	// check that files have been Downloaded
 	File file = null;
 	for (String fileToDownload : filesToDownload) {
-	    file = new File(importerConfig.getGeonamesDir() + fileToDownload);
+	    file = new File(importerConfig.getGeonamesZipDir() + fileToDownload);
 	    if (importerConfig.isRetrieveFiles()) {
 		Assert.assertTrue("Le fichier " + fileToDownload
 			+ " have not been downloaded in "
-			+ importerConfig.getGeonamesDir(), file.exists());
+			+ importerConfig.getGeonamesZipDir(), file.exists());
 	    } else {
 		Assert.assertFalse("Le fichier " + fileToDownload
 			+ " have been downloaded in "
-			+ importerConfig.getGeonamesDir()
+			+ importerConfig.getGeonamesZipDir()
 			+ " even if the option retrievefile is"
 			+ importerConfig.isRetrieveFiles(), file.exists());
 	    }
 	}
 
-	// check that files have been decompress
+	// check that files have been unzip
 	for (String fileToDownload : filesToDownload) {
 	    String fileNameWithExtension = fileToDownload.substring(0,
 		    (fileToDownload.length()) - 3)
 		    + "txt";
-	    file = new File(importerConfig.getGeonamesDir()
+	    file = new File(importerConfig.getGeonamesZipDir()
 		    + fileNameWithExtension);
 	    if (importerConfig.isRetrieveFiles()) {
 		Assert.assertTrue("Le fichier " + fileNameWithExtension
 			+ " have not been decompress in "
-			+ importerConfig.getGeonamesDir(), file.exists());
+			+ importerConfig.getGeonamesZipDir(), file.exists());
 	    } else {
 		Assert.assertFalse("Le fichier " + fileToDownload
 			+ " have been unzip in "
-			+ importerConfig.getGeonamesDir()
+			+ importerConfig.getGeonamesZipDir()
 			+ " even if the option retrievefile is"
 			+ importerConfig.isRetrieveFiles(), file.exists());
 	    }

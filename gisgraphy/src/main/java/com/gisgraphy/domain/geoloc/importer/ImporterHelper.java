@@ -233,7 +233,6 @@ public class ImporterHelper {
 	InputStream in = null;
 	try {
 	    URL url = new URL(address);
-	    out = new BufferedOutputStream(new FileOutputStream(localFileName));
 	    conn = (HttpURLConnection) url.openConnection();
 	    if (conn instanceof HttpURLConnection) {
 
@@ -252,6 +251,7 @@ public class ImporterHelper {
 		
 	    }
 	    in = conn.getInputStream();
+	    out = new BufferedOutputStream(new FileOutputStream(localFileName));
 	    byte[] buffer = new byte[1024];
 	    int numRead;
 	    long numWritten = 0;
@@ -264,6 +264,8 @@ public class ImporterHelper {
 	    String errorMessage = "can not download " + address + " to " + localFileName + " : " + e.getMessage() + ". if the host exists and is reachable," + " maybe this links can help : http://www.gisgraphy.com/forum/viewtopic.php?f=3&t=64 ";
 	    logger.warn(errorMessage);
 	    throw new ImporterException(errorMessage, e);
+	} catch (FileNotFoundException e) {
+	    throw e;
 	} catch (Exception e) {
 	    logger.warn("can not download " + address + " to " + localFileName + " : " + e.getMessage());
 	    throw new ImporterException(e);
