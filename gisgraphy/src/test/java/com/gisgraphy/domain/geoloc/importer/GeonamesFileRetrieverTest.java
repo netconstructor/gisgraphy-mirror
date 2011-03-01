@@ -28,6 +28,7 @@ import static junit.framework.Assert.fail;
 import static org.junit.Assert.assertFalse;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +98,42 @@ public class GeonamesFileRetrieverTest {
 	geonamesFileRetriever.setImporterConfig(importerConfig);
 	Assert.assertEquals("getFilesToDownload should return the importerConfig Option",filesToDownload, geonamesFileRetriever.getFilesToDownload());
     }
+    
+    @Test
+    public void processWithNotExistingFiles() {
+	GeonamesFileRetriever geonamesFileRetriever = new GeonamesFileRetriever();
+	geonamesFileRetriever.setInternationalisationService(createMockInternationalisationService());
+	ImporterConfig importerConfig = new ImporterConfig();
+	importerConfig.setGeonamesDownloadURL("http://download.geonames.org/export/dump/");
+	
+	// create a temporary directory to download files
+	File tempDir = FileHelper.createTempDir(this.getClass()
+		.getSimpleName());
+
+	// get files to download
+	List<String> filesToDownload =new ArrayList<String>();
+	String fileTobeDownload = "NotExistingFile.zip";
+	filesToDownload.add(fileTobeDownload);
+	importerConfig.setGeonamesFilesToDownload(fileTobeDownload);
+	importerConfig.setRetrieveFiles(true);
+
+	importerConfig.setGeonamesDir(tempDir.getAbsolutePath());
+	geonamesFileRetriever.setImporterConfig(importerConfig);
+
+
+	try {
+	    geonamesFileRetriever.process();
+	    fail("all the files specify should exists");
+	} catch (ImporterException e) {
+	    Assert.assertEquals(FileNotFoundException.class, e.getCause().getCause().getClass());
+	}
+	// delete temp dir
+	assertTrue("The tempDir has not been deleted", GeolocTestHelper
+		.DeleteNonEmptyDirectory(tempDir));
+
+
+    }
+    
     
     @Test
     public void process() {

@@ -22,7 +22,10 @@
  *******************************************************************************/
 package com.gisgraphy.domain.geoloc.importer;
 
+import static junit.framework.Assert.fail;
+
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -124,13 +127,9 @@ public class OpenStreetMapFileRetrieverTest {
     
     @Test
     public void process() {
-	
 	OpenStreetMapFileRetriever openStreetMapFileRetriever = new OpenStreetMapFileRetriever();
-
 	openStreetMapFileRetriever.setInternationalisationService(createMockInternationalisationService());
-	
 	ImporterConfig importerConfig = new ImporterConfig();
-
 	importerConfig.setOpenstreetMapDownloadURL("http://download.gisgraphy.com/openstreetmap/");
 	
 	// create a temporary directory to download files
@@ -201,7 +200,44 @@ public class OpenStreetMapFileRetrieverTest {
 	Assert.assertTrue("the tempDir has not been deleted", GeolocTestHelper
 		.DeleteNonEmptyDirectory(tempDir));
 
+
+    }
+    
+    
+    @Test
+    public void processWhenNotExistingFile() {
+	OpenStreetMapFileRetriever openStreetMapFileRetriever = new OpenStreetMapFileRetriever();
+	openStreetMapFileRetriever.setInternationalisationService(createMockInternationalisationService());
+	ImporterConfig importerConfig = new ImporterConfig();
+	importerConfig.setOpenstreetMapDownloadURL("http://download.gisgraphy.com/openstreetmap/");
 	
+	// create a temporary directory to download files
+	File tempDir = FileHelper.createTempDir(this.getClass()
+		.getSimpleName());
+
+	// get files to download
+	List<String> filesToDownload =new ArrayList<String>();
+	String fileTobeDownload = "notExisting.bz2";
+	filesToDownload.add(fileTobeDownload);
+	importerConfig.setOpenStreetMapFilesToDownload(fileTobeDownload);
+	importerConfig.setRetrieveFiles(true);
+
+	importerConfig.setOpenStreetMapDir(tempDir.getAbsolutePath());
+
+
+	openStreetMapFileRetriever.setImporterConfig(importerConfig);
+	try {
+	    openStreetMapFileRetriever.process();
+	    fail("all the files specify should exists");
+	} catch (ImporterException e) {
+	    Assert.assertEquals(FileNotFoundException.class, e.getCause().getCause().getClass());
+	}
+
+
+	// delete temp dir
+	Assert.assertTrue("the tempDir has not been deleted", GeolocTestHelper
+		.DeleteNonEmptyDirectory(tempDir));
+
 
     }
 
