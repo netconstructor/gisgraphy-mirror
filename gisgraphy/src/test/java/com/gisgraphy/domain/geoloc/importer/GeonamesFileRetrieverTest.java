@@ -34,10 +34,12 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.easymock.classextension.EasyMock;
 import org.junit.Test;
 
 import com.gisgraphy.domain.valueobject.NameValueDTO;
 import com.gisgraphy.helper.FileHelper;
+import com.gisgraphy.service.IInternationalisationService;
 import com.gisgraphy.test.GeolocTestHelper;
 
 public class GeonamesFileRetrieverTest {
@@ -94,8 +96,92 @@ public class GeonamesFileRetrieverTest {
 	GeonamesFileRetriever geonamesFileRetriever = new GeonamesFileRetriever();
 	geonamesFileRetriever.setImporterConfig(importerConfig);
 	Assert.assertEquals("getFilesToDownload should return the importerConfig Option",filesToDownload, geonamesFileRetriever.getFilesToDownload());
-	
-	
     }
+    
+    @Test
+    public void process() {
+	GeonamesFileRetriever geonamesFileRetriever = new GeonamesFileRetriever();
+	geonamesFileRetriever.setInternationalisationService(createMockInternationalisationService());
+	ImporterConfig importerConfig = new ImporterConfig();
+	importerConfig.setGeonamesDownloadURL("http://download.geonames.org/export/dump/");
+	
+	// create a temporary directory to download files
+	File tempDir = FileHelper.createTempDir(this.getClass()
+		.getSimpleName());
+
+	// get files to download
+	List<String> filesToDownload =new ArrayList<String>();
+	String fileTobeDownload = "AD.zip";
+	filesToDownload.add(fileTobeDownload);
+	importerConfig.setGeonamesFilesToDownload(fileTobeDownload);
+	importerConfig.setRetrieveFiles(true);
+
+	importerConfig.setGeonamesDir(tempDir.getAbsolutePath());
+
+	// check that the directory is ending with the / or \ according to the
+	// System
+	Assert.assertTrue("geonamesDir must ends with" + File.separator,
+		importerConfig.getGeonamesDir().endsWith(File.separator));
+	
+	geonamesFileRetriever.setImporterConfig(importerConfig);
+	geonamesFileRetriever.process();
+
+	// check that geonamesDownloadURL ends with '/' : normally "/" is added
+	// if not
+	Assert.assertTrue("GeonamesDownloadURL must ends with '/' but was "
+		+ importerConfig.getGeonamesDownloadURL(), importerConfig
+		.getGeonamesDownloadURL().endsWith("/"));
+
+	// check that files have been Downloaded
+	File file = null;
+	for (String fileToDownload : filesToDownload) {
+	    file = new File(importerConfig.getGeonamesDir() + fileToDownload);
+	    if (importerConfig.isRetrieveFiles()) {
+		Assert.assertTrue("Le fichier " + fileToDownload
+			+ " have not been downloaded in "
+			+ importerConfig.getGeonamesDir(), file.exists());
+	    } else {
+		Assert.assertFalse("Le fichier " + fileToDownload
+			+ " have been downloaded in "
+			+ importerConfig.getGeonamesDir()
+			+ " even if the option retrievefile is"
+			+ importerConfig.isRetrieveFiles(), file.exists());
+	    }
+	}
+
+	// check that files have been untar
+	for (String fileToDownload : filesToDownload) {
+	    String fileNameWithExtension = fileToDownload.substring(0,
+		    (fileToDownload.length()) - 3)
+		    + "txt";
+	    file = new File(importerConfig.getGeonamesDir()
+		    + fileNameWithExtension);
+	    if (importerConfig.isRetrieveFiles()) {
+		Assert.assertTrue("Le fichier " + fileNameWithExtension
+			+ " have not been decompress in "
+			+ importerConfig.getGeonamesDir(), file.exists());
+	    } else {
+		Assert.assertFalse("Le fichier " + fileToDownload
+			+ " have been unzip in "
+			+ importerConfig.getGeonamesDir()
+			+ " even if the option retrievefile is"
+			+ importerConfig.isRetrieveFiles(), file.exists());
+	    }
+	}
+
+	// delete temp dir
+	Assert.assertTrue("the tempDir has not been deleted", GeolocTestHelper
+		.DeleteNonEmptyDirectory(tempDir));
+    }
+    
+
+    private IInternationalisationService createMockInternationalisationService() {
+	IInternationalisationService internationalisationService = EasyMock.createMock(IInternationalisationService.class);
+	EasyMock.expect(internationalisationService.getString((String)EasyMock.anyObject())).andStubReturn("localizedValue");
+	EasyMock.replay(internationalisationService);
+	return internationalisationService;
+    }
+
+    
 
 }
