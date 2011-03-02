@@ -33,6 +33,7 @@ import com.gisgraphy.domain.geoloc.importer.ImporterManager;
 import com.gisgraphy.domain.geoloc.importer.ImporterMetaDataException;
 import com.gisgraphy.domain.valueobject.ImporterStatus;
 import com.gisgraphy.domain.valueobject.ImporterStatusDto;
+import com.gisgraphy.helper.StringHelper;
 import com.opensymphony.xwork2.Action;
 import com.opensymphony.xwork2.ActionSupport;
 
@@ -139,6 +140,14 @@ public class ImportAction extends ActionSupport {
      */
     public List<ImporterStatusDto> getImporterStatusDtoList() {
 	return importerManager.getStatusDtoList();
+    }
+    
+    /**
+     * @param string a CamelCaseString
+     * @return a human readable String 
+     */
+    public String  splitCamelCase(String string){
+	return StringHelper.splitCamelCase(string);
     }
 
     /**

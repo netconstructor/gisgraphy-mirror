@@ -28,6 +28,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.gisgraphy.ToDelete;
 import com.gisgraphy.domain.geoloc.entity.OpenStreetMap;
 import com.gisgraphy.domain.valueobject.GisgraphyConfig;
 
@@ -132,5 +133,21 @@ public class StringHelper {
 		}
 		return openStreetMap;
 	}
+	
+	/**
+	 * @param s a camel Case string
+	 * @return a human readable string where upper char is replaced by a space and the lowercase char 
+	 */
+	public static String splitCamelCase(String s) {
+	    return s.replaceAll(
+	       String.format("%s|%s|%s",
+	          "(?<=[A-Z])(?=[A-Z][a-z])",
+	          "(?<=[^A-Z])(?=[A-Z])",
+	          "(?<=[A-Za-z])(?=[^A-Za-z])"
+	       ),
+	       " "
+	    );
+	 }
+
 
 }

@@ -1,5 +1,8 @@
 package com.gisgraphy.helper;
 
+import static com.gisgraphy.helper.StringHelper.splitCamelCase;
+import static junit.framework.Assert.assertEquals;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -124,6 +127,19 @@ public class StringHelperTest {
 	StringHelper.updateOpenStreetMapEntityForIndexation(openStreetMap);
 	Assert.assertNull("The value of partial search should be null if name is too long", openStreetMap.getPartialSearchName());
 	Assert.assertEquals("The value of text search name should not be null and correct if name is too long",StringHelper.transformStringForFulltextIndexation(openStreetMap.getName()), openStreetMap.getTextSearchName());
+    }
+    
+    @Test
+    public void splitCamelCaseShouldSplit(){
+	assertEquals("lowercase", splitCamelCase("lowercase"));
+	    assertEquals("Class", splitCamelCase("Class"));
+	    assertEquals("My Class", splitCamelCase("MyClass"));
+	    assertEquals("HTML", splitCamelCase("HTML"));
+	    assertEquals("PDF Loader", splitCamelCase("PDFLoader"));
+	    assertEquals("A String", splitCamelCase("AString"));
+	    assertEquals("Simple XML Parser", splitCamelCase("SimpleXMLParser"));
+	    assertEquals("GL 11 Version", splitCamelCase("GL11Version"));
+
     }
     
     
