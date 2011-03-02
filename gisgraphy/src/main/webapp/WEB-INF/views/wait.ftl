@@ -28,7 +28,7 @@
     <th><@s.text name="import.status.label" /></th>
     <@s.iterator value="importerStatusDtoList" >
      <tr>
-         <td> <img src="/images/<@s.property value='status' />.png" alt="<@s.property value='status' />" title="<@s.property value='status' />"/><@s.set name="processorNameHumanReadable" value="splitCamelCase(processorName)"/>${processorNameHumanReadable?lower_case }<br/></td>
+         <td> <img src="/images/<@s.property value='status' />.png" alt="<@s.property value='status' />" title="<@s.property value='status' />"/><@s.set name="processorNameHumanReadable" value="splitCamelCase(processorName)"/>${processorNameHumanReadable?lower_case?cap_first }<br/></td>
          <td>
 	         <@s.property value="percent" />% :
 		         <table style="width:100px;border:1px solid;padding:0px;margin:0px;vertical-align:middle;" ><tr>
