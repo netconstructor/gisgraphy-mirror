@@ -10,9 +10,22 @@ public class ZipCodeTest {
 	private String code ="code";
 	
 	@Test
+	public void testSetCodeShouldUppercase(){
+		ZipCode zipCode = new ZipCode("");
+		zipCode.setCode(code);
+		Assert.assertEquals("zipcode constructor should upper case","CODE", zipCode.getCode());
+	}
+	
+	@Test
+	public void testConstructorShouldUpperCaseCode(){
+		ZipCode zipCode = new ZipCode(code);
+		Assert.assertEquals("zipcode constructor should upper case","CODE", zipCode.getCode());
+	}
+	
+	@Test
 	public void testToString(){
 		ZipCode zipCode = new ZipCode(code);
-		Assert.assertEquals("toString should return the code ",code, zipCode.toString());
+		Assert.assertEquals("toString should return the code ","CODE", zipCode.toString());
 	}
 	
 	@Test(expected=IllegalArgumentException.class)

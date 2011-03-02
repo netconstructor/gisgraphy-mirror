@@ -60,11 +60,11 @@ public class ZipCode {
 
     /**
      * @param code
-     *            the code of the zipcode
+     *            the code of the zipcode (will be uppercased)
      */
     public ZipCode(String code) {
 	if (code != null) {
-	    this.code = code;
+	    this.code = code.toUpperCase();
 	} else {
 	    throw new IllegalArgumentException("Can not create a zip code with null code");
 	}
@@ -99,10 +99,14 @@ public class ZipCode {
 
     /**
      * @param code
-     *            the code to set
+     *            the code to set, (will be uppercased)
      */
     public void setCode(String code) {
-	this.code = code;
+	if (code!=null){
+	    this.code = code.toUpperCase();
+	} else {
+	    this.code =null;
+	}
     }
 
     /**

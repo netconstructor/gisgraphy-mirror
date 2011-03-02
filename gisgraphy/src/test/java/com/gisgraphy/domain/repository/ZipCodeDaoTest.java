@@ -32,7 +32,43 @@ public class ZipCodeDaoTest extends AbstractIntegrationHttpSolrTestCase{
 		Assert.assertEquals(zip1, actual);
 		actual = zipCodeDao.getByCodeAndCountry(code, "DE");
 		Assert.assertNull(actual);
+	}
+	
+	@Test
+	public void testGetByCodeAndCountrySmart(){
+		String code = "code1";
+		String countryCode = "FR";
 		
+		String smartCode = "H1B";
+		String smartCountryCode = "GB";
+		
+		ZipCode smartZip = new ZipCode(smartCode);
+		ZipCode zip1 = new ZipCode(code);
+		
+		GisFeature gisFeature = GeolocTestHelper.createGisFeature("asciiname", 3F, 4F, 1L);
+		gisFeature.setCountryCode(countryCode);
+		gisFeature.addZipCode(zip1);
+		gisFeatureDao.save(gisFeature);
+		
+		GisFeature smartGisFeature = GeolocTestHelper.createGisFeature("asciiname", 3F, 4F, 2L);
+		smartGisFeature.setCountryCode(smartCountryCode);
+		smartGisFeature.addZipCode(smartZip);
+		gisFeatureDao.save(smartGisFeature);
+		
+		ZipCode actual = zipCodeDao.getByCodeAndCountrySmart(code, countryCode);
+		Assert.assertEquals(zip1, actual);
+		actual = zipCodeDao.getByCodeAndCountrySmart(code, "DE");
+		Assert.assertNull(actual);
+		
+		//smart case
+		 actual = zipCodeDao.getByCodeAndCountrySmart(smartCode, smartCountryCode);
+		Assert.assertEquals("smart search for zipCode should handle strictly equals countrycode",smartZip, actual);
+		
+		 actual = zipCodeDao.getByCodeAndCountrySmart("h1b", smartCountryCode);
+		 Assert.assertEquals("smart search for zipCode should be case insensitive",smartZip, actual);
+		 
+		 actual = zipCodeDao.getByCodeAndCountrySmart("H1B FGH", smartCountryCode);
+		 Assert.assertEquals("smart search for zipCode should search for code that starts with",smartZip, actual);
 	}
 	
 	@Test
@@ -62,9 +98,8 @@ public class ZipCodeDaoTest extends AbstractIntegrationHttpSolrTestCase{
 		List<ZipCode> actual = zipCodeDao.listByCode("Nocode");
 		Assert.assertNotNull(actual);
 		Assert.assertEquals(0, actual.size());
-		
-		
 	}
+	
 
 	public void setZipCodeDao(IZipCodeDao zipCodeDao) {
 		this.zipCodeDao = zipCodeDao;

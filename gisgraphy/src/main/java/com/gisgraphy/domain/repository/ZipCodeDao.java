@@ -66,8 +66,10 @@ import com.vividsolutions.jts.geom.Polygon;
 @Repository
 public class ZipCodeDao extends GenericDao<ZipCode, Long> implements IZipCodeDao
 {
+    
+    //CREATE INDEX communes_idxr ON zipcode("code" text_pattern_ops);
 	
-	/**
+   /**
      * The logger
      */
     protected static final Logger logger = LoggerFactory
@@ -101,13 +103,46 @@ public class ZipCodeDao extends GenericDao<ZipCode, Long> implements IZipCodeDao
 				Query qry = session.createQuery(queryString);
 				qry.setCacheable(true);
 
-				qry.setParameter(0, code);
+				qry.setParameter(0, code.toUpperCase());
 				qry.setParameter(1, countryCode.toUpperCase());
 
 				ZipCode result = (ZipCode) qry.uniqueResult();
 				return result;
 			    }
 			});
+	}
+	
+	/* (non-Javadoc)
+	 * @see com.gisgraphy.domain.repository.IZipCodeDao#getByCodeAndCountry(java.lang.String, java.lang.String)
+	 */
+	public ZipCode getByCodeAndCountrySmart(final String code, final String countryCode) {
+		Assert.notNull(code);
+		Assert.notNull(countryCode);
+		
+		if (countryCode.equalsIgnoreCase("CA") || countryCode.equalsIgnoreCase("GB")){
+		    return (ZipCode) this.getHibernateTemplate().execute(
+			    new HibernateCallback() {
+				
+				public Object doInHibernate(Session session)
+				throws PersistenceException {
+				    String queryString = "from "
+					+ getPersistenceClass().getSimpleName()
+					+ " as z where code like ?  and z.gisFeature.countryCode= ?";
+				    
+				    
+				    Query qry = session.createQuery(queryString);
+				    qry.setCacheable(true);
+				    
+				    qry.setParameter(0, code.trim().split(" ")[0].toUpperCase());
+				    qry.setParameter(1, countryCode.toUpperCase());
+				    
+				    ZipCode result = (ZipCode) qry.uniqueResult();
+				    return result;
+				}
+			    });
+		} else {
+		    return getByCodeAndCountry(code, countryCode);
+		}
 	}
 
 
@@ -131,7 +166,7 @@ public class ZipCodeDao extends GenericDao<ZipCode, Long> implements IZipCodeDao
 				Query qry = session.createQuery(queryString);
 				qry.setCacheable(true);
 
-				qry.setParameter(0, code);
+				qry.setParameter(0, code.toUpperCase());
 
 				List<ZipCode> result = (List<ZipCode>) qry.list();
 				return result==null? new ArrayList<ZipCode>():result;

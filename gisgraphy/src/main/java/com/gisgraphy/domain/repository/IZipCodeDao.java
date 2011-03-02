@@ -32,10 +32,20 @@ public interface IZipCodeDao extends IDao<ZipCode, java.lang.Long> {
 	/**
 	 * @param code the zipcode to search
 	 * @param countryCode
-     *                The ISO 3166 Alpha 2 code in upper case
+         * The ISO 3166 Alpha 2 code in upper case
 	 * @return the zipcode
 	 */
 	public ZipCode getByCodeAndCountry(String code,String countryCode);
+	
+	/**
+	 * 
+	 * same as {@link #getByCodeAndCountry(String, String)} but do a starts with method if country is GB or CA
+	 * @param code the zipcode to search
+	 * @param countryCode
+         * The ISO 3166 Alpha 2 code in upper case
+	 * @return the zipcode
+	 */
+	public ZipCode getByCodeAndCountrySmart(String code,String countryCode);
 	
 	/**
 	 * @param code The zipcode to search
