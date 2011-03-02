@@ -170,6 +170,9 @@
 		<property name="openStreetMapDao" ref= "openStreetMapDao" />
 	</bean>
 	
+	<bean id="geonamesZipCodeFileRetriever"
+		class="com.gisgraphy.domain.geoloc.importer.GeonamesZipCodeFileRetriever" parent="abstractFileRetriever" >
+	</bean>
 
 
 	<bean id="importerManager"
@@ -192,6 +195,7 @@
 				<ref bean="geonamesFeatureImporter" />
 				<ref bean="geonamesAlternateNamesExtracter" />
 				<ref bean="geonamesAlternateNamesImporter" />
+				<ref bean="geonamesZipCodeFileRetriever" />
 				<ref bean="geonamesDatabaseIndexer" />
 				<ref bean="openstreetmapFileRetriever" />
 				<ref bean="openStreetMapImporter"/>
