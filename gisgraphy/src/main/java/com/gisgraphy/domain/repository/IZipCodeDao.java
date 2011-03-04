@@ -35,7 +35,7 @@ public interface IZipCodeDao extends IDao<ZipCode, java.lang.Long> {
          * The ISO 3166 Alpha 2 code in upper case
 	 * @return the zipcode
 	 */
-	public ZipCode getByCodeAndCountry(String code,String countryCode);
+	public List<ZipCode> getByCodeAndCountry(String code,String countryCode);
 	
 	/**
 	 * 
@@ -45,7 +45,7 @@ public interface IZipCodeDao extends IDao<ZipCode, java.lang.Long> {
          * The ISO 3166 Alpha 2 code in upper case
 	 * @return the zipcode
 	 */
-	public ZipCode getByCodeAndCountrySmart(String code,String countryCode);
+	public List<ZipCode> getByCodeAndCountrySmart(String code,String countryCode);
 	
 	/**
 	 * @param code The zipcode to search

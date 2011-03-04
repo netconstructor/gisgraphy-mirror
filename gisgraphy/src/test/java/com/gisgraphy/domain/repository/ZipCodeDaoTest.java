@@ -28,10 +28,11 @@ public class ZipCodeDaoTest extends AbstractIntegrationHttpSolrTestCase{
 		gisFeature.addZipCode(zip1);
 		gisFeatureDao.save(gisFeature);
 		
-		ZipCode actual = zipCodeDao.getByCodeAndCountry(code, countryCode);
-		Assert.assertEquals(zip1, actual);
+		List<ZipCode> actual = zipCodeDao.getByCodeAndCountry(code, countryCode);
+		Assert.assertEquals(zip1, actual.get(0));
 		actual = zipCodeDao.getByCodeAndCountry(code, "DE");
-		Assert.assertNull(actual);
+		Assert.assertNotNull(actual);
+		Assert.assertTrue(actual.size()==0);
 	}
 	
 	@Test
@@ -55,20 +56,21 @@ public class ZipCodeDaoTest extends AbstractIntegrationHttpSolrTestCase{
 		smartGisFeature.addZipCode(smartZip);
 		gisFeatureDao.save(smartGisFeature);
 		
-		ZipCode actual = zipCodeDao.getByCodeAndCountrySmart(code, countryCode);
-		Assert.assertEquals(zip1, actual);
+		List<ZipCode> actual = zipCodeDao.getByCodeAndCountrySmart(code, countryCode);
+		Assert.assertEquals(zip1, actual.get(0));
 		actual = zipCodeDao.getByCodeAndCountrySmart(code, "DE");
-		Assert.assertNull(actual);
+		Assert.assertNotNull(actual);
+		Assert.assertTrue(actual.size()==0);
 		
 		//smart case
 		 actual = zipCodeDao.getByCodeAndCountrySmart(smartCode, smartCountryCode);
-		Assert.assertEquals("smart search for zipCode should handle strictly equals countrycode",smartZip, actual);
+		Assert.assertEquals("smart search for zipCode should handle strictly equals countrycode",smartZip, actual.get(0));
 		
 		 actual = zipCodeDao.getByCodeAndCountrySmart("h1b", smartCountryCode);
-		 Assert.assertEquals("smart search for zipCode should be case insensitive",smartZip, actual);
+		 Assert.assertEquals("smart search for zipCode should be case insensitive",smartZip, actual.get(0));
 		 
 		 actual = zipCodeDao.getByCodeAndCountrySmart("H1B FGH", smartCountryCode);
-		 Assert.assertEquals("smart search for zipCode should search for code that starts with",smartZip, actual);
+		 Assert.assertEquals("smart search for zipCode should search for code that starts with",smartZip, actual.get(0));
 	}
 	
 	@Test

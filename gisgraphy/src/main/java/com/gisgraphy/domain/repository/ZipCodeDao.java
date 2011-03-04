@@ -87,10 +87,11 @@ public class ZipCodeDao extends GenericDao<ZipCode, Long> implements IZipCodeDao
 	/* (non-Javadoc)
 	 * @see com.gisgraphy.domain.repository.IZipCodeDao#getByCodeAndCountry(java.lang.String, java.lang.String)
 	 */
-	public ZipCode getByCodeAndCountry(final String code, final String countryCode) {
+	@SuppressWarnings("unchecked")
+	public List<ZipCode> getByCodeAndCountry(final String code, final String countryCode) {
 		Assert.notNull(code);
 		Assert.notNull(countryCode);
-		return (ZipCode) this.getHibernateTemplate().execute(
+		return (List<ZipCode>) this.getHibernateTemplate().execute(
 			new HibernateCallback() {
 
 			    public Object doInHibernate(Session session)
@@ -106,8 +107,8 @@ public class ZipCodeDao extends GenericDao<ZipCode, Long> implements IZipCodeDao
 				qry.setParameter(0, code.toUpperCase());
 				qry.setParameter(1, countryCode.toUpperCase());
 
-				ZipCode result = (ZipCode) qry.uniqueResult();
-				return result;
+				List<ZipCode> result = (List<ZipCode>) qry.list();
+				return result==null? new ArrayList<ZipCode>():result;
 			    }
 			});
 	}
@@ -115,12 +116,13 @@ public class ZipCodeDao extends GenericDao<ZipCode, Long> implements IZipCodeDao
 	/* (non-Javadoc)
 	 * @see com.gisgraphy.domain.repository.IZipCodeDao#getByCodeAndCountry(java.lang.String, java.lang.String)
 	 */
-	public ZipCode getByCodeAndCountrySmart(final String code, final String countryCode) {
+	@SuppressWarnings("unchecked")
+	public List<ZipCode> getByCodeAndCountrySmart(final String code, final String countryCode) {
 		Assert.notNull(code);
 		Assert.notNull(countryCode);
 		
 		if (countryCode.equalsIgnoreCase("CA") || countryCode.equalsIgnoreCase("GB")){
-		    return (ZipCode) this.getHibernateTemplate().execute(
+		    return (List<ZipCode>) this.getHibernateTemplate().execute(
 			    new HibernateCallback() {
 				
 				public Object doInHibernate(Session session)
@@ -136,8 +138,8 @@ public class ZipCodeDao extends GenericDao<ZipCode, Long> implements IZipCodeDao
 				    qry.setParameter(0, code.trim().split(" ")[0].toUpperCase());
 				    qry.setParameter(1, countryCode.toUpperCase());
 				    
-				    ZipCode result = (ZipCode) qry.uniqueResult();
-				    return result;
+				    List<ZipCode> result = (List<ZipCode>) qry.list();
+				    return result==null? new ArrayList<ZipCode>():result;
 				}
 			    });
 		} else {

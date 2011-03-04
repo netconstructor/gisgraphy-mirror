@@ -23,36 +23,29 @@
 package com.gisgraphy.domain.geoloc.importer;
 
 import java.io.File;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import org.hibernate.FlushMode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Required;
 
 import com.gisgraphy.domain.geoloc.entity.Adm;
-import com.gisgraphy.domain.geoloc.entity.AlternateName;
-import com.gisgraphy.domain.geoloc.entity.Country;
+import com.gisgraphy.domain.geoloc.entity.City;
 import com.gisgraphy.domain.geoloc.entity.GisFeature;
 import com.gisgraphy.domain.geoloc.entity.ZipCode;
+import com.gisgraphy.domain.geoloc.service.fulltextsearch.FulltextQuery;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.IFullTextSearchEngine;
 import com.gisgraphy.domain.repository.IAdmDao;
-import com.gisgraphy.domain.repository.IAlternateNameDao;
 import com.gisgraphy.domain.repository.ICityDao;
-import com.gisgraphy.domain.repository.ICountryDao;
-import com.gisgraphy.domain.repository.IGisDao;
 import com.gisgraphy.domain.repository.IGisFeatureDao;
 import com.gisgraphy.domain.repository.ISolRSynchroniser;
-import com.gisgraphy.domain.valueobject.AlternateNameSource;
-import com.gisgraphy.domain.valueobject.Constants;
-import com.gisgraphy.domain.valueobject.FeatureCode;
+import com.gisgraphy.domain.repository.IZipCodeDao;
+import com.gisgraphy.domain.valueobject.FulltextResultsDto;
 import com.gisgraphy.domain.valueobject.GISSource;
 import com.gisgraphy.domain.valueobject.NameValueDTO;
+import com.gisgraphy.domain.valueobject.SolrResponseDto;
 import com.gisgraphy.helper.GeolocHelper;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * Import the zipcode from a Geonames dump file.
@@ -61,30 +54,31 @@ import com.gisgraphy.helper.GeolocHelper;
  */
 public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 
-    private ICityDao cityDao;
-
     private IGisFeatureDao gisFeatureDao;
-
-    private IAlternateNameDao alternateNameDao;
 
     private IAdmDao admDao;
 
-    private ICountryDao countryDao;
-    
     private IFullTextSearchEngine fullTextSearchEngine;
-
 
     private ISolRSynchroniser solRSynchroniser;
 
-    @Autowired
-    IGisDao<? extends GisFeature>[] iDaos;
+    private ICityDao cityDao;
+
+    private IZipCodeDao zipCodeDao;
+
+    protected long generatedFeatureId = 0;
+
+    protected final long featureIdIncrement = 2000000;
 
 
+    protected int[] accuracyToDistance = { 50000, 50000, 40000, 10000, 10000, 5000, 3000 };
 
     /*
      * (non-Javadoc)
      * 
-     * @see com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#processData(java.lang.String)
+     * @see
+     * com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#processData
+     * (java.lang.String)
      */
     @Override
     protected void processData(String line) {
@@ -92,97 +86,199 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 
 	/*
 	 * line table has the following fields :
-	 * --------------------------------------------------- 0 country code : 1
-	 * postal code 2 place name 3 admin name1 4 admin code1 5 admin name2 6 admin code2
-	 *  7 admin name3 8 admin code3  9 latitude 10 longitude 11 accuracy
-	 * accuracy
+	 * --------------------------------------------------- 0 country code :
+	 * 1 postal code 2 place name 3 admin name1 4 admin code1 5 admin name2
+	 * 6 admin code2 7 admin name3 8 admin code3 9 latitude 10 longitude 11
+	 * accuracy accuracy
+	 * 
+	 * Accuracy is an integer, the higher the better : 1 : estimated as
+	 * average from numerically neigbouring postal codes 3 : same postal
+	 * code, other name 4 : place name from geonames db 6 : postal code area
+	 * centroid
 	 */
 
 	// check that the csv file line is in a correct format
 	checkNumberOfColumn(fields);
-	
-	String country = null ;
+
+	String countryCode = null;
 	String code = null;
 	String name = null;
 	String adm1Name = null;
-	String adm2Name = null;
 	int accuracy = 0;
-	
+	Point zipPoint = null;
 
 	if (!isEmptyField(fields, 0, true)) {
-	    country = fields[0];
-	} 
-	
+	    countryCode = fields[0];
+	}
+
 	if (!isEmptyField(fields, 1, true)) {
 	    code = fields[1];
-	} 
-	
-	if (!isEmptyField(fields, 2, true)) {
-		name = fields[2];
-	} 
-	
-	if (!isEmptyField(fields, 3, false)) {
-		adm1Name = fields[3];
-	} 
-	
-	if (!isEmptyField(fields, 5, false)) {
-		adm2Name = fields[3];
-	} 
-	
-	if (!isEmptyField(fields, 11, true)) {
-	    accuracy = new Integer(fields[11]);
-	} 
-	
-
-	//si zip deja present =>retrun
-	
-	//find city or subdivision by name and adm1 name verif distance
-	//find city or subdivision by name and adm2 name verif distance
-	//find city or subdivision by name
-	
-	/*si null=>ajoute gisfeature avec source geonames zip
-	
-	getgisfeature =>add zipcode
-	*/
-	
-	/*if (featureCode_ != null) {
-	    GisFeature featureObject = (GisFeature) featureCode_.getObject();
-	    logger.debug(featureClass + "_" + featureCode
-		    + " have an entry in " + FeatureCode.class.getSimpleName()
-		    + " : " + featureObject.getClass().getSimpleName());
-	    featureObject.populate(gisFeature);
-		// zipcode
-		String foundZipCode = findZipCode(fields);
-		if (foundZipCode != null){
-			featureObject.addZipCode(new ZipCode(foundZipCode));//TODO tests zip we should take embeded option into account
-		}
-	    this.gisFeatureDao.save(featureObject);
-	} else {
-	    logger.debug(featureClass + "_" + featureCode
-		    + " have no entry in " + FeatureCode.class.getSimpleName()
-		    + " and will be considered as a GisFeature");
-	    this.gisFeatureDao.save(gisFeature);
 	}
-	// }*/
+
+	if (!isEmptyField(fields, 2, true)) {
+	    name = fields[2];
+	}
+
+	if (!isEmptyField(fields, 3, false)) {
+	    adm1Name = fields[3];
+	}
+
+	if (!isEmptyField(fields, 11, false)) {
+	    accuracy = new Integer(fields[11]);
+	}
+
+	// Location
+	if (!isEmptyField(fields, 10, true) && !isEmptyField(fields, 9, true)) {
+	    zipPoint = GeolocHelper.createPoint(new Float(fields[10]), new Float(fields[9]));
+	}
+
+	Long featureId = findFeature(fields, zipPoint, getAccurateDistance(accuracy));
+	if (featureId != null) {
+	    addAndSaveZipCodeToFeature(code, featureId);
+	} else {
+	    addNewEntityAndZip(fields);
+	}
+    }
+
+    protected Long findFeature(String[] fields,  Point zipPoint,int maxDistance) {
+	String query;
+	boolean extendedsearch;
+	if (fields[3] != null) {
+	    query = fields[2] + " " + fields[3];
+	    extendedsearch = true;
+	} else {
+	    query = fields[2];
+	    extendedsearch = false;
+	}
+	FulltextResultsDto results = doAFulltextSearch(query,fields[0]);
+	if (results.getResults().size() == 0) {
+	    if (extendedsearch) {
+		// do a basic search
+		results = doAFulltextSearch(query, fields[0]);
+		if (results.getResultsSize() == 0) {
+		    // oops, no results
+		    return null;
+		} else if (results.getResultsSize() == 1) {
+		    // we found the one!
+		    return results.getResults().get(0).getFeature_id();
+		} else {
+		    // more than one match iterate and calculate distance and
+		    // take the nearest
+		    new Integer(fields[11]);
+		    return findNearest(zipPoint, maxDistance, query, results);
+		}
+	    } else {
+		// no features matches!
+		return null;
+
+	    }
+	} else if (results.getResults().size() == 1) {
+	    // we found the one!
+	    return results.getResults().get(0).getFeature_id();
+	} else {
+	    // more than one match, take the nearest
+	    return findNearest(zipPoint, maxDistance, query, results);
+	}
 
     }
-    
-    /* (non-Javadoc)
-     * @see com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#shouldBeSkiped()
+
+    protected Long findNearest(Point zipPoint, int maxDistance, String query, FulltextResultsDto results) {
+	Long nearestFeatureId = null;
+	double nearestDistance = 0;
+	logger.error("More than one city match " + query);
+	for (SolrResponseDto dto : results.getResults()) {
+	    Point dtoPoint = GeolocHelper.createPoint(new Float(dto.getLng()), new Float(dto.getLat()));
+	    if (nearestFeatureId == null) {
+		nearestFeatureId = dto.getFeature_id();
+		nearestDistance = GeolocHelper.distance(zipPoint, dtoPoint);
+	    } else {
+		double distance = GeolocHelper.distance(zipPoint, dtoPoint);
+		if (distance > getAccurateDistance(maxDistance)) {
+		    logger.debug(dto.getFeature_id() + " is too far and is not candidate");
+		} else {
+		    if (distance < nearestDistance) {
+			logger.debug(dto.getFeature_id() + "is nearest than " + nearestFeatureId);
+			nearestFeatureId = dto.getFeature_id();
+			nearestDistance = distance;
+		    }
+		}
+
+	    }
+	}
+	return nearestFeatureId;
+    }
+
+    protected int getAccurateDistance(int accuracyLevel) {
+	return accuracyToDistance[Math.max(accuracyLevel, accuracyToDistance.length - 1)];
+    }
+
+    protected void addNewEntityAndZip(String[] fields) {
+	City city = new City();
+	city.setFeatureId(generatedFeatureId++);
+	city.setName(fields[2]);
+	// Location
+	if (!isEmptyField(fields, 9, true) && !isEmptyField(fields, 10, true)) {
+	    city.setLocation(GeolocHelper.createPoint(new Float(fields[9]), new Float(fields[10])));
+	}
+	city.setFeatureClass("P");
+	city.setFeatureCode("PPL");
+	city.setSource(GISSource.GEONAMES_ZIP);
+	city.setCountryCode(fields[0]);
+	setAdmCodesWithCSVOnes(fields, city);
+	Adm adm;
+	if (importerConfig.isTryToDetectAdmIfNotFound()) {
+	    adm = this.admDao.suggestMostAccurateAdm(fields[0], fields[4], fields[6], fields[8], null, city);
+	    logger.debug("suggestAdm=" + adm);
+	} else {
+	    adm = this.admDao.getAdm(fields[0], fields[4], fields[6], fields[8], null);
+	}
+
+	city.setAdm(adm);
+	setAdmCodesWithLinkedAdmOnes(adm, city, importerConfig.isSyncAdmCodesWithLinkedAdmOnes());
+	setAdmNames(adm, city);
+	city.addZipCode(new ZipCode(fields[1]));
+
+	cityDao.save(city);
+    }
+
+    protected void addAndSaveZipCodeToFeature(String code, Long featureId) {
+	GisFeature feature = gisFeatureDao.getByFeatureId(featureId);
+	if (feature == null) {
+	    logger.error("can not add zip code " + code + " to " + featureId + ", because the feature doesn't exists");
+	}
+	ZipCode zipCode = new ZipCode(code);
+	if (feature.getZipCodes() != null && !feature.getZipCodes().contains(zipCode)) {
+	    feature.addZipCode(zipCode);
+	    gisFeatureDao.save(feature);
+	} else {
+	    logger.warn("the zipcode " + code + " already exists for feature " + featureId);
+	}
+    }
+
+    protected FulltextResultsDto doAFulltextSearch(String query, String countryCode) {
+	FulltextQuery fulltextQuery = new FulltextQuery(query);
+	fulltextQuery.limitToCountryCode(countryCode);
+	fulltextQuery.withPlaceTypes(com.gisgraphy.fulltext.Constants.CITY_AND_CITYSUBDIVISION_PLACETYPE);
+
+	FulltextResultsDto results = fullTextSearchEngine.executeQuery(fulltextQuery);
+	return results;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#shouldBeSkiped
+     * ()
      */
     @Override
     public boolean shouldBeSkipped() {
 	return !importerConfig.isGeonamesImporterEnabled();
     }
 
-    private boolean isAlreadyUpdated(GisFeature feature) {
-	if (feature.getModificationDate() != null) {
-	    logger
-		    .info(feature
-			    + " has already been updated, it is probably a duplicate entry");
-	    return true;
-	}
-	return false;
+    protected void initFeatureIdGenerator() {
+	generatedFeatureId = gisFeatureDao.getMaxFeatureId();
+	generatedFeatureId = generatedFeatureId + featureIdIncrement;
     }
 
     private void setAdmNames(Adm adm, GisFeature gisFeature) {
@@ -205,8 +301,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 
     }
 
-    private void setAdmCodesWithLinkedAdmOnes(Adm adm, GisFeature gisFeature,
-	    boolean syncAdmCodesWithLinkedAdmOnes) {
+    private void setAdmCodesWithLinkedAdmOnes(Adm adm, GisFeature gisFeature, boolean syncAdmCodesWithLinkedAdmOnes) {
 
 	if (syncAdmCodesWithLinkedAdmOnes) {
 	    // reset adm code because we might link to an adm3 and adm4 code
@@ -240,92 +335,22 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 
     private void setAdmCodesWithCSVOnes(String[] fields, GisFeature gisFeature) {
 	logger.debug("in setAdmCodesWithCSVOnes");
-	if (!isEmptyField(fields, 10, false)) {
-	    gisFeature.setAdm1Code(fields[10]);
+	if (!isEmptyField(fields, 4, false)) {
+	    gisFeature.setAdm1Code(fields[4]);
 	}
-	if (!isEmptyField(fields, 11, false)) {
-	    gisFeature.setAdm2Code(fields[11]);
+	if (!isEmptyField(fields, 6, false)) {
+	    gisFeature.setAdm2Code(fields[6]);
 	}
-	if (!isEmptyField(fields, 12, false)) {
-	    gisFeature.setAdm3Code(fields[12]);
-	}
-	if (!isEmptyField(fields, 13, false)) {
-	    gisFeature.setAdm4Code(fields[13]);
-	}
-    }
-
-    private List<AlternateName> splitAlternateNames(String alternateNamesString,
-	    GisFeature gisFeature) {
-	String[] alternateNames = alternateNamesString.split(",");
-	List<AlternateName> alternateNamesList = new ArrayList<AlternateName>();
-	for (String name : alternateNames) {
-	    AlternateName alternateName = new AlternateName();
-	    alternateName.setName(name.trim());
-	    alternateName.setSource(AlternateNameSource.EMBEDED);
-	    alternateName.setGisFeature(gisFeature);
-	    alternateNamesList.add(alternateName);
-	}
-	return alternateNamesList;
-    }
-
-    private String findZipCode(String[] fields) {
-	logger.debug("try to detect zipCode for " + fields[1] + "[" + fields[0]
-		+ "]");
-	String zipCode = null;
-	String[] alternateNames = fields[3].split(",");
-	boolean found = false;
-	Pattern patterncountry = null;
-	Matcher matcherCountry = null;
 	if (!isEmptyField(fields, 8, false)) {
-	    Country country = countryDao.getByIso3166Alpha2Code(fields[8]);
-	    if (country != null) {
-		String regex = country.getPostalCodeRegex();
-		if (regex != null) {
-		    patterncountry = Pattern.compile(regex);
-		    if (patterncountry == null) {
-			logger.info("can not compile regexp" + regex);
-			return null;
-		    }
-		} else {
-		    logger.debug("regex=null for country " + country);
-		    return null;
-		}
-	    } else {
-		logger
-			.warn("can not proces ZipCode because can not find country for "
-				+ fields[8]);
-		return null;
-	    }
-
-	} else {
-	    logger.warn("can not proces ZipCode because can not find country ");
+	    gisFeature.setAdm3Code(fields[8]);
 	}
-	for (String element : alternateNames) {
-	    matcherCountry = patterncountry.matcher(element);
-	    if (matcherCountry.matches()) {
-		if (found) {
-		    logger
-			    .info("There is more than one possible ZipCode for feature with featureid="
-				    + fields[0] + ". it will be ignore");
-		    return null;
-		}
-		try {
-		    zipCode = element;
-		    found = true;
-		} catch (NumberFormatException e) {
-		}
-
-	    }
-	}
-	logger.debug("found " + zipCode + " for " + fields[1] + "[" + fields[0]
-		+ "]");
-	return zipCode;
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#shouldIgnoreFirstLine()
+     * @seecom.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#
+     * shouldIgnoreFirstLine()
      */
     @Override
     protected boolean shouldIgnoreFirstLine() {
@@ -335,7 +360,8 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
     /*
      * (non-Javadoc)
      * 
-     * @see com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#shouldIgnoreComments()
+     * @seecom.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#
+     * shouldIgnoreComments()
      */
     @Override
     protected boolean shouldIgnoreComments() {
@@ -345,33 +371,35 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
     /*
      * (non-Javadoc)
      * 
-     * @see com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#setCommitFlushMode()
+     * @seecom.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#
+     * setCommitFlushMode()
      */
     @Override
     protected void setCommitFlushMode() {
-	this.cityDao.setFlushMode(FlushMode.COMMIT);
 	this.gisFeatureDao.setFlushMode(FlushMode.COMMIT);
-	this.alternateNameDao.setFlushMode(FlushMode.COMMIT);
+	this.cityDao.setFlushMode(FlushMode.COMMIT);
 	this.admDao.setFlushMode(FlushMode.COMMIT);
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#flushAndClear()
+     * @see
+     * com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#flushAndClear
+     * ()
      */
     @Override
     protected void flushAndClear() {
-	this.cityDao.flushAndClear();
 	this.gisFeatureDao.flushAndClear();
-	this.alternateNameDao.flushAndClear();
+	this.cityDao.flushAndClear();
 	this.admDao.flushAndClear();
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#getNumberOfColumns()
+     * @seecom.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#
+     * getNumberOfColumns()
      */
     @Override
     protected int getNumberOfColumns() {
@@ -380,7 +408,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 
     /**
      * @param cityDao
-     *                The CityDao to set
+     *            The CityDao to set
      */
     @Required
     public void setCityDao(ICityDao cityDao) {
@@ -388,17 +416,8 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
     }
 
     /**
-     * @param alternateNameDao
-     *                The alternateNameDao to set
-     */
-    @Required
-    public void setAlternateNameDao(IAlternateNameDao alternateNameDao) {
-	this.alternateNameDao = alternateNameDao;
-    }
-
-    /**
      * @param gisFeatureDao
-     *                The GisFeatureDao to set
+     *            The GisFeatureDao to set
      */
     @Required
     public void setGisFeatureDao(IGisFeatureDao gisFeatureDao) {
@@ -407,7 +426,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 
     /**
      * @param admDao
-     *                the admDao to set
+     *            the admDao to set
      */
     @Required
     public void setAdmDao(IAdmDao admDao) {
@@ -417,63 +436,49 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
     /*
      * (non-Javadoc)
      * 
-     * @see com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#setup()
+     * @see
+     * com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#setup()
      */
     @Override
     public void setup() {
 	super.setup();
+	initFeatureIdGenerator();
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#tearDown()
+     * @see
+     * com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#tearDown()
      */
     @Override
     protected void tearDown() {
 	super.tearDown();
 	super.tearDown();
-	if (!solRSynchroniser.commit()){
-	    logger.warn("The commit in tearDown of "+this.getClass().getSimpleName()+" has failed, the uncommitted changes will be commited with the auto commit of solr in few minuts");
+	if (!solRSynchroniser.commit()) {
+	    logger.warn("The commit in tearDown of " + this.getClass().getSimpleName() + " has failed, the uncommitted changes will be commited with the auto commit of solr in few minuts");
 	}
 	solRSynchroniser.optimize();
-    }
-
-    /**
-     * @param countryDao
-     *                The countryDao to set
-     */
-    @Required
-    public void setCountryDao(ICountryDao countryDao) {
-	this.countryDao = countryDao;
     }
 
     /*
      * (non-Javadoc)
      * 
-     * @see com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#getFiles()
+     * @see
+     * com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#getFiles()
      */
     @Override
     protected File[] getFiles() {
-	return ImporterHelper.listCountryFilesToImport(importerConfig
-		.getGeonamesDir());
+	return ImporterHelper.listCountryFilesToImport(importerConfig.getGeonamesZipCodeDir());
     }
 
     /**
      * @param solRSynchroniser
-     *                the solRSynchroniser to set
+     *            the solRSynchroniser to set
      */
     @Required
     public void setSolRSynchroniser(ISolRSynchroniser solRSynchroniser) {
 	this.solRSynchroniser = solRSynchroniser;
-    }
-
-    /**
-     * @param daos
-     *                the iDaos to set
-     */
-    public void setIDaos(IGisDao<? extends GisFeature>[] daos) {
-	iDaos = daos;
     }
 
     /*
@@ -484,34 +489,24 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
     public List<NameValueDTO<Integer>> rollback() {
 	List<NameValueDTO<Integer>> deletedObjectInfo = new ArrayList<NameValueDTO<Integer>>();
 	// we first reset subClass
-	for (IGisDao<? extends GisFeature> gisDao : iDaos) {
-	    if (gisDao.getPersistenceClass() != GisFeature.class
-		    && gisDao.getPersistenceClass() != Adm.class
-		    && gisDao.getPersistenceClass() != Country.class) {
-		logger.warn("deleting "
-			+ gisDao.getPersistenceClass().getSimpleName() + "...");
-		// we don't want to remove adm because some feature can be
-		// linked again
-		int deletedgis = gisDao.deleteAll();
-		logger.warn(deletedgis+" "
-			+ gisDao.getPersistenceClass().getSimpleName()
-			+ " have been deleted");
-		if (deletedgis != 0) {
-		    deletedObjectInfo.add(new NameValueDTO<Integer>(
-			    GisFeature.class.getSimpleName(), deletedgis));
-		}
-	    }
-	}
-	logger.warn("deleting gisFeature...");
+	int deletedgis = zipCodeDao.deleteAll();
+	logger.warn("deleting zipCodes...");
 	// we don't want to remove adm because some feature can be linked again
-	int deletedgis = gisFeatureDao.deleteAllExceptAdmsAndCountries();
-	logger.warn(deletedgis + " gisFeature have been deleted");
 	if (deletedgis != 0) {
-	    deletedObjectInfo.add(new NameValueDTO<Integer>(GisFeature.class
-		    .getSimpleName(), deletedgis));
+	    deletedObjectInfo.add(new NameValueDTO<Integer>(GisFeature.class.getSimpleName(), deletedgis));
 	}
 	resetStatus();
 	return deletedObjectInfo;
+    }
+
+    @Required
+    public void setZipCodeDao(IZipCodeDao zipCodeDao) {
+	this.zipCodeDao = zipCodeDao;
+    }
+
+    @Required
+    public void setFullTextSearchEngine(IFullTextSearchEngine fullTextSearchEngine) {
+        this.fullTextSearchEngine = fullTextSearchEngine;
     }
 
 }

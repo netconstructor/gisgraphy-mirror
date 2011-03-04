@@ -154,5 +154,10 @@ public interface IGisFeatureDao extends IGisDao<GisFeature> {
      * @return the number of deleted elements
      */
     public int deleteAllExceptAdmsAndCountries();
+    
+    /**
+     * @return the highest featureId (independant from the placetype) 
+     */
+    public long getMaxFeatureId();
 
 }

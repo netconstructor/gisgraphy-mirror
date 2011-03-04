@@ -28,6 +28,7 @@ import java.util.Random;
 
 import javax.annotation.Resource;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -35,6 +36,7 @@ import com.gisgraphy.domain.geoloc.entity.Adm;
 import com.gisgraphy.domain.geoloc.entity.AlternateName;
 import com.gisgraphy.domain.geoloc.entity.City;
 import com.gisgraphy.domain.geoloc.entity.GisFeature;
+import com.gisgraphy.domain.geoloc.entity.OpenStreetMap;
 import com.gisgraphy.domain.geoloc.entity.ZipCode;
 import com.gisgraphy.domain.geoloc.importer.ImporterConfig;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.AbstractIntegrationHttpSolrTestCase;
@@ -919,6 +921,18 @@ public class GisFeatureDaoTest extends AbstractIntegrationHttpSolrTestCase {
 	assertTrue(
 		"the fulltext search engine should be iso, case and - insensitive",
 		results.size() == 1);
+    }
+    
+    @Test
+    public void testGetMaxFeatureId(){
+	long featureId = 42L;
+	City feature = GeolocTestHelper.createCity("city", 3.5F, 4.2F, featureId);
+	
+	gisFeatureDao.save(feature);
+	
+	long estimateCount = gisFeatureDao.getMaxFeatureId();
+	Assert.assertEquals("countestimate should return the max gid, the estimation is based on the fact that the importer start the gid to 0",featureId, estimateCount);
+	
     }
     
     public void testCreateGISTIndexForLocationColumnShouldNotThrow(){

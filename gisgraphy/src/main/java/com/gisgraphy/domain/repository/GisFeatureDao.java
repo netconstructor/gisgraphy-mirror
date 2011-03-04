@@ -146,5 +146,26 @@ public class GisFeatureDao extends GenericGisDao<GisFeature> implements
 		})).intValue();
 
     }
+    
+  
+    /* (non-Javadoc)
+     * @see com.gisgraphy.domain.repository.IGisFeatureDao#getMaxFeatureId()
+     */
+    public long getMaxFeatureId(){
+	return (Long) this.getHibernateTemplate().execute(
+		new HibernateCallback() {
+
+		    public Object doInHibernate(Session session)
+			    throws PersistenceException {
+			String queryString = "select max(featureId) from "
+				+ GisFeature.class.getSimpleName();
+
+			Query qry = session.createQuery(queryString);
+			qry.setCacheable(true);
+			Long count = (Long) qry.uniqueResult();
+			return count==null?0:count;
+		    }
+		});
+    }
 
 }
