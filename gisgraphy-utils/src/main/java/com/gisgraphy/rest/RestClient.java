@@ -42,7 +42,6 @@ import org.apache.commons.httpclient.params.HttpClientParams;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.gisgraphy.fulltext.service.exception.FullTextSearchException;
 import com.gisgraphy.serializer.OutputFormat;
 import com.gisgraphy.serializer.SerializerException;
 import com.gisgraphy.serializer.UniversalSerializer;
