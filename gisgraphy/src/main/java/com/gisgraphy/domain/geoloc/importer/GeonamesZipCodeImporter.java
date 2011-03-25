@@ -151,14 +151,14 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	    extendedsearch = false;
 	}
 	FulltextResultsDto results = doAFulltextSearch(query,fields[0]);
-	if (results.getResults().size() == 0) {
+	if (results.getNumFound() == 0) {
 	    if (extendedsearch) {
 		// do a basic search
-		results = doAFulltextSearch(query, fields[0]);
+		results = doAFulltextSearch(fields[2], fields[0]);
 		if (results.getResultsSize() == 0) {
 		    // oops, no results
 		    return null;
-		} else if (results.getResultsSize() == 1) {
+		} else if (results.getNumFound() == 1) {
 		    // we found the one!
 		    return results.getResults().get(0).getFeature_id();
 		} else {
@@ -168,7 +168,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 		    return findNearest(zipPoint, maxDistance, query, results);
 		}
 	    } else {
-		// no features matches!
+		// no features matches in basic search!
 		return null;
 
 	    }
