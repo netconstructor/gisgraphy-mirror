@@ -8,6 +8,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.gisgraphy.domain.geoloc.entity.GisFeature;
+import com.gisgraphy.domain.geoloc.entity.ZipCode;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.FulltextQuery;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.IFullTextSearchEngine;
 import com.gisgraphy.domain.repository.IGisFeatureDao;
@@ -21,15 +23,22 @@ public class GeonamesZipCodeImporterTest {
   
     FulltextResultsDto dtoWithTwoResults;
     FulltextResultsDto dtoWithOneResult;
+    SolrResponseDto dtoTwo ;
+    SolrResponseDto dtoOne ;
     
     @Before
     public void setup(){
-	SolrResponseDto dtoOne = EasyMock.createMock(SolrResponseDto.class);
+	dtoOne = EasyMock.createMock(SolrResponseDto.class);
 	EasyMock.expect(dtoOne.getFeature_id()).andStubReturn(123L);
+	EasyMock.expect(dtoOne.getLat()).andStubReturn(20D);
+	EasyMock.expect(dtoOne.getLng()).andStubReturn(2D);
 	EasyMock.replay(dtoOne);
 	
-	SolrResponseDto dtoTwo = EasyMock.createMock(SolrResponseDto.class);
+	dtoTwo = EasyMock.createMock(SolrResponseDto.class);
 	EasyMock.expect(dtoTwo.getFeature_id()).andStubReturn(456L);
+	EasyMock.expect(dtoTwo.getLat()).andStubReturn(34D);
+	EasyMock.expect(dtoTwo.getLng()).andStubReturn(5D);
+	
 	EasyMock.replay(dtoTwo);
 	
 	List<SolrResponseDto> oneResult =new ArrayList<SolrResponseDto>();
@@ -332,6 +341,59 @@ public class GeonamesZipCodeImporterTest {
 	Long actualFeatureId = importer.findFeature(fields,point,maxDistance);
 	Assert.assertNull(actualFeatureId);
 	
+    }
+    
+    @Test
+    public void findNearest(){
+	GeonamesZipCodeImporter importer = new GeonamesZipCodeImporter();
+	Long FeatureId = importer.findNearest(GeolocHelper.createPoint(5F, 34F), 5, dtoWithTwoResults);
+	Assert.assertEquals(dtoTwo.getFeature_id(), FeatureId);
+    }
+    
+    @Test
+    public void addAndSaveZipCodeToFeatureWithUnknowFeature(){
+	Long featureId = 123456L; 
+	GeonamesZipCodeImporter importer = new GeonamesZipCodeImporter();
+	IGisFeatureDao gisFeatureDaoMock = EasyMock.createMock(IGisFeatureDao.class);
+	EasyMock.expect(gisFeatureDaoMock.getByFeatureId(featureId)).andReturn(null);
+	EasyMock.replay(gisFeatureDaoMock);
+	importer.setGisFeatureDao(gisFeatureDaoMock);
+	Assert.assertNull(importer.addAndSaveZipCodeToFeature("code", featureId));
+	EasyMock.verify(gisFeatureDaoMock);
+    }
+    
+    @Test
+    public void addAndSaveZipCodeToFeatureWithAlreadyExistingCode(){
+	Long featureId = 123456L; 
+	GisFeature gisFeature = new GisFeature();
+	gisFeature.setFeatureId(123456L);
+	gisFeature.addZipCode(new ZipCode("code"));
+	GeonamesZipCodeImporter importer = new GeonamesZipCodeImporter();
+	IGisFeatureDao gisFeatureDaoMock = EasyMock.createMock(IGisFeatureDao.class);
+	EasyMock.expect(gisFeatureDaoMock.getByFeatureId(featureId)).andReturn(gisFeature);
+	EasyMock.replay(gisFeatureDaoMock);
+	importer.setGisFeatureDao(gisFeatureDaoMock);
+	GisFeature actual = importer.addAndSaveZipCodeToFeature("code", featureId);
+	Assert.assertTrue(actual.getZipCodes().contains(new ZipCode("code")));
+	Assert.assertEquals(featureId,actual.getFeatureId());
+	EasyMock.verify(gisFeatureDaoMock);
+    }
+    
+    @Test
+    public void addAndSaveZipCodeToFeatureShouldAdd(){
+	Long featureId = 123456L; 
+	GisFeature gisFeature = new GisFeature();
+	gisFeature.setFeatureId(123456L);
+	GeonamesZipCodeImporter importer = new GeonamesZipCodeImporter();
+	IGisFeatureDao gisFeatureDaoMock = EasyMock.createMock(IGisFeatureDao.class);
+	EasyMock.expect(gisFeatureDaoMock.getByFeatureId(featureId)).andReturn(gisFeature);
+	EasyMock.expect(gisFeatureDaoMock.save(gisFeature)).andReturn(gisFeature);
+	EasyMock.replay(gisFeatureDaoMock);
+	importer.setGisFeatureDao(gisFeatureDaoMock);
+	GisFeature actual = importer.addAndSaveZipCodeToFeature("code", featureId);
+	Assert.assertTrue(actual.getZipCodes().contains(new ZipCode("code")));
+	Assert.assertEquals(featureId,actual.getFeatureId());
+	EasyMock.verify(gisFeatureDaoMock);
     }
 
 }

@@ -164,8 +164,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 		} else {
 		    // more than one match iterate and calculate distance and
 		    // take the nearest
-		    new Integer(fields[11]);
-		    return findNearest(zipPoint, maxDistance, query, results);
+		    return findNearest(zipPoint, maxDistance, results);
 		}
 	    } else {
 		// no features matches in basic search!
@@ -177,15 +176,14 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	    return results.getResults().get(0).getFeature_id();
 	} else {
 	    // more than one match, take the nearest
-	    return findNearest(zipPoint, maxDistance, query, results);
+	    return findNearest(zipPoint, maxDistance, results);
 	}
 
     }
 
-    protected Long findNearest(Point zipPoint, int maxDistance, String query, FulltextResultsDto results) {
+    protected Long findNearest(Point zipPoint, int accuracyLevel, FulltextResultsDto results) {
 	Long nearestFeatureId = null;
 	double nearestDistance = 0;
-	logger.error("More than one city match " + query);
 	for (SolrResponseDto dto : results.getResults()) {
 	    Point dtoPoint = GeolocHelper.createPoint(new Float(dto.getLng()), new Float(dto.getLat()));
 	    if (nearestFeatureId == null) {
@@ -193,7 +191,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 		nearestDistance = GeolocHelper.distance(zipPoint, dtoPoint);
 	    } else {
 		double distance = GeolocHelper.distance(zipPoint, dtoPoint);
-		if (distance > getAccurateDistance(maxDistance)) {
+		if (distance > getAccurateDistance(accuracyLevel)) {
 		    logger.debug(dto.getFeature_id() + " is too far and is not candidate");
 		} else {
 		    if (distance < nearestDistance) {
@@ -241,17 +239,19 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	cityDao.save(city);
     }
 
-    protected void addAndSaveZipCodeToFeature(String code, Long featureId) {
+    protected GisFeature addAndSaveZipCodeToFeature(String code, Long featureId) {
 	GisFeature feature = gisFeatureDao.getByFeatureId(featureId);
 	if (feature == null) {
 	    logger.error("can not add zip code " + code + " to " + featureId + ", because the feature doesn't exists");
+	    return null;
 	}
 	ZipCode zipCode = new ZipCode(code);
-	if (feature.getZipCodes() != null && !feature.getZipCodes().contains(zipCode)) {
+	if (feature.getZipCodes() == null || !feature.getZipCodes().contains(zipCode)) {
 	    feature.addZipCode(zipCode);
-	    gisFeatureDao.save(feature);
+	    return gisFeatureDao.save(feature);
 	} else {
 	    logger.warn("the zipcode " + code + " already exists for feature " + featureId);
+	    return feature;
 	}
     }
 

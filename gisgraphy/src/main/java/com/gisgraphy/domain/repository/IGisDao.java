@@ -49,13 +49,13 @@ public interface IGisDao<T> extends IDao<T, java.lang.Long> {
      * It is not the same as {@link IDao#get(java.io.Serializable)} which
      * retrieve an object from his PK.
      * 
-     * @param FeatureId
+     * @param featureId
      *                the featureid of the GIS object to retrieve
      * @return the Gis Object with the specified GisFeature id.
      * @throws IllegalArgumentException
      *                 if the FeatureId is null
      */
-    public T getByFeatureId(final Long FeatureId);
+    public T getByFeatureId(final Long featureId);
 
     /**
      * Returns inconsistant object (in most case object With featureid < 0)
