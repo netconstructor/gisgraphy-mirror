@@ -8,12 +8,18 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.gisgraphy.domain.geoloc.entity.Adm;
+import com.gisgraphy.domain.geoloc.entity.City;
 import com.gisgraphy.domain.geoloc.entity.GisFeature;
 import com.gisgraphy.domain.geoloc.entity.ZipCode;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.FulltextQuery;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.IFullTextSearchEngine;
+import com.gisgraphy.domain.repository.CityDao;
+import com.gisgraphy.domain.repository.IAdmDao;
+import com.gisgraphy.domain.repository.ICityDao;
 import com.gisgraphy.domain.repository.IGisFeatureDao;
 import com.gisgraphy.domain.valueobject.FulltextResultsDto;
+import com.gisgraphy.domain.valueobject.GISSource;
 import com.gisgraphy.domain.valueobject.SolrResponseDto;
 import com.gisgraphy.helper.GeolocHelper;
 import com.vividsolutions.jts.geom.Point;
@@ -394,6 +400,64 @@ public class GeonamesZipCodeImporterTest {
 	Assert.assertTrue(actual.getZipCodes().contains(new ZipCode("code")));
 	Assert.assertEquals(featureId,actual.getFeatureId());
 	EasyMock.verify(gisFeatureDaoMock);
+    }
+    
+    @Test
+    public void addNewEntityAndZip(){
+    	String lat = "3.5";
+    	String lng = "44";
+    	String accuracy = "5";
+    	String placeName = "place name";
+    	String countryCode = "FR";
+    	String adm1Name = "adm1name";
+    	String adm1Code = "adm1code";
+    	String adm2Name = "adm2name";
+    	String adm2Code = "adm2code";
+    	String adm3Name = "adm3name";
+    	String adm3Code = "adm3code";
+    	String[] fields = {countryCode,"post",placeName,adm1Name,adm1Code,adm2Name,adm2Code,adm3Name,adm3Code,lat,lng,accuracy};
+    	
+    	GeonamesZipCodeImporter importer = new GeonamesZipCodeImporter();
+    	long generatedId = 1234L;
+		importer.generatedFeatureId=generatedId;
+    	
+    	
+    	ICityDao cityDaoMock = EasyMock.createMock(ICityDao.class);
+    	EasyMock.expect(cityDaoMock.save((City) EasyMock.anyObject())).andReturn(new City());
+    	EasyMock.replay(cityDaoMock);
+    	importer.setCityDao(cityDaoMock);
+    	
+    	IAdmDao admDaoMock = EasyMock.createMock(IAdmDao.class);
+    	City mockCity = new City();
+    	mockCity.setFeatureId(generatedId+1);
+    	EasyMock.expect(admDaoMock.suggestMostAccurateAdm(countryCode, adm1Code, adm2Code, adm3Code, null, mockCity)).andReturn(new Adm(3));
+    	EasyMock.replay(admDaoMock);
+    	importer.setAdmDao(admDaoMock);
+    	
+    	ImporterConfig importerConfig = new ImporterConfig();
+    	importerConfig.setTryToDetectAdmIfNotFound(true);
+    	importer.setImporterConfig(importerConfig);
+    	
+    	GisFeature city = importer.addNewEntityAndZip(fields);
+    	
+    	
+    	
+    	
+    	Assert.assertEquals(new Long(generatedId+1), city.getFeatureId());
+    	Assert.assertEquals(placeName, city.getName());
+    	Assert.assertEquals(new Double(lng) , new Double(city.getLocation().getX()));
+    	Assert.assertEquals(new Double(lat) , new Double(city.getLocation().getY()));
+    	Assert.assertEquals("P", city.getFeatureClass());
+    	Assert.assertEquals("PPL", city.getFeatureCode());
+    	Assert.assertEquals(GISSource.GEONAMES_ZIP, city.getSource());
+    	Assert.assertEquals(countryCode, city.getCountryCode());
+    	Assert.assertNotNull(city.getZipCodes());
+    	Assert.assertEquals(1, city.getZipCodes().size());
+    	Assert.assertEquals(new ZipCode("post"), city.getZipCodes().get(0));
+    	EasyMock.verify(cityDaoMock);
+    	EasyMock.verify(admDaoMock);
+    	
+    	
     }
 
 }
