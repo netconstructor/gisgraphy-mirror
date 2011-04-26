@@ -2076,7 +2076,7 @@ public class ImporterManagerTest extends AbstractIntegrationHttpSolrTestCase {
 	commitAndOptimize();
 	assertEquals(
 		"All the Language have not been imported, the first line has not been ignored",
-		7600, this.languageDao.count());
+		7766, this.languageDao.count());
 	Language lang = this.languageDao.getByIso639Alpha2Code("FR");
 	assertEquals("French", lang.getIso639LanguageName());
 	// check upperCase for iso-alpha2
@@ -2085,14 +2085,19 @@ public class ImporterManagerTest extends AbstractIntegrationHttpSolrTestCase {
 	// check upperCase for iso-alpha3
 	assertEquals("Iso 639 alpha3 code must be correct and in upperCase",
 		"FRA", lang.getIso639Alpha3LanguageCode());
-	Language language = this.languageDao.getByIso639Alpha2Code("FR");
+	lang = this.languageDao.getByIso639Alpha2Code("FR");
 	assertNotNull(
-		"No Language found for CO, maybe the iso alpha2 Code have not been set o upper Case",
-		language);
-	language = this.languageDao.getByIso639Alpha3Code("FRA");
+		"No Language found for CO, maybe the iso alpha2 Code have not been set to upper Case",
+		lang);
+	lang = this.languageDao.getByIso639Alpha3Code("FRA");
 	assertNotNull(
-		"No Language found for CO, maybe the iso alpha Code have not been set o upper Case",
-		language);
+		"No Language found for FRA, maybe the iso alpha Code have not been set to upper Case",
+		lang);
+	lang = this.languageDao.getByIso639Alpha2Code("BH");
+	assertNotNull(
+		"No Language found for BH, maybe the iso alpha Code have not been set to upper Case, or we managed iso 639-2 in a bad way ",
+		lang);
+	
     }
 
     /**

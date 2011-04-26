@@ -65,10 +65,15 @@ public class GeonamesLanguageImporter extends AbstractImporterProcessor {
 	 */
 	// checkNumberOfColumn(fields);
 	Language lang = new Language();
-
-	if (!isEmptyField(fields, 0, true)) {
-	    lang.setIso639Alpha3LanguageCode(fields[0].toUpperCase());
+	String iso639Alpha3LanguageCode;
+	if (!isEmptyField(fields, 0, false)) {
+	    iso639Alpha3LanguageCode = fields[0].toUpperCase();
+	} else if (!isEmptyField(fields, 1, false)) {
+	    iso639Alpha3LanguageCode = fields[1].toUpperCase();
+	} else {
+	    throw new MissingRequiredFieldException("ISO 639-3 and ISO 639-2 are both empty for : "+dumpFields(fields));
 	}
+	lang.setIso639Alpha3LanguageCode(iso639Alpha3LanguageCode);
 
 	if (!isEmptyField(fields, 2, false)) {
 	    lang.setIso639Alpha2LanguageCode(fields[2].toUpperCase());
@@ -78,7 +83,11 @@ public class GeonamesLanguageImporter extends AbstractImporterProcessor {
 	    lang.setIso639LanguageName(fields[3]);
 	}
 
-	this.languageDao.save(lang);
+	if (this.languageDao.getByIso639Alpha3Code(iso639Alpha3LanguageCode)==null){
+	    this.languageDao.save(lang);
+	} else {
+	    logger.warn("language "+iso639Alpha3LanguageCode + "is already present...we ignore the line");
+	}
 
     }
 

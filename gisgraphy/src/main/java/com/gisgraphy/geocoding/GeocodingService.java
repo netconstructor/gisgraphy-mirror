@@ -27,7 +27,7 @@ public class GeocodingService implements IGeocodingService {
 		 * if rawAddress == null throw
 		 * parseAddress()
 		 * if address==null=>
-         *		findcityIntext
+         *		findcityIntext( fulltext city or subdivision with allwords required = false)
          *			if city =null
          *				fulltext street wo position
          *			else

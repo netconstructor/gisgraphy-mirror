@@ -100,28 +100,23 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	// check that the csv file line is in a correct format
 	checkNumberOfColumn(fields);
 
-	String countryCode = null;
 	String code = null;
-	String name = null;
-	String adm1Name = null;
 	int accuracy = 0;
 	Point zipPoint = null;
 
+	//check required field
 	if (!isEmptyField(fields, 0, true)) {
-	    countryCode = fields[0];
 	}
 
 	if (!isEmptyField(fields, 1, true)) {
 	    code = fields[1];
 	}
 
+	//check required field
 	if (!isEmptyField(fields, 2, true)) {
-	    name = fields[2];
 	}
 
-	if (!isEmptyField(fields, 3, false)) {
-	    adm1Name = fields[3];
-	}
+	
 
 	if (!isEmptyField(fields, 11, false)) {
 	    accuracy = new Integer(fields[11]);
