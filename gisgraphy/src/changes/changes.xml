@@ -417,6 +417,12 @@ remove the ability to search for 'no name street'
 				The location (point with lat/long) is not required anymore. that allow to do a fulltextsearch on all street
 			</action>
 			
+			<action dev="David Masclet" type="update">
+				LanguageImporter accept duplicates code and null iso639Alpha3LanguageCode if iso639Alpha2LanguageCode is specify 
+			</action>
+			
+			
+			
 			</release>
 			
 	</body>
