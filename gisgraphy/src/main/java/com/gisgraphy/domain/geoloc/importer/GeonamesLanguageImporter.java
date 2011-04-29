@@ -83,11 +83,11 @@ public class GeonamesLanguageImporter extends AbstractImporterProcessor {
 	    lang.setIso639LanguageName(fields[3]);
 	}
 
-	if (this.languageDao.getByIso639Alpha3Code(iso639Alpha3LanguageCode)==null){
+	//if (this.languageDao.getByIso639Alpha3Code(iso639Alpha3LanguageCode)==null){
 	    this.languageDao.save(lang);
-	} else {
+	/*} else {
 	    logger.warn("language "+iso639Alpha3LanguageCode + "is already present...we ignore the line");
-	}
+	}*/
 
     }
 

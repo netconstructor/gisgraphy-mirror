@@ -370,7 +370,7 @@ public class GeolocTestHelper {
 	//Simulate middle point
 	streetOSM.setLocation(GeolocHelper.createPoint(30.11F, 30.11F));
 	streetOSM.setOneWay(true);
-	streetOSM.setStreetType(StreetType.MOTROWAY);
+	streetOSM.setStreetType(StreetType.MOTORWAY);
 	streetOSM.setName("John Kénedy");
 	return StringHelper.updateOpenStreetMapEntityForIndexation(streetOSM);
 
@@ -391,7 +391,7 @@ public class GeolocTestHelper {
     
     public static StreetDistance createStreetDistance() {
 	return StreetDistanceBuilder.streetDistance().withName("streetName").withCountryCode("FR").withGid(123L).withLength(3.6D).withOneWay(true)
-	.withStreetType(StreetType.MOTROWAY).withLocation(GeolocHelper.createPoint(25.2F, 54.5F)).withDistance(43.5D).withCountryCode("fr").build();
+	.withStreetType(StreetType.MOTORWAY).withLocation(GeolocHelper.createPoint(25.2F, 54.5F)).withDistance(43.5D).withCountryCode("fr").build();
 
     }
     
