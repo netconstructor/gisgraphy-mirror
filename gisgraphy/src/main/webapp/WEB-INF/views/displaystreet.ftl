@@ -25,7 +25,7 @@
 						<br/>
 						<@s.text name="global.longitude"/> : ${result.location.x}
 						<br/>
-						<@s.text name="global.length"/> : ${result.length} km(s); 
+						<@s.text name="global.length"/> : ${result.length} m(s); 
 						<br/>
 						<#if result.streetType??><@s.text name="search.type.of.street"/> : <@s.text name="${result.streetType}"/><br/></#if>
 						<#if result.oneWay??>
