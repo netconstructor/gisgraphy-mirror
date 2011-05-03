@@ -101,11 +101,11 @@ public class FulltextSearchAction extends SearchAction {
 	    if (e.getCause() != null && e.getCause().getCause() != null) {
 		exceptionMessage = e.getCause().getCause().toString();
 		logger.error("An error occured during search : "
-			+ exceptionMessage);
+			+ exceptionMessage,e);
 	    } else {
 		exceptionMessage = e.getMessage();
 		logger.error("An error occured during search : "
-			+ e.getMessage());
+			+ e.getMessage(),e);
 	    }
 	    this.errorMessage = exceptionMessage == null? getText("errorPage.heading"):exceptionMessage;
 	}

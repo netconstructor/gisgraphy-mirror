@@ -138,8 +138,8 @@ public class FullTextSearchEngine implements IFullTextSearchEngine {
 	} catch (RuntimeException e2) {
 	    logger
 		    .error("An error has occurred during fulltext search of query "
-			    + query + " : " + e2.getCause().getMessage());
-	    throw new FullTextSearchException(e2.getCause().getMessage());
+			    + query + " : " + e2.getCause().getMessage(),e2);
+	    throw new FullTextSearchException(e2.getCause().getMessage(),e2);
 	}
 
     }
@@ -156,7 +156,7 @@ public class FullTextSearchEngine implements IFullTextSearchEngine {
 	    return outputStream.toString(Constants.CHARSET);
 	} catch (UnsupportedEncodingException e) {
 	    throw new FullTextSearchException("Encoding error during search : "
-		    + e.getCause().getMessage());
+		    + e.getCause().getMessage(),e);
 	}
     }
 
@@ -189,7 +189,7 @@ public class FullTextSearchEngine implements IFullTextSearchEngine {
 	} catch (Exception e) {
 	    logger
 		    .error("An error has occurred during fulltext search to database object for query "
-			    + query + " : " + e.getCause().getMessage());
+			    + query + " : " + e.getCause().getMessage(),e);
 	    throw new FullTextSearchException(e);
 	}
 

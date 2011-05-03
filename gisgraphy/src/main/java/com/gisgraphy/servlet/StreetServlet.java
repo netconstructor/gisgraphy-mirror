@@ -136,7 +136,7 @@ public class StreetServlet extends GisgraphyServlet {
 		logger.warn("A communication error has occured, maybe the socket has been closed probably because the client has cancel the request, it is probably not important");
 		return;
 	    }
-	    logger.error("error while execute a streetsearch query from http request : " + e);
+	    logger.error("error while execute a streetsearch query from http request : " + e,e);
 	    String errorMessage = this.debugMode ? " : " + e.getMessage() : "";
 	    sendCustomError(ResourceBundle
 		    .getBundle(Constants.BUNDLE_ERROR_KEY).getString(
