@@ -80,7 +80,7 @@ public class FulltextQuerySolrHelper {
 	} else {
 	    parameters.set(Constants.FL_PARAMETER, outputStyleHelper.getFulltextFieldList(query.getOutput()));
 	}
-	boolean isAdvancedQuery = (query.getCountryCode()!=null || query.getPlaceTypes() != null || !query.isAllwordsRequired());
+	boolean isAdvancedQuery = (query.getCountryCode()!=null || !query.getCountryCode().trim().equals("") || query.getPlaceTypes() != null || !query.isAllwordsRequired());
 	boolean isNumericQuery = isNumericQuery(query.getQuery());
 	StringBuffer querybuffer ;
 	if (isAdvancedQuery){
@@ -94,7 +94,7 @@ public class FulltextQuerySolrHelper {
 	    }
 	    parameters.set(Constants.QT_PARAMETER, Constants.SolrQueryType.advanced
 			.toString());
-	    if (query.getCountryCode() != null) {
+	    if (query.getCountryCode() != null && !query.getCountryCode().trim().equals("")) {
 	    	querybuffer.append(" AND ").append(FullTextFields.COUNTRYCODE.getValue()+":"+query.getCountryCode());
 
 		}
@@ -143,7 +143,7 @@ public class FulltextQuerySolrHelper {
     
     private static boolean containsOtherThingsThanNull(Class[] array){
     	if (array!=null){
-    		for (int i=0;i<=array.length;i++){
+    		for (int i=0;i<array.length;i++){
     			if (array[i]!= null){
     				return true;
     			}

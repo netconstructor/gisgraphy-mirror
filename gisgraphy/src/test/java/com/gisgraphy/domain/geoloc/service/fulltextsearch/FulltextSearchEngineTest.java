@@ -324,6 +324,34 @@ public class FulltextSearchEngineTest extends
     }
     
     @Test
+    public void testExecuteQueryWithEmptyCountryCode() {
+	City city = GeolocTestHelper.createCity("paris", 1.5F, 2F, 1001L);
+	this.cityDao.save(city);
+	assertNotNull(this.cityDao.getByFeatureId(1001L));
+	Adm adm = GeolocTestHelper.createAdm("paris", "FR", "A1",
+			null, null, null, null, 1);
+	this.admDao.save(adm);
+	// commit changes
+	this.solRSynchroniser.commit();
+
+	try {
+	    Pagination pagination = paginate().from(1).to(10);
+	    Output output = Output.withFormat(OutputFormat.XML)
+		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
+		    .withIndentation();
+	    FulltextQuery fulltextQuery = new FulltextQuery("paris",
+		    pagination, output, new Class[]{City.class,Adm.class}, "");
+	    String result = fullTextSearchEngine
+		    .executeQueryToString(fulltextQuery);
+	    FeedChecker.assertQ("The query return incorrect values", result,
+		    "//*[@numFound='2']", "//*[@name='status'][.='0']"
+		    );
+	} catch (FullTextSearchException e) {
+	    fail("error during search : " + e.getMessage());
+	}
+    }
+    
+    @Test
     public void testExecuteQueryWithMultiplePlacetypewithNullPlacetypeAtEnd() {
 	City city = GeolocTestHelper.createCity("paris", 1.5F, 2F, 1001L);
 	this.cityDao.save(city);
