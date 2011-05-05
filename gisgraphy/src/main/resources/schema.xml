@@ -300,6 +300,26 @@ Full (alternatenames for adm and country): Long + country_alternate_name_, adm1_
 
 
  -->
+ 
+ <!-- 
+ STREET specific fields
+ 
+old fields used:
+gid=>featureid
+name=>name
+location=>lat/lng
+countrycode=country_code
+
+new fields:
+==========>streettype
+==========>oneway
+length
+  -->
+  <!-- Medium --><!-- <field name="street_type" type="string" indexed="true" stored="true"/>-->
+  <!-- Medium --><!-- <field name="one_way" type="boolean" indexed="true" stored="true"/>-->
+  <!-- Medium --><!-- <field name="length" type="integer" indexed="true" stored="true"/>-->
+  
+  
    <field name="feature_id" type="long" indexed="true" stored="true"/>
    
   <!--Short --><field name="name" type="text" indexed="true" stored="true"/>
