@@ -426,6 +426,10 @@ remove the ability to search for 'no name street'
 				change wrong unit (km=>m) in display street
 			</action>
 			
+			<action dev="David Masclet" type="fix">
+				Better logging
+			</action>
+			
 			
 			</release>
 			
