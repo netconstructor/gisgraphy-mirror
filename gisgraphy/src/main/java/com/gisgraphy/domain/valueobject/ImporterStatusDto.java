@@ -122,9 +122,9 @@ public class ImporterStatusDto {
 	}
 	this.processorName = fields[0];
 	setCurrentFileName(fields[1]);
-	this.currentLine = Integer.valueOf(fields[2]);
-	this.numberOfLineToProcess = Integer.valueOf(fields[3]);
-	this.numberOfLineProcessed = Integer.valueOf(fields[4]);
+	this.currentLine = Long.valueOf(fields[2]);
+	this.numberOfLineToProcess = Long.valueOf(fields[3]);
+	this.numberOfLineProcessed = Long.valueOf(fields[4]);
 	this.statusMessage = fields[5];
 	try {
 	    this.status = ImporterStatus.valueOf(fields[6]);
