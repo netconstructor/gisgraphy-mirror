@@ -307,7 +307,7 @@ public abstract class AbstractImporterProcessor implements IImporterProcessor {
 	    this.status = ImporterStatus.ERROR;
 	    this.statusMessage = "An error occurred when processing "
 		    + this.getClass().getSimpleName()+ " : " + e.getMessage();
-	    logger.error(statusMessage);
+	    logger.error(statusMessage,e);
 	    throw new ImporterException(statusMessage, e.getCause());
 	} finally {
 	    try {

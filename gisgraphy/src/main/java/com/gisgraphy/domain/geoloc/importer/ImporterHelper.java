@@ -43,6 +43,8 @@ import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import javax.servlet.http.HttpServlet;
+
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpException;
@@ -194,13 +196,26 @@ public class ImporterHelper {
     
     /**
      * @param URL the HTTP URL
-     * @return The size of the HTTP file using HTTP head method.
+     * @return The size of the HTTP file using HTTP head method 
+     * or -1 if error or the file doesn't exists
      */
     public static long getHttpFileSize(String URL){
 	HeadMethod headMethod = new HeadMethod(URL);
-	
+	headMethod.setFollowRedirects(true);
     try {
-    	client.executeMethod(headMethod);
+    	int code = client.executeMethod(headMethod);
+    	int firstDigitOfCode = code/100;
+    	switch (firstDigitOfCode) {
+	case 4 :
+	    logger.error("Can not determine HTTP file size of "+URL+" because it does not exists ("+code+")");
+	    return -1;
+	case 5:
+	    logger.error("Can not determine HTTP file size of "+URL+" because the server send an error "+code);
+	    return -1;
+
+	default:
+	    break;
+	}
 	Header[] contentLengthHeaders = headMethod.getResponseHeaders("Content-Length");
 	if (contentLengthHeaders.length ==1){
 	    logger.error("HTTP file "+URL+" = "+contentLengthHeaders[0].getValue());

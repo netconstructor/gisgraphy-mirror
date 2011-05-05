@@ -43,6 +43,7 @@ public class ImporterHelperTest {
 	public void testGetHTTPFileSize(){
 	    Assert.assertEquals(1150,ImporterHelper.getHttpFileSize("http://www.gisgraphy.com/favicon.ico"));
 	    Assert.assertEquals(-1,ImporterHelper.getHttpFileSize("http://www.gisgraphy.com/FileThatNotExists"));
+	    Assert.assertEquals(-1,ImporterHelper.getHttpFileSize("http://download.geonames.org/export/zip/notexist.zip"));
 	}
 	
     @Test

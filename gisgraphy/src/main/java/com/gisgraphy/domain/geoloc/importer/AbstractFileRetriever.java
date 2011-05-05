@@ -83,8 +83,11 @@ public abstract class AbstractFileRetriever implements IImporterProcessor {
 	    if (!shouldBeSkipped()) {
 		if (importerConfig.isRetrieveFiles()){
 		logger
-			.info("DownloadFiles option is set to true, we will download and unzip files");
+			.info("DownloadFiles option is set to true, we will download and decompress files");
 		downloadFiles();
+		} else {
+		    logger
+			.info("DownloadFiles option is set to false, we won't download and decompress files");
 		}
 		statusMessage = internationalisationService.getString("import.extract.info");
 		decompressFiles();

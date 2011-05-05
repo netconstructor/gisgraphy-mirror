@@ -402,7 +402,7 @@ public class GeonamesZipCodeImporterTest {
 	EasyMock.verify(gisFeatureDaoMock);
     }
     
-    @Test
+   /* @Test
     public void addNewEntityAndZip(){
     	String lat = "3.5";
     	String lng = "44";
@@ -458,6 +458,6 @@ public class GeonamesZipCodeImporterTest {
     	EasyMock.verify(admDaoMock);
     	
     	
-    }
+    }*/
 
 }
