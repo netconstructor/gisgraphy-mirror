@@ -430,6 +430,14 @@ remove the ability to search for 'no name street'
 				Better logging
 			</action>
 			
+			<action dev="David Masclet" type="fix">
+				importer status throw when there is toomuch line (int=>long)
+			</action>
+			
+			<action dev="David Masclet" type="update">
+				improve the way we retrieve http file size
+			</action>
+			
 			
 			</release>
 			
