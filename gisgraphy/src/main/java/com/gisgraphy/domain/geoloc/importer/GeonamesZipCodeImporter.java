@@ -176,7 +176,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 
     }
 
-    protected Long findNearest(Point zipPoint, int accuracyLevel, FulltextResultsDto results) {
+    protected Long findNearest(Point zipPoint, int maxDistance, FulltextResultsDto results) {
 	Long nearestFeatureId = null;
 	double nearestDistance = 0;
 	for (SolrResponseDto dto : results.getResults()) {
@@ -186,7 +186,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 		nearestDistance = GeolocHelper.distance(zipPoint, dtoPoint);
 	    } else {
 		double distance = GeolocHelper.distance(zipPoint, dtoPoint);
-		if (distance > getAccurateDistance(accuracyLevel)) {
+		if (distance > maxDistance) {
 		    logger.debug(dto.getFeature_id() + " is too far and is not candidate");
 		} else {
 		    if (distance < nearestDistance) {
