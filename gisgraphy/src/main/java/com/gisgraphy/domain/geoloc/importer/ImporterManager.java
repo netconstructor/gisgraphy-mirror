@@ -119,14 +119,14 @@ public class ImporterManager implements IImporterManager {
 	    try {
 		this.importerStatusListDao.saveOrUpdate(ComputeStatusDtoList());
 	    } catch (RuntimeException e) {
-		logger.error("Can not save statusDtoList : " + e.getMessage());
+		logger.error("Can not save statusDtoList : " + e.getMessage(),e);
 	    }
 	    try {
 		this.endTime = System.currentTimeMillis();
 		this.inProgress = false;
 		setAlreadyDone(true);
 	    } catch (Exception e) {
-		logger.error("The import is done but we can not persist the already done status : "+e.getMessage());
+		logger.error("The import is done but we can not persist the already done status : "+e.getMessage(),e);
 	    }
 	}
     }

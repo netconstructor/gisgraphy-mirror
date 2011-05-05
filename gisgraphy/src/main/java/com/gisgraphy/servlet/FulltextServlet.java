@@ -78,7 +78,7 @@ public class FulltextServlet extends GisgraphyServlet {
 	    logger.info("fullTextSearchEngine is injected :"
 		    + fullTextSearchEngine);
 	} catch (Exception e) {
-	    logger.error("Can not start fulltextServlet : " + e.getMessage());
+	    logger.error("Can not start fulltextServlet : " + e.getMessage(),e);
 	}
     }
 
@@ -128,7 +128,7 @@ public class FulltextServlet extends GisgraphyServlet {
 	    fullTextSearchEngine.executeAndSerialize(query, resp
 		    .getOutputStream());
 	} catch (RuntimeException e) {
-	    logger.error("error while execute a fulltext query from http request : " + e,e);
+	    logger.error("error while execute a fulltext query from http request : " + e.getMessage(),e);
 	    String errorMessage = this.debugMode ? " : " + e.getMessage() : "";
 	    sendCustomError(ResourceBundle
 		    .getBundle(Constants.BUNDLE_ERROR_KEY).getString(

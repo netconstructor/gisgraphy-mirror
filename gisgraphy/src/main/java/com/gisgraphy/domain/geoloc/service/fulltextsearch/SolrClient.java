@@ -143,7 +143,7 @@ public class SolrClient implements IsolrClient {
 	    return ((String) response.getResponse().get("status")).equals("OK");
 	} catch (Exception e) {
 	    logger.error("can not determine if fulltext engine is alive "
-		    + e.getMessage());
+		    + e.getMessage(),e);
 	    return false;
 	}
 

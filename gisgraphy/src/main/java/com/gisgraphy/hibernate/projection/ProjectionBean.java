@@ -107,7 +107,7 @@ public class ProjectionBean extends ProjectionList {
 		}
 	    }
 	} catch (Exception e) {
-	    logger.error("can not inspect bean " + clazz.getSimpleName());
+	    logger.error("can not inspect bean " + clazz.getSimpleName()+" : "+e.getMessage(),e);
 	}
 
 	return fieldNames;

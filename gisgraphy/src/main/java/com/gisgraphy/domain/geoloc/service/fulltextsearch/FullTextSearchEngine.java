@@ -130,16 +130,17 @@ public class FullTextSearchEngine implements IFullTextSearchEngine {
 	} catch (SolrServerException e) {
 	    logger.error("Can not execute query " + FulltextQuerySolrHelper.toQueryString(query)
 		    + "for URL : " + solrClient.getURL() + " : "
-		    + e.getCause().getMessage());
+		    + e.getCause().getMessage(),e);
 	    throw new FullTextSearchException(e.getCause().getMessage());
 	} catch (MalformedURLException e1) {
-	    logger.error("The URL " + solrClient.getURL() + " is incorrect");
+	    logger.error("The URL " + solrClient.getURL() + " is incorrect",e1);
 	    throw new FullTextSearchException(e1);
 	} catch (RuntimeException e2) {
+	    String message = e2.getCause()!=null?e2.getCause().getMessage():e2.getMessage();
 	    logger
 		    .error("An error has occurred during fulltext search of query "
-			    + query + " : " + e2.getCause().getMessage(),e2);
-	    throw new FullTextSearchException(e2.getCause().getMessage(),e2);
+			    + query + " : " + message,e2);
+	    throw new FullTextSearchException(message,e2);
 	}
 
     }

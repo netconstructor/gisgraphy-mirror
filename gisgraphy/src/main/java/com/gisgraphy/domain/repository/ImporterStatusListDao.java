@@ -143,7 +143,7 @@ public class ImporterStatusListDao implements IImporterStatusListDao {
 		line = bufferReader.readLine();
 	    }
 	} catch (Exception e) {
-	    logger.error(e.getMessage());
+	    logger.error(e.getMessage(),e);
 	    return new ArrayList<ImporterStatusDto>();
 	} finally {
 	    if (bufferReader != null) {

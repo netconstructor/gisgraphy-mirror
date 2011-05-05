@@ -205,7 +205,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	return accuracyToDistance[Math.max(accuracyLevel, accuracyToDistance.length - 1)];
     }
 
-    protected void addNewEntityAndZip(String[] fields) {
+    protected GisFeature addNewEntityAndZip(String[] fields) {
 	City city = new City();
 	city.setFeatureId(generatedFeatureId++);
 	city.setName(fields[2]);
@@ -232,6 +232,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	city.addZipCode(new ZipCode(fields[1]));
 
 	cityDao.save(city);
+	return city;
     }
 
     protected GisFeature addAndSaveZipCodeToFeature(String code, Long featureId) {

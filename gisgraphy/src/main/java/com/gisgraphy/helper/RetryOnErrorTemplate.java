@@ -62,7 +62,7 @@ public abstract class RetryOnErrorTemplate<T> {
 	    alreadyTry++;
 	    return this;
 	} catch (Exception e) {
-	    logger.error("try no "+alreadyTry+" for "+loggingSentence+" fails : " + e);
+	    logger.error("try no "+alreadyTry+" for "+loggingSentence+" fails : " + e.getMessage(),e);
 	    numberOfTimesToRetry--;
 	    alreadyTry++;
 	    if (numberOfTimesToRetry == 0) {

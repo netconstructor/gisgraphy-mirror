@@ -316,7 +316,7 @@ public class ImporterHelper {
 
 	    zipFile.close();
 	} catch (IOException e) {
-	    logger.error("can not unzip " + file.getName() + " : " + e.getMessage());
+	    logger.error("can not unzip " + file.getName() + " : " + e.getMessage(),e);
 	    throw new ImporterException(e);
 	}
     }

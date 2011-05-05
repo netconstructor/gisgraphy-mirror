@@ -99,7 +99,7 @@ public class DatabaseHelper extends HibernateDaoSupport implements IDatabaseHelp
 						    logger.info("execution of line : "+line+" modify "+nbupdate+" lines");
 						} catch (Exception e) {
 							String msg = "Error on line "+count+" ("+line +") :" +e.getCause();
-							logger.error(msg);
+							logger.error(msg,e);
 							exceptionMessageList.add(msg);
 							if (!continueOnError){
 							    throw new PersistenceException(e.getCause());
@@ -107,7 +107,7 @@ public class DatabaseHelper extends HibernateDaoSupport implements IDatabaseHelp
 						} 
 					}
 				} catch (IOException e) {
-					logger.error("error on line "+count+" : "+e);
+					logger.error("error on line "+count+" : "+e,e);
 				} 
 				return exceptionMessageList;
 			}

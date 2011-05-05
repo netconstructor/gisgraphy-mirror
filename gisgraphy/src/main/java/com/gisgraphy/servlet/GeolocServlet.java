@@ -80,7 +80,7 @@ public class GeolocServlet extends GisgraphyServlet {
 		    .info("geolocSearchEngine is injected :"
 			    + geolocSearchEngine);
 	} catch (Exception e) {
-	    logger.error("Can not start GeolocServlet : " + e.getMessage());
+	    logger.error("Can not start GeolocServlet : " + e.getMessage(),e);
 	}
     }
 

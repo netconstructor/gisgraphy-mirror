@@ -363,7 +363,7 @@ public class GeolocHelper {
 	   geometry.setSRID(SRID.WGS84_SRID.getSRID());
 	   return geometry;
 	} catch (com.vividsolutions.jts.io.ParseException e) {
-	    logger.error(e.toString());
+	    logger.error(e.getMessage(),e);
 		   throw new RuntimeException("error when convert HEXEWKB to Geometry",e);
 	}
 	

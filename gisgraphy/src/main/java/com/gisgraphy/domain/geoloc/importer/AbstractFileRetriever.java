@@ -97,7 +97,7 @@ public abstract class AbstractFileRetriever implements IImporterProcessor {
 	    statusMessage = "";
 	} catch (Exception e) {
 	    this.statusMessage = "error retrieving or decompres file : " + e.getMessage();
-	    logger.error(statusMessage);
+	    logger.error(statusMessage,e);
 	    status = ImporterStatus.ERROR;
 	    throw new ImporterException(statusMessage, e);
 	} 

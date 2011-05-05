@@ -85,7 +85,7 @@ public class StreetServlet extends GisgraphyServlet {
 		    .info("streetSearchEngine is injected :"
 			    + streetSearchEngine);
 	} catch (Exception e) {
-	    logger.error("Can not start StreetServlet : " + e.getMessage());
+	    logger.error("Can not start StreetServlet : " + e.getMessage(),e);
 	}
     }
 

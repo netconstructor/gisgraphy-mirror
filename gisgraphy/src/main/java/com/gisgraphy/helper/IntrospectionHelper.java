@@ -130,7 +130,7 @@ public class IntrospectionHelper {
 	    } while (clazzParent != Object.class);
 
 	} catch (RuntimeException x) {
-	  logger.error("can not update introspection cache "+x);
+	  logger.error("can not update introspection cache :"+x.getMessage(),x);
 	}
 	cacheList.put(clazz, introspectedFields);
 	cacheArray.put(clazz, introspectedFields.toArray(new String[] {}));

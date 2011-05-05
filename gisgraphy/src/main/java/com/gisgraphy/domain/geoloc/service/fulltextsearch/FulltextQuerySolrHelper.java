@@ -80,7 +80,8 @@ public class FulltextQuerySolrHelper {
 	} else {
 	    parameters.set(Constants.FL_PARAMETER, outputStyleHelper.getFulltextFieldList(query.getOutput()));
 	}
-	boolean isAdvancedQuery = (query.getCountryCode()!=null || !query.getCountryCode().trim().equals("") || query.getPlaceTypes() != null || !query.isAllwordsRequired());
+	String trimedCountryCode = query.getCountryCode()!=null?query.getCountryCode().trim():null;
+	boolean isAdvancedQuery = (trimedCountryCode!=null || "".equals(trimedCountryCode) || query.getPlaceTypes() != null || !query.isAllwordsRequired());
 	boolean isNumericQuery = isNumericQuery(query.getQuery());
 	StringBuffer querybuffer ;
 	if (isAdvancedQuery){

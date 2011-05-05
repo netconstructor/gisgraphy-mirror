@@ -91,7 +91,7 @@ public class OutputstreamResponseWrapper extends ResponseParser {
 	try {
 	    IOUtils.copy(reader, outputStream, Constants.CHARSET);
 	} catch (IOException e) {
-	   logger.error("error when writing fulltext respone : "+e);
+	   logger.error("error when writing fulltext respone : "+e,e);
 	} finally {
 
 	    try {
