@@ -218,7 +218,7 @@ public class ImporterHelper {
 	}
 	Header[] contentLengthHeaders = headMethod.getResponseHeaders("Content-Length");
 	if (contentLengthHeaders.length ==1){
-	    logger.error("HTTP file "+URL+" = "+contentLengthHeaders[0].getValue());
+	    logger.info("HTTP file size of "+URL+" = "+contentLengthHeaders[0].getValue());
 	    return new Long(contentLengthHeaders[0].getValue());
 	} else if (contentLengthHeaders.length <= 0){
 	    return -1L;

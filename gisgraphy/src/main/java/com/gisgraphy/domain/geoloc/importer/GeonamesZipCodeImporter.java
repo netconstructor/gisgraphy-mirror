@@ -87,8 +87,8 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	/*
 	 * line table has the following fields :
 	 * --------------------------------------------------- 0 country code :
-	 * 1 postal code 2 place name 3 admin name1 4 admin code1 5 admin name2
-	 * 6 admin code2 7 admin name3 8 admin code3 9 latitude 10 longitude 11
+	 * 1 postal code 2 place name 3 admin1 name 4 admin1 code 5 admin2 name
+	 * 6 admin2 code2 7 admin3 name 8 admin3 code 9 latitude 10 longitude 11
 	 * accuracy accuracy
 	 * 
 	 * Accuracy is an integer, the higher the better : 1 : estimated as
@@ -207,11 +207,11 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 
     protected GisFeature addNewEntityAndZip(String[] fields) {
 	City city = new City();
-	city.setFeatureId(generatedFeatureId++);
+	city.setFeatureId(++generatedFeatureId);
 	city.setName(fields[2]);
 	// Location
 	if (!isEmptyField(fields, 9, true) && !isEmptyField(fields, 10, true)) {
-	    city.setLocation(GeolocHelper.createPoint(new Float(fields[9]), new Float(fields[10])));
+	    city.setLocation(GeolocHelper.createPoint(new Float(fields[10]), new Float(fields[9])));
 	}
 	city.setFeatureClass("P");
 	city.setFeatureCode("PPL");

@@ -402,7 +402,7 @@ public class GeonamesZipCodeImporterTest {
 	EasyMock.verify(gisFeatureDaoMock);
     }
     
-   /* @Test
+    @Test
     public void addNewEntityAndZip(){
     	String lat = "3.5";
     	String lng = "44";
@@ -419,7 +419,7 @@ public class GeonamesZipCodeImporterTest {
     	
     	GeonamesZipCodeImporter importer = new GeonamesZipCodeImporter();
     	long generatedId = 1234L;
-		importer.generatedFeatureId=generatedId;
+	importer.generatedFeatureId=generatedId;
     	
     	
     	ICityDao cityDaoMock = EasyMock.createMock(ICityDao.class);
@@ -429,7 +429,16 @@ public class GeonamesZipCodeImporterTest {
     	
     	IAdmDao admDaoMock = EasyMock.createMock(IAdmDao.class);
     	City mockCity = new City();
+    	mockCity.setFeatureClass("P");
+    	mockCity.setFeatureCode("PPL");
+    	mockCity.setSource(GISSource.GEONAMES_ZIP);
+    	mockCity.setName(placeName);
     	mockCity.setFeatureId(generatedId+1);
+    	mockCity.setAdm1Code(adm1Code);
+    	mockCity.setAdm2Code(adm2Code);
+    	mockCity.setAdm3Code(adm3Code);
+    	Point point = GeolocHelper.createPoint(new Float(lng), new Float(lat));
+    	mockCity.setLocation(point);
     	EasyMock.expect(admDaoMock.suggestMostAccurateAdm(countryCode, adm1Code, adm2Code, adm3Code, null, mockCity)).andReturn(new Adm(3));
     	EasyMock.replay(admDaoMock);
     	importer.setAdmDao(admDaoMock);
@@ -458,6 +467,6 @@ public class GeonamesZipCodeImporterTest {
     	EasyMock.verify(admDaoMock);
     	
     	
-    }*/
+    }
 
 }

@@ -385,7 +385,7 @@ public abstract class AbstractImporterProcessor implements IImporterProcessor {
 	    transactionManager.rollback(txStatus);
 	    throw new ImporterException(
 		    "An error occurred when processing "
-			    + getCurrentFileName() + " : " + e.getMessage(), e);
+			    + getCurrentFileName() + " : " + e.getMessage(), e.getCause());
 	}
     }
 
