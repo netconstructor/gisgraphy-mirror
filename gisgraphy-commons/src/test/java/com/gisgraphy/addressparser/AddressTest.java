@@ -8,7 +8,7 @@ public class AddressTest {
 
     
     @Test
-    public void setEmptyExtarinfoShouldNotSet(){
+    public void setEmptyExtraInfoShouldNotSet(){
 	Address address  =new Address();
 	address.setExtraInfo(" ");
 	Assert.assertNull(address.getExtraInfo());
