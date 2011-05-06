@@ -47,6 +47,9 @@ public class EncodingHelper {
      */
     public static String toUTF8(String string) {
 	String utf8 = "";
+	if (string == null){
+	    return null;
+	}
 	try {
 	    utf8 = new String(string.getBytes(Constants.CHARSET));
 	} catch (UnsupportedEncodingException e1) {

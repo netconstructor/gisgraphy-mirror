@@ -72,7 +72,7 @@ public class RestClient implements IRestClient {
 	 *                The
 	 * @link {@link MultiThreadedHttpConnectionManager} that the fulltext search
 	 *       engine will use
-	 * @throws FullTextSearchException
+	 * @throws RestClientException
 	 *                 If an error occured
 	 */
 	public RestClient(MultiThreadedHttpConnectionManager multiThreadedHttpConnectionManager) throws RestClientException {

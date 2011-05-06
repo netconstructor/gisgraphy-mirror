@@ -5,6 +5,14 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 public class EncodingHelperTest {
+    
+    
+    	@Test
+	public void testToUTF8() {
+    	    Assert.assertNotNull(EncodingHelper.toUTF8("é"));
+    	    Assert.assertNull(EncodingHelper.toUTF8(null));
+	
+    }
 
 	@Test
 	public void testRemoveAccents() {
