@@ -79,7 +79,7 @@ public class OpenStreetMapImporterTest extends AbstractIntegrationHttpSolrTestCa
 	openStreetMapImporter.process();
 	assertEquals(4L,openStreetMapDao.count());
 	OpenStreetMap openStreetMap = openStreetMapDao.getByGid(1L);
-	assertTrue("The oneWay attribute is not correct",openStreetMap.getOneWay());
+	assertTrue("The oneWay attribute is not correct",openStreetMap.isOneWay());
 	assertEquals("The countryCode is not correct ","FR",openStreetMap.getCountryCode());
 	assertEquals("The streetType is not correct",StreetType.RESIDENTIAL, openStreetMap.getStreetType());
 	assertEquals("The name is not correct","Bachlettenstrasse", openStreetMap.getName());

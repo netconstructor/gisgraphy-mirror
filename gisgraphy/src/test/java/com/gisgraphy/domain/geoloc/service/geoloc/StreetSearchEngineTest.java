@@ -82,7 +82,7 @@ public class StreetSearchEngineTest extends AbstractIntegrationHttpSolrTestCase 
 
 	Pagination pagination = paginate().from(1).to(15);
 	Output output = Output.withFormat(OutputFormat.XML).withIndentation();
-	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),10000,pagination,output,StreetType.MOTORWAY,street.getOneWay(),null,null);
+	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),10000,pagination,output,StreetType.MOTORWAY,street.isOneWay(),null,null);
 	FileOutputStream outputStream = null;
 	try {
 	    outputStream = new FileOutputStream(file);
@@ -117,7 +117,7 @@ public class StreetSearchEngineTest extends AbstractIntegrationHttpSolrTestCase 
 
 	Pagination pagination = paginate().from(1).to(15);
 	Output output = Output.withFormat(OutputFormat.XML).withIndentation();
-	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),10000,pagination,output,StreetType.MOTORWAY,street.getOneWay(),"hn ken",StreetSearchMode.CONTAINS);
+	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),10000,pagination,output,StreetType.MOTORWAY,street.isOneWay(),"hn ken",StreetSearchMode.CONTAINS);
 	
 	StreetSearchResultsDto results = streetSearchEngine.executeQuery(query);
 	assertEquals("Contains mode should be case insensitive and accent insensitive ",1, results.getResult().size());
@@ -141,7 +141,7 @@ public class StreetSearchEngineTest extends AbstractIntegrationHttpSolrTestCase 
 
 	Pagination pagination = paginate().from(1).to(15);
 	Output output = Output.withFormat(OutputFormat.XML).withIndentation();
-	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),10000,pagination,output,StreetType.MOTORWAY,street.getOneWay(),"Kenedy",StreetSearchMode.FULLTEXT);
+	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),10000,pagination,output,StreetType.MOTORWAY,street.isOneWay(),"Kenedy",StreetSearchMode.FULLTEXT);
 	
 	StreetSearchResultsDto results = streetSearchEngine.executeQuery(query);
 	assertEquals(1, results.getResult().size());
@@ -160,7 +160,7 @@ public class StreetSearchEngineTest extends AbstractIntegrationHttpSolrTestCase 
 
 	Pagination pagination = paginate().from(1).to(15);
 	Output output = Output.withFormat(OutputFormat.XML).withIndentation();
-	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),10000,pagination,output,street.getStreetType(),street.getOneWay(),null,null);
+	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),10000,pagination,output,street.getStreetType(),street.isOneWay(),null,null);
 	
 	String content = streetSearchEngine.executeQueryToString(query);
 
@@ -179,7 +179,7 @@ public class StreetSearchEngineTest extends AbstractIntegrationHttpSolrTestCase 
 
 	Pagination pagination = paginate().from(1).to(15);
 	Output output = Output.withFormat(OutputFormat.PHP).withIndentation();
-	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),10000,pagination,output,street.getStreetType(),street.getOneWay(),null,null);
+	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),10000,pagination,output,street.getStreetType(),street.isOneWay(),null,null);
 	query.withCallback("doit");
 	
 	String content = streetSearchEngine.executeQueryToString(query);
@@ -196,7 +196,7 @@ public class StreetSearchEngineTest extends AbstractIntegrationHttpSolrTestCase 
 
 	Pagination pagination = paginate().from(20).to(25);
 	Output output = Output.withFormat(OutputFormat.PHP).withIndentation();
-	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),1,pagination,output,street.getStreetType(),street.getOneWay(),null,null);
+	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),1,pagination,output,street.getStreetType(),street.isOneWay(),null,null);
 	query.withCallback("doit");
 	
 	String content = streetSearchEngine.executeQueryToString(query);
@@ -213,7 +213,7 @@ public class StreetSearchEngineTest extends AbstractIntegrationHttpSolrTestCase 
 
 	Pagination pagination = paginate().from(1).to(15);
 	Output output = Output.withFormat(OutputFormat.XML).withIndentation();
-	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),10000,pagination,output,street.getStreetType(),street.getOneWay(),null,null);
+	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),10000,pagination,output,street.getStreetType(),street.isOneWay(),null,null);
 	query.withCallback("doit");
 	
 	String content = streetSearchEngine.executeQueryToString(query);
@@ -231,7 +231,7 @@ public class StreetSearchEngineTest extends AbstractIntegrationHttpSolrTestCase 
 
 	Pagination pagination = paginate().from(1).to(15);
 	Output output = Output.withFormat(OutputFormat.XML).withIndentation();
-	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),10000,pagination,output,street.getStreetType(),street.getOneWay(),null,null);
+	StreetSearchQuery query = new StreetSearchQuery(street.getLocation(),10000,pagination,output,street.getStreetType(),street.isOneWay(),null,null);
 	
 	StreetSearchResultsDto results = streetSearchEngine.executeQuery(query);
 	assertEquals(1, results.getResult().size());

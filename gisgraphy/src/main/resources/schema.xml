@@ -311,13 +311,13 @@ location=>lat/lng
 countrycode=country_code
 
 new fields:
-==========>streettype
+==========>street_type
 ==========>oneway
-length
+==========>length
   -->
-  <!-- Medium --><!-- <field name="street_type" type="string" indexed="true" stored="true"/>-->
-  <!-- Medium --><!-- <field name="one_way" type="boolean" indexed="true" stored="true"/>-->
-  <!-- Medium --><!-- <field name="length" type="integer" indexed="true" stored="true"/>-->
+  <!-- Medium --><field name="street_type" type="string" indexed="true" stored="true"/>
+  <!-- Medium --><field name="one_way" type="boolean" indexed="true" stored="true"/>
+  <!-- Medium --><field name="length" type="integer" indexed="true" stored="true"/>
   
   
    <field name="feature_id" type="long" indexed="true" stored="true"/>

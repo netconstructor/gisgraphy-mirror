@@ -28,6 +28,8 @@ import javax.persistence.Transient;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
+import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetType;
+
 /**
  * Represents a {@link Street}.
  * 
@@ -37,6 +39,10 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
 public class Street extends GisFeature {
 
+    private boolean oneWay;
+    private StreetType streetType;
+    private Double length;
+    
     /**
      * Override the gisFeature value.<br>
      * Default to true;<br>
@@ -65,6 +71,30 @@ public class Street extends GisFeature {
      */
     public Street() {
 	super();
+    }
+
+    public boolean isOneWay() {
+        return oneWay;
+    }
+
+    public void setOneWay(boolean oneWay) {
+        this.oneWay = oneWay;
+    }
+
+    public StreetType getStreetType() {
+        return streetType;
+    }
+
+    public void setStreetType(StreetType streetType) {
+        this.streetType = streetType;
+    }
+
+    public Double getLength() {
+        return length;
+    }
+
+    public void setLength(Double length) {
+        this.length = length;
     }
 
 }

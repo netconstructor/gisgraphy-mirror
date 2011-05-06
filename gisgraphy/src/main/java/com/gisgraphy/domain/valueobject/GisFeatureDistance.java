@@ -40,7 +40,9 @@ import org.slf4j.LoggerFactory;
 import com.gisgraphy.domain.geoloc.entity.Adm;
 import com.gisgraphy.domain.geoloc.entity.Country;
 import com.gisgraphy.domain.geoloc.entity.GisFeature;
+import com.gisgraphy.domain.geoloc.entity.Street;
 import com.gisgraphy.domain.geoloc.entity.ZipCode;
+import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetType;
 import com.gisgraphy.helper.URLUtils;
 import com.vividsolutions.jts.geom.Point;
 
@@ -255,6 +257,21 @@ public class GisFeatureDistance {
 	    return this;
 	}
 	    
+	public GisFeatureDistanceBuilder withOneWay(boolean oneWay) {
+	    gisFeatureDistance.oneWay = oneWay;
+	    return this;
+	}
+	
+	public GisFeatureDistanceBuilder withStreetType(StreetType streetType) {
+	    gisFeatureDistance.streetType = streetType;
+	    return this;
+	}
+	
+	public GisFeatureDistanceBuilder withLength(double length) {
+	    gisFeatureDistance.length = length;
+	    return this;
+	}
+	
 	public GisFeatureDistanceBuilder withPostalCodeMask(String postalCodeMask) {
 	    gisFeatureDistance.postalCodeMask = postalCodeMask;
 	    return this;
@@ -331,6 +348,12 @@ public class GisFeatureDistance {
     private Double lng;
 
     private String placeType;
+    
+    private boolean oneWay;
+
+    private StreetType streetType;
+
+    private double length;
    
 //    @XmlElement(name="zipCode")
     @XmlElementWrapper(name="zipCodes")
@@ -442,6 +465,19 @@ public class GisFeatureDistance {
     public GisFeatureDistance(Adm adm, Double distance) {
 	this((GisFeature)adm,distance);
 	this.level = adm.getLevel();
+    }
+    
+    /**
+     * @param adm
+     *                The adm
+     * @param distance
+     *                The distance
+     */
+    public GisFeatureDistance(Street street, Double distance) {
+	this((GisFeature)street,distance);
+	this.length = street.getLength();
+	this.oneWay = street.isOneWay();
+	this.streetType = street.getStreetType();
     }
     
     /**
@@ -863,6 +899,18 @@ public class GisFeatureDistance {
 	 */
 	public Long getId() {
 		return id;
+	}
+
+	public double getLength() {
+	    return length;
+	}
+
+	public boolean isOneWay() {
+	    return oneWay;
+	}
+
+	public StreetType getStreetType() {
+	    return streetType;
 	}
 
 }

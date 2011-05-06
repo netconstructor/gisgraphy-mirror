@@ -52,6 +52,7 @@ import com.gisgraphy.domain.geoloc.entity.CitySubdivision;
 import com.gisgraphy.domain.geoloc.entity.Country;
 import com.gisgraphy.domain.geoloc.entity.GisFeature;
 import com.gisgraphy.domain.geoloc.entity.OpenStreetMap;
+import com.gisgraphy.domain.geoloc.entity.Street;
 import com.gisgraphy.domain.geoloc.entity.ZipCode;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.FulltextQuery;
 import com.gisgraphy.domain.geoloc.service.geoloc.GeolocQuery;
@@ -65,8 +66,8 @@ import com.gisgraphy.domain.valueobject.GISSource;
 import com.gisgraphy.domain.valueobject.GeolocResultsDto;
 import com.gisgraphy.domain.valueobject.GisFeatureDistance;
 import com.gisgraphy.domain.valueobject.StreetDistance;
-import com.gisgraphy.domain.valueobject.StreetSearchResultsDto;
 import com.gisgraphy.domain.valueobject.StreetDistance.StreetDistanceBuilder;
+import com.gisgraphy.domain.valueobject.StreetSearchResultsDto;
 import com.gisgraphy.helper.GeolocHelper;
 import com.gisgraphy.helper.StringHelper;
 import com.gisgraphy.servlet.FulltextServlet;
@@ -474,6 +475,39 @@ public class GeolocTestHelper {
 	adm.setTimezone("gmt+1");
 
 	return new GisFeatureDistance(adm, 3D);
+
+    }
+    
+    public static GisFeatureDistance createFullFilledGisFeatureDistanceForStreet() {
+	Street street = new Street();
+	street.setAdm1Code("A1");
+	street.setAdm2Code("B2");
+	street.setAdm3Code("C3");
+	street.setAdm4Code("D4");
+
+	street.setAdm1Name("adm1 name");
+	street.setAdm2Name("adm2 name");
+	street.setAdm3Name("adm3 name");
+	street.setAdm4Name("adm4 name");
+
+	street.setAsciiName("ascii");
+	street.setCountryCode("FR");
+	street.setElevation(3);
+	street.setFeatureClass("P");
+	street.setFeatureCode("PPL");
+	street.setFeatureId(1000L);
+	street.setGtopo30(30);
+	street.setLocation(createPoint(2F, 4F));
+	street.setName("a name");
+	street.setPopulation(1000000);
+	street.setSource(GISSource.PERSONAL);
+	street.setTimezone("gmt+1");
+	
+	street.setOneWay(true);
+	street.setLength(3.56D);
+	street.setStreetType(StreetType.SERVICE);
+
+	return new GisFeatureDistance(street, 3D);
 
     }
     

@@ -84,8 +84,14 @@ public enum FullTextFields {
 	
 	
 	//Adm Only
-	LEVEL("level");
+	LEVEL("level"),
 	//end Adm only
+	
+	//street only
+	LENGTH("length"),
+	ONE_WAY("one_way"),
+	STREET_TYPE("street_type");
+	//end of street only
 	
 	/** The value of the fulltext field in the schema.xml */
 	private final String value;

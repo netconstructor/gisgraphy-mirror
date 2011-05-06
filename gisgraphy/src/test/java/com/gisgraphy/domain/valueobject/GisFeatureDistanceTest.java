@@ -130,7 +130,7 @@ public class GisFeatureDistanceTest extends AbstractIntegrationHttpSolrTestCase 
     }
     
     @Test
-    public void testGisFeatureDistanceShouldHaveZipCodeIfGisFeatureIsAdm() {
+    public void testGisFeatureDistanceShouldHaveLevelIfGisFeatureIsAdm() {
 	GisFeatureDistance result = null;
 	try {
 	    JAXBContext context = JAXBContext
@@ -142,10 +142,41 @@ public class GisFeatureDistanceTest extends AbstractIntegrationHttpSolrTestCase 
 	    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 	    m.marshal(result, outputStream);
 	    FeedChecker.checkGisFeatureDistanceJAXBMapping(result, outputStream.toString(Constants.CHARSET),"");
-	    FeedChecker.assertQ("Zipcode should be output if The GisFeature is a city",
+	    FeedChecker.assertQ("level should be output if The GisFeature is an Adm",
 		    outputStream.toString(Constants.CHARSET), "/"
 			    + Constants.GISFEATUREDISTANCE_JAXB_NAME
 			    + "/level[.='" + result.getLevel() + "']");
+	} catch (PropertyException e) {
+	    fail(e.getMessage());
+	} catch (JAXBException e) {
+	    fail(e.getMessage());
+	} catch (UnsupportedEncodingException e) {
+	    fail("unsupported encoding for " + Constants.CHARSET);
+	}
+    }
+    
+    @Test
+    public void testGisFeatureDistanceShouldBeCorrectlyFullFilledGisFeatureIsStreet() {
+	GisFeatureDistance result = null;
+	try {
+	    JAXBContext context = JAXBContext
+		    .newInstance(GisFeatureDistance.class);
+	    Marshaller m = context.createMarshaller();
+	    m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+	    result = GeolocTestHelper
+		    .createFullFilledGisFeatureDistanceForStreet();
+	    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+	    m.marshal(result, outputStream);
+	    FeedChecker.checkGisFeatureDistanceJAXBMapping(result, outputStream.toString(Constants.CHARSET),"");
+	    FeedChecker.assertQ("Zipcode should be output if The GisFeature is a city",
+		    outputStream.toString(Constants.CHARSET), "/"
+			    + Constants.GISFEATUREDISTANCE_JAXB_NAME
+			    + "/length[.='" + result.getLength() + "']",
+			    "/"
+			    + Constants.GISFEATUREDISTANCE_JAXB_NAME
+			    + "/streetType[.='" + result.getStreetType()+ "']", "/"
+			    + Constants.GISFEATUREDISTANCE_JAXB_NAME
+			    + "/oneWay[.='" + result.isOneWay() + "']");
 	} catch (PropertyException e) {
 	    fail(e.getMessage());
 	} catch (JAXBException e) {
@@ -229,7 +260,7 @@ public class GisFeatureDistanceTest extends AbstractIntegrationHttpSolrTestCase 
     
 
    @Test
-   public void testEqualsShouldTakeFeatureIdIntoAccout(){
+   public void testEqualsShouldTakeFeatureIdIntoAccount(){
 	Long featureId = 123L;
 	GisFeatureDistance gisFeatureDistance = GisFeatureDistance.
 							GisFeatureDistanceBuilder.gisFeatureDistance()

@@ -296,7 +296,7 @@ public class OpenStreetMap {
      */
     @Index(name = "streetosmonewayIndex")
     @Column(length = 9)
-    public boolean getOneWay() {
+    public boolean isOneWay() {
 	return oneWay;
     }
 

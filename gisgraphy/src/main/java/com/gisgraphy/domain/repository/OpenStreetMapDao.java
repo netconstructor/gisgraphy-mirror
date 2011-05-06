@@ -42,7 +42,13 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 
 import com.gisgraphy.domain.geoloc.entity.OpenStreetMap;
+import com.gisgraphy.domain.geoloc.entity.Street;
+import com.gisgraphy.domain.geoloc.entity.event.EventManager;
+import com.gisgraphy.domain.geoloc.entity.event.GisFeatureDeletedEvent;
+import com.gisgraphy.domain.geoloc.entity.event.GisFeatureStoredEvent;
+import com.gisgraphy.domain.geoloc.entity.event.PlaceTypeDeleteAllEvent;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.StreetSearchMode;
+import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetFactory;
 import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetType;
 import com.gisgraphy.domain.valueobject.GisgraphyConfig;
 import com.gisgraphy.domain.valueobject.StreetDistance;
@@ -65,8 +71,9 @@ import com.vividsolutions.jts.geom.Polygon;
 @Repository
 public class OpenStreetMapDao extends GenericDao<OpenStreetMap, Long> implements IOpenStreetMapDao
 {
-	@Autowired
-	IDatabaseHelper databaseHelper;
+	private StreetFactory streetFactory = new StreetFactory();
+	 
+	 private EventManager eventManager;
 	
 	/**
      * The logger
@@ -335,4 +342,50 @@ public class OpenStreetMapDao extends GenericDao<OpenStreetMap, Long> implements
 		    }
 		});
     }
+    
+    @Override
+    public OpenStreetMap save(OpenStreetMap openStreetMap) {
+	OpenStreetMap savedEntity = super.save(openStreetMap);
+	Street street = streetFactory.create(savedEntity);
+	GisFeatureStoredEvent CreatedEvent = new GisFeatureStoredEvent(
+		street);
+	eventManager.handleEvent(CreatedEvent);
+	return savedEntity;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.gisgraphy.domain.repository.GenericDao#remove(java.lang.Object)
+     */
+    @Override
+    public void remove(OpenStreetMap openStreetMap) {
+	super.remove(openStreetMap);
+	Street street = streetFactory.create(openStreetMap);
+	GisFeatureDeletedEvent gisFeatureDeletedEvent = new GisFeatureDeletedEvent(
+		street);
+	eventManager.handleEvent(gisFeatureDeletedEvent);
+    }
+    
+    /*
+     * (non-Javadoc)
+     * 
+     * @see com.gisgraphy.domain.repository.GenericDao#deleteAll()
+     */
+    @Override
+    public int deleteAll() {
+	int numberOfOpenStreetMapDeleted = super.deleteAll();
+	PlaceTypeDeleteAllEvent placeTypeDeleteAllEvent = new PlaceTypeDeleteAllEvent(
+		Street.class);
+	eventManager.handleEvent(placeTypeDeleteAllEvent);
+	return numberOfOpenStreetMapDeleted;
+    }
+
+
+
+    @Autowired
+    public void setEventManager(EventManager eventManager) {
+        this.eventManager = eventManager;
+    }
+
 }
