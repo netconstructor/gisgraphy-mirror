@@ -438,6 +438,12 @@ remove the ability to search for 'no name street'
 				improve the way we retrieve http file size
 			</action>
 			
+			<action dev="David Masclet" type="update">
+				consider zipcode as keyword (not tokenized, not split for whitespace, and so on , case insensitive)
+			</action>
+			
+			
+			
 			
 			</release>
 			
