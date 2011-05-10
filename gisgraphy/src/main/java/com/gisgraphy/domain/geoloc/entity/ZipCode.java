@@ -93,6 +93,7 @@ public class ZipCode {
      * @return the code
      */
     @Column(nullable = false, length = 80)
+     @Index(name = "zipcode_code")
     public String getCode() {
 	return code;
     }
