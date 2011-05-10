@@ -135,26 +135,11 @@ public class GenericDao<T, PK extends Serializable> extends HibernateDaoSupport
      * 
      * @see com.gisgraphy.domain.repository.IDao#get(java.io.Serializable)
      */
-    @SuppressWarnings("unchecked")
-    public T get(final PK id) {
+       public T get(final PK id) {
 	Assert.notNull(id, "Can not retrieve an Ogject with a null id");
 	T returnValue = null;
 	try {
-	    return (T) this.getHibernateTemplate().execute(
-		    new HibernateCallback() {
-
-			public Object doInHibernate(Session session)
-				throws PersistenceException {
-			    String queryString = "from "
-				    + persistentClass.getSimpleName()
-				    + " o where o.id=" + id;
-
-			    Query qry = session.createQuery(queryString);
-			    qry.setCacheable(true);
-			    return (T) qry.uniqueResult();
-
-			}
-		    });
+	    returnValue = (T) this.getHibernateTemplate().get(persistentClass, id);
 	} catch (Exception e) {
 	    log.info("could not retrieve object of type "
 		    + persistentClass.getSimpleName() + " with id " + id, e);

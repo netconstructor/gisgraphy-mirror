@@ -48,7 +48,36 @@ public class AdmDao extends GenericGisDao<Adm> implements IAdmDao {
     public AdmDao() {
 	super(Adm.class);
     }
+    
+    @Override
+    public Adm get(final Long id) {
+	Assert.notNull(id, "Can not retrieve an Ogject with a null id");
+	Adm returnValue = null;
+	try {
+	    return (Adm) this.getHibernateTemplate().execute(
+		    new HibernateCallback() {
 
+			public Object doInHibernate(Session session)
+				throws PersistenceException {
+			    String queryString = "from "
+				    + persistentClass.getSimpleName()
+				    + " o where o.id=" + id;
+
+			    Query qry = session.createQuery(queryString);
+			    qry.setCacheable(true);
+			    return (Adm) qry.uniqueResult();
+
+			}
+		    });
+	} catch (Exception e) {
+	    logger.info("could not retrieve object of type "
+		    + persistentClass.getSimpleName() + " with id " + id, e);
+	}
+	return returnValue;
+    }
+
+    
+    
     /**
      * Check that codes are consistent according the level (see
      * {@link Adm#isConsistentForLevel() } and save it in the datastore
@@ -717,5 +746,6 @@ public class AdmDao extends GenericGisDao<Adm> implements IAdmDao {
 		    }
 		}));
     }
+    
 
 }

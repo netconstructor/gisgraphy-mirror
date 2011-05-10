@@ -422,7 +422,7 @@ public class AdmDaoTest extends AbstractIntegrationHttpSolrTestCase {
     }
 
     @Test
-    public void testDeleteAdmShouldNotDeleteHisparentInCascade() {
+    public void testDeleteAdmShouldNotDeleteHisParentInCascade() {
 	int nbChilds = 2;
 	Adm admParent = GeolocTestHelper.createAdm("admparent", "FR", "A1",
 		null, null, null, null, 1);
@@ -472,6 +472,7 @@ public class AdmDaoTest extends AbstractIntegrationHttpSolrTestCase {
 	GisFeature gisFeature = GeolocTestHelper.createCity("paris", 1.3F, 45F,
 		null);
 	gisFeature.setAdm(retrievedAdm);
+	
 
 	// save gisFeature
 	GisFeature savedGisFeature = gisFeatureDao.save(gisFeature);
@@ -491,6 +492,8 @@ public class AdmDaoTest extends AbstractIntegrationHttpSolrTestCase {
 	assertNull(retrievedAdmAfterRemove);
 
 	// check gisFeature is not still in datastore
+	//we must clear the cache
+	gisFeatureDao.flushAndClear();
 	GisFeature retrievedGisFeatrueAfterRemove = this.gisFeatureDao
 		.get(retrievedGisFeature.getId());
 	assertNull(retrievedGisFeatrueAfterRemove);
