@@ -52,13 +52,13 @@ public class GeonamesDatabaseIndexer implements IImporterProcessor {
 	    .getLogger(GeonamesDatabaseIndexer.class);
     
     @Autowired
-    private IGisDao<? extends GisFeature>[] daos;
+    protected IGisDao<? extends GisFeature>[] daos;
     
     @Autowired
-    private ImporterConfig importerConfig;
+    protected ImporterConfig importerConfig;
     
     @Autowired
-    private IInternationalisationService internationalisationService;
+    protected IInternationalisationService internationalisationService;
     
     private IGisDao<? extends GisFeature> currentDao;
     
@@ -116,6 +116,7 @@ public class GeonamesDatabaseIndexer implements IImporterProcessor {
 	    this.status = ImporterStatus.ERROR;
 	    this.statusMessage = "The import is done but performance may not be optimal because an error occurred when creating spatial indexes for geonames in DAO "
 		    + getCurrentFileName() + "(maybe you haven't the SQL rights or the indexes are already created) : " + e.getCause();
+	    logger.error(statusMessage,e);
 	    throw new ImporterException(statusMessage, e.getCause());
 	} finally {
 	    try {
@@ -173,5 +174,7 @@ public class GeonamesDatabaseIndexer implements IImporterProcessor {
 	statusMessage = "";
 	currentDao = null;
     }
+
+  
 
 }

@@ -2,24 +2,65 @@ package com.gisgraphy.domain.geoloc.importer;
 
 import junit.framework.Assert;
 
+import org.easymock.classextension.EasyMock;
 import org.junit.Test;
 
+import com.gisgraphy.domain.geoloc.entity.Adm;
+import com.gisgraphy.domain.geoloc.entity.City;
+import com.gisgraphy.domain.geoloc.entity.GisFeature;
 import com.gisgraphy.domain.repository.AbstractTransactionalTestCase;
+import com.gisgraphy.domain.repository.AdmDao;
+import com.gisgraphy.domain.repository.CityDao;
+import com.gisgraphy.domain.repository.IAdmDao;
+import com.gisgraphy.domain.repository.ICityDao;
+import com.gisgraphy.domain.repository.IGisDao;
 import com.gisgraphy.domain.valueobject.ImporterStatus;
 import com.gisgraphy.domain.valueobject.ImporterStatusDto;
+import com.gisgraphy.service.IInternationalisationService;
 
 public class GeonamesDatabaseIndexerTest extends AbstractTransactionalTestCase {
     
     public GeonamesDatabaseIndexer geonamesDatabaseIndexer;
     
     @Test
-   public void testProcess(){
+   public void testProcessPercentAndDTO(){
 	geonamesDatabaseIndexer.process();
 	assertEquals("statusMessage should be empty if the process is ok","", geonamesDatabaseIndexer.getStatusMessage());
 	ImporterStatusDto status = new ImporterStatusDto(geonamesDatabaseIndexer);
 	assertEquals(100, status.getPercent());
 	Assert.assertEquals("curentFileName should be the default one at the end of the process",GeonamesDatabaseIndexer.DEFAULT_CURRENT_FILENAME, status.getCurrentFileName());
     }
+    
+    @Test
+    public void testProcessShouldCallTheDao(){
+	GeonamesDatabaseIndexer geonamesDatabaseIndexer = new GeonamesDatabaseIndexer();
+ 	ICityDao cityDao = EasyMock.createMock(CityDao.class);
+ 	cityDao.createGISTIndexForLocationColumn();
+ 	EasyMock.expect(cityDao.getPersistenceClass()).andReturn(City.class);
+ 	EasyMock.replay(cityDao);
+ 	
+ 	IAdmDao admDao = EasyMock.createMock(AdmDao.class);
+ 	admDao.createGISTIndexForLocationColumn();
+ 	EasyMock.expect(admDao.getPersistenceClass()).andReturn(Adm.class);
+ 	EasyMock.replay(admDao);
+ 	
+ 	IInternationalisationService internationalisationService = EasyMock.createMock(IInternationalisationService.class);
+ 	EasyMock.expect(internationalisationService.getString((String)EasyMock.anyObject(), ((Object[])EasyMock.anyObject()))).andStubReturn("");
+ 	geonamesDatabaseIndexer.internationalisationService= internationalisationService;
+ 	EasyMock.replay(internationalisationService);
+ 	
+ 	IGisDao[] daoArray = {cityDao,admDao};
+ 	geonamesDatabaseIndexer.daos= daoArray;
+ 	
+ 	ImporterConfig importerConfig = new ImporterConfig();
+ 	importerConfig.setGeonamesImporterEnabled(true);
+ 	
+ 	geonamesDatabaseIndexer.importerConfig =importerConfig;
+ 	
+	geonamesDatabaseIndexer.process();
+ 	EasyMock.verify(cityDao);
+ 	EasyMock.verify(admDao);
+     }
     
     @Test
     public void testShouldBeSkiped(){
