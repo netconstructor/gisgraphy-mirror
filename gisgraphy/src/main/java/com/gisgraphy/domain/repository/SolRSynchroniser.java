@@ -38,6 +38,7 @@ import com.gisgraphy.domain.geoloc.entity.AlternateName;
 import com.gisgraphy.domain.geoloc.entity.Country;
 import com.gisgraphy.domain.geoloc.entity.GisFeature;
 import com.gisgraphy.domain.geoloc.entity.Language;
+import com.gisgraphy.domain.geoloc.entity.Street;
 import com.gisgraphy.domain.geoloc.entity.ZipCode;
 import com.gisgraphy.domain.geoloc.entity.event.GisFeatureDeleteAllEvent;
 import com.gisgraphy.domain.geoloc.entity.event.GisFeatureDeletedEvent;
@@ -47,6 +48,7 @@ import com.gisgraphy.domain.geoloc.entity.event.PlaceTypeDeleteAllEvent;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.FullTextFields;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.IsolrClient;
 import com.gisgraphy.domain.geoloc.service.geoloc.GisgraphyCommunicationException;
+import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetType;
 import com.gisgraphy.helper.ClassNameHelper;
 import com.gisgraphy.helper.EncodingHelper;
 import com.gisgraphy.helper.RetryOnErrorTemplate;
@@ -280,7 +282,8 @@ public class SolRSynchroniser implements ISolRSynchroniser {
 				    + "," + gisFeature.getLatitude() + "]");
 			    return false;
 			}
-
+			
+			
 			if (!gisFeature.isFullTextSearchable()) {
 			    logger.debug(gisFeature.getClass().getSimpleName()
 				    + " is not FullTextSearchable");
@@ -289,12 +292,28 @@ public class SolRSynchroniser implements ISolRSynchroniser {
 
 			ex.setField(FullTextFields.FEATUREID.getValue(), gisFeature
 				.getFeatureId());
+			ex.setField(FullTextFields.NAME.getValue(), EncodingHelper
+				.toUTF8(gisFeature.getName()));
+			ex.setField(FullTextFields.LAT.getValue(), gisFeature.getLatitude());
+			ex.setField(FullTextFields.LONG.getValue(), gisFeature.getLongitude());
+			
+			
+		    if (gisFeature instanceof Street) {
+			ex.setField(FullTextFields.LENGTH.getValue(), ((Street) gisFeature).getLength());
+			ex.setField(FullTextFields.ONE_WAY.getValue(), ((Street) gisFeature).isOneWay());
+			ex.setField(FullTextFields.STREET_TYPE.getValue(), ((Street) gisFeature).getStreetType());
+			String countryCode = gisFeature.getCountryCode();
+			if (countryCode != null) {
+			    ex.setField(FullTextFields.COUNTRYCODE.getValue(), gisFeature.getCountryCode().toUpperCase());
+			}
+
+		    } else {
+			
 			ex.setField(FullTextFields.FEATURECLASS.getValue(), gisFeature
 				.getFeatureClass());
 			ex.setField(FullTextFields.FEATURECODE.getValue(), gisFeature
 				.getFeatureCode());
-			ex.setField(FullTextFields.NAME.getValue(), EncodingHelper
-				.toUTF8(gisFeature.getName()));
+			
 			ex.setField(FullTextFields.NAMEASCII.getValue(), gisFeature
 				.getAsciiName());
 
@@ -310,8 +329,6 @@ public class SolRSynchroniser implements ISolRSynchroniser {
 				.getPopulation());
 			ex.setField(FullTextFields.FULLY_QUALIFIED_NAME.getValue(),
 				EncodingHelper.toUTF8(gisFeature.getFullyQualifiedName(false)));
-			ex.setField(FullTextFields.LAT.getValue(), gisFeature.getLatitude());
-			ex.setField(FullTextFields.LONG.getValue(), gisFeature.getLongitude());
 			ex.setField(FullTextFields.COUNTRY_FLAG_URL.getValue(), URLUtils
 				.createCountryFlagUrl(gisFeature.getCountryCode()));
 			ex.setField(FullTextFields.GOOGLE_MAP_URL.getValue(), URLUtils
@@ -408,7 +425,6 @@ public class SolRSynchroniser implements ISolRSynchroniser {
 			    ex.setField(FullTextFields.COUNTRYNAME.getValue(),
 				    EncodingHelper.toUTF8(country.getName()));
 			} else {
-
 			    String countryCode = gisFeature.getCountryCode();
 			    if (countryCode != null) {
 				ex.setField(FullTextFields.COUNTRYCODE.getValue(), countryCode
@@ -425,6 +441,7 @@ public class SolRSynchroniser implements ISolRSynchroniser {
 					    + gisFeature);
 				}
 			    }
+			}
 			}
 			solClient.getServer().add(ex);
 			return true;
