@@ -22,17 +22,29 @@
  *******************************************************************************/
 package com.gisgraphy.domain.repository;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.easymock.classextension.EasyMock;
 import org.hibernate.exception.ConstraintViolationException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.orm.hibernate3.HibernateCallback;
+import org.springframework.orm.hibernate3.HibernateTemplate;
 
+import com.gisgraphy.domain.geoloc.entity.GisFeature;
 import com.gisgraphy.domain.geoloc.entity.OpenStreetMap;
+import com.gisgraphy.domain.geoloc.entity.Street;
+import com.gisgraphy.domain.geoloc.entity.event.EventManager;
+import com.gisgraphy.domain.geoloc.entity.event.GisFeatureDeleteAllEvent;
+import com.gisgraphy.domain.geoloc.entity.event.GisFeatureDeletedEvent;
+import com.gisgraphy.domain.geoloc.entity.event.GisFeatureStoredEvent;
+import com.gisgraphy.domain.geoloc.entity.event.PlaceTypeDeleteAllEvent;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.AbstractIntegrationHttpSolrTestCase;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.StreetSearchMode;
+import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetFactory;
 import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetType;
 import com.gisgraphy.domain.valueobject.GisgraphyConfig;
 import com.gisgraphy.domain.valueobject.SRID;
@@ -319,8 +331,94 @@ public class OpenStreetMapDaoTest extends AbstractIntegrationHttpSolrTestCase{
     
 
     
+    @Test
+    public void testSaveShouldCallEventManager(){
+	OpenStreetMap openStreetMap = GeolocTestHelper.createOpenStreetMapForPeterMartinStreet();
+	OpenStreetMapDao openStreetMapDao = new OpenStreetMapDao();
+	
+	EventManager mockEventManager = EasyMock.createMock(EventManager.class);
+	mockEventManager.handleEvent((GisFeatureStoredEvent)EasyMock.anyObject());
+	EasyMock.replay(mockEventManager);
+	
+	StreetFactory mockStreetFactory = EasyMock.createMock(StreetFactory.class);
+	EasyMock.expect(mockStreetFactory.create(openStreetMap)).andReturn(new Street());
+	EasyMock.replay(mockStreetFactory);
+	
+	HibernateTemplate mockHibernateTemplate = EasyMock.createMock(HibernateTemplate.class);
+	mockHibernateTemplate.saveOrUpdate(EasyMock.anyObject());
+	EasyMock.replay(mockHibernateTemplate);
+	
+	openStreetMapDao.setHibernateTemplate(mockHibernateTemplate );
+	openStreetMapDao.setStreetFactory(mockStreetFactory);
+	openStreetMapDao.setEventManager(mockEventManager);
+	
+	
+	openStreetMapDao.save(openStreetMap);
+	
+	EasyMock.verify(mockEventManager);
+	EasyMock.verify(mockStreetFactory);
+	EasyMock.verify(mockHibernateTemplate);
+    }
+    
+    @Test
+    public void testRemoveShouldCallEventManager(){
+	OpenStreetMap openStreetMap = GeolocTestHelper.createOpenStreetMapForPeterMartinStreet();
+	OpenStreetMapDao openStreetMapDao = new OpenStreetMapDao();
+	
+	EventManager mockEventManager = EasyMock.createMock(EventManager.class);
+	mockEventManager.handleEvent((GisFeatureDeletedEvent)EasyMock.anyObject());
+	EasyMock.replay(mockEventManager);
+	
+	StreetFactory mockStreetFactory = EasyMock.createMock(StreetFactory.class);
+	EasyMock.expect(mockStreetFactory.create(openStreetMap)).andReturn(new Street());
+	EasyMock.replay(mockStreetFactory);
+	
+	HibernateTemplate mockHibernateTemplate = EasyMock.createMock(HibernateTemplate.class);
+	mockHibernateTemplate.delete((EasyMock.anyObject()));
+	EasyMock.replay(mockHibernateTemplate);
+	
+	openStreetMapDao.setHibernateTemplate(mockHibernateTemplate );
+	openStreetMapDao.setStreetFactory(mockStreetFactory);
+	openStreetMapDao.setEventManager(mockEventManager);
+	
+	
+	openStreetMapDao.remove(openStreetMap);
+	
+	EasyMock.verify(mockEventManager);
+	EasyMock.verify(mockStreetFactory);
+	EasyMock.verify(mockHibernateTemplate);
+	
+    }
+
+    @Test
+    public void testDeleteAllShouldCallEventManager(){
+	OpenStreetMap openStreetMap = GeolocTestHelper.createOpenStreetMapForPeterMartinStreet();
+	OpenStreetMapDao openStreetMapDao = new OpenStreetMapDao();
+	
+	EventManager mockEventManager = EasyMock.createMock(EventManager.class);
+	mockEventManager.handleEvent(new PlaceTypeDeleteAllEvent(Street.class));
+	EasyMock.replay(mockEventManager);
+	
+	
+	HibernateTemplate mockHibernateTemplate = EasyMock.createMock(HibernateTemplate.class);
+	EasyMock.expect(mockHibernateTemplate.execute(((HibernateCallback)EasyMock.anyObject()))).andReturn(3);
+	EasyMock.replay(mockHibernateTemplate);
+	
+	openStreetMapDao.setHibernateTemplate(mockHibernateTemplate );
+	openStreetMapDao.setEventManager(mockEventManager);
+	
+	
+	openStreetMapDao.deleteAll();
+	
+	EasyMock.verify(mockEventManager);
+	EasyMock.verify(mockHibernateTemplate);
+	
+    }
+
+    
     public void setOpenStreetMapDao(IOpenStreetMapDao openStreetMapDao) {
         this.openStreetMapDao = openStreetMapDao;
     }
     
 }
+

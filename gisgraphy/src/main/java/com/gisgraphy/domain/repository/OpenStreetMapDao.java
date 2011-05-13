@@ -388,4 +388,9 @@ public class OpenStreetMapDao extends GenericDao<OpenStreetMap, Long> implements
         this.eventManager = eventManager;
     }
 
+
+    public void setStreetFactory(StreetFactory streetFactory) {
+        this.streetFactory = streetFactory;
+    }
+
 }
