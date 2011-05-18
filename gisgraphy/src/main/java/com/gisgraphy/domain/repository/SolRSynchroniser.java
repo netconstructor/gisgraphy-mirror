@@ -297,16 +297,19 @@ public class SolRSynchroniser implements ISolRSynchroniser {
 			ex.setField(FullTextFields.LAT.getValue(), gisFeature.getLatitude());
 			ex.setField(FullTextFields.LONG.getValue(), gisFeature.getLongitude());
 			
-			
-		    if (gisFeature instanceof Street) {
-			ex.setField(FullTextFields.LENGTH.getValue(), ((Street) gisFeature).getLength());
-			ex.setField(FullTextFields.ONE_WAY.getValue(), ((Street) gisFeature).isOneWay());
-			ex.setField(FullTextFields.STREET_TYPE.getValue(), ((Street) gisFeature).getStreetType());
+			String placetype = ClassNameHelper.stripEnhancerClass(gisFeature
+					.getClass().getSimpleName());
+				ex.setField(FullTextFields.PLACETYPE.getValue(), placetype);
 			String countryCode = gisFeature.getCountryCode();
 			if (countryCode != null) {
-			    ex.setField(FullTextFields.COUNTRYCODE.getValue(), gisFeature.getCountryCode().toUpperCase());
-			}
-
+				    ex.setField(FullTextFields.COUNTRYCODE.getValue(), gisFeature.getCountryCode().toUpperCase());
+				    ex.setField(FullTextFields.COUNTRY_FLAG_URL.getValue(), URLUtils
+							.createCountryFlagUrl(gisFeature.getCountryCode()));
+				}
+		    if (gisFeature instanceof Street) {
+		    	ex.setField(FullTextFields.LENGTH.getValue(), ((Street) gisFeature).getLength());
+		    	ex.setField(FullTextFields.ONE_WAY.getValue(), ((Street) gisFeature).isOneWay());
+		    	ex.setField(FullTextFields.STREET_TYPE.getValue(), ((Street) gisFeature).getStreetType());
 		    } else {
 			
 			ex.setField(FullTextFields.FEATURECLASS.getValue(), gisFeature
@@ -322,15 +325,11 @@ public class SolRSynchroniser implements ISolRSynchroniser {
 			ex.setField(FullTextFields.GTOPO30.getValue(), gisFeature.getGtopo30());
 			ex.setField(FullTextFields.TIMEZONE.getValue(), gisFeature
 				.getTimezone());
-			String placetype = ClassNameHelper.stripEnhancerClass(gisFeature
-				.getClass().getSimpleName());
-			ex.setField(FullTextFields.PLACETYPE.getValue(), placetype);
+			
 			ex.setField(FullTextFields.POPULATION.getValue(), gisFeature
 				.getPopulation());
 			ex.setField(FullTextFields.FULLY_QUALIFIED_NAME.getValue(),
 				EncodingHelper.toUTF8(gisFeature.getFullyQualifiedName(false)));
-			ex.setField(FullTextFields.COUNTRY_FLAG_URL.getValue(), URLUtils
-				.createCountryFlagUrl(gisFeature.getCountryCode()));
 			ex.setField(FullTextFields.GOOGLE_MAP_URL.getValue(), URLUtils
 				.createGoogleMapUrl(gisFeature.getLocation(), gisFeature
 					.getName()));
@@ -425,10 +424,7 @@ public class SolRSynchroniser implements ISolRSynchroniser {
 			    ex.setField(FullTextFields.COUNTRYNAME.getValue(),
 				    EncodingHelper.toUTF8(country.getName()));
 			} else {
-			    String countryCode = gisFeature.getCountryCode();
 			    if (countryCode != null) {
-				ex.setField(FullTextFields.COUNTRYCODE.getValue(), countryCode
-					.toUpperCase());
 				Country country = gisFeature.getCountry();
 				if (country != null) {
 				    populateAlternateNames(FullTextFields.COUNTRYNAME

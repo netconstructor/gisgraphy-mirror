@@ -22,6 +22,9 @@ public class OutputStyleHelper {
 	    
 	} else if (outputStyle == Output.OutputStyle.MEDIUM){
 	    return new StringBuffer(getFulltextFieldList(OutputStyle.SHORT,languageCode))
+		.append(",").append(FullTextFields.ONE_WAY.getValue())
+		.append(",").append(FullTextFields.LENGTH.getValue())
+		.append(",").append(FullTextFields.STREET_TYPE.getValue())
 		.append(",").append(FullTextFields.LAT.getValue())
 		.append(",").append(FullTextFields.LONG.getValue())
 		.append(",").append(

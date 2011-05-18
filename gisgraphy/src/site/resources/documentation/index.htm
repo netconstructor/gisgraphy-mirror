@@ -1234,7 +1234,7 @@ Use the alpha2 code when possible, only use the alpha3 code when no alpha2 code 
 <li>The output style verbosity (optional) : Determines the output verbosity. 4 styles are available :<br/><br/>
 <ul>
 <li>Short : feature_id, name, fully_qualified_name, zipcode (if city or city subdivision), placetype, country_code, country_name</li>
-<li>Medium (default) : Short + lat, lon, feature_class, feature_code, population, fips,</li>
+<li>Medium (default) : Short + lat, lon,street_type(if street),one_way(if street),length(if street), feature_class, feature_code, population, fips,</li>
 <li>Medium (if country) continent, currency_code, currency_name, fips_code, isoalpha2_country_code, isoalpha3_country_code, postal_code_mask, postal_code_regex,
  phone_prefix, spoken_languages, tld, capital_name, area</li>
 <li>Medium (adm only) level</li>
@@ -1342,9 +1342,16 @@ Here is a description of all the output fields :<br/>
 <tr><td>placetype</td><td>The <a href="placetype.htm">place Type</a> of the Feature</td><td>SHORT</td></tr>
 <tr><td>country_code</td><td>The <a href="http://en.wikipedia.org/wiki/ISO_3166">ISO 3166</a> country code</td><td>SHORT</td></tr>
 <tr><td>country_name</td><td>The name of the country the features belongs to</td><td>SHORT</td></tr>
+
+
+
 <tr><td>zipcode</td><td>The zipcodes</td><td>SHORT</td></tr>
 <tr><td>google_map_url</td><td>The URL to get the location on <a href="http://maps.google.com/">Google Map</a></td><td>MEDIUM</td></tr>
 <tr><td>yahoo_map_url</td><td>The URL to get the location on <a href="http://maps.yahoo.com/">Yahoo Map</a></td><td>MEDIUM</td></tr>
+
+<tr><td>one_way</td><td>whether the street is one way or not (only for placetype street)</td><td>MEDIUM</td></tr>
+<tr><td>Length</td><td>The length of the street (only for placetype street)</td><td>MEDIUM</td></tr>
+<tr><td>street_type</td><td>The type of the street (only for placetype street)</td><td>MEDIUM</td></tr>
 <tr><td>country_flag_url</td><td>The relative URL to get the country flag image</td><td>MEDIUM</td></tr>
 <tr><td>feature_class</td><td>The feature Class. <a href="http://download.geonames.org/export/dump/featureCodes.txt">More</a>...</td><td>MEDIUM</td></tr>
 <tr><td>feature_code</td><td>The feature Code. <a href="http://download.geonames.org/export/dump/featureCodes.txt">More</a>...</td><td>MEDIUM</td></tr>

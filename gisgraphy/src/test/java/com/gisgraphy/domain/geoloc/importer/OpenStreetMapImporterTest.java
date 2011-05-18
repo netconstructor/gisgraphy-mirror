@@ -38,6 +38,7 @@ import org.junit.Test;
 import com.gisgraphy.domain.geoloc.entity.OpenStreetMap;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.AbstractIntegrationHttpSolrTestCase;
 import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetType;
+import com.gisgraphy.domain.repository.IGisFeatureDao;
 import com.gisgraphy.domain.repository.IOpenStreetMapDao;
 import com.gisgraphy.domain.valueobject.GisgraphyConfig;
 import com.gisgraphy.domain.valueobject.ImporterStatus;
@@ -70,15 +71,16 @@ public class OpenStreetMapImporterTest extends AbstractIntegrationHttpSolrTestCa
     		.rollback();
     	assertEquals(1, deleted.size());
     	assertEquals(5, deleted.get(0).getValue().intValue());
-    	assertEquals("generatedId should be reset to 0",0L, OpenStreetMapImporter.generatedId,0.01);
+    	assertEquals("generatedId should be reset to 0",0L, openStreetMapImporter.generatedId,0.01);
 	}
     
     @Test
     public void testImporterShouldImport(){
-	OpenStreetMapImporter.generatedId = 0L;
+    openStreetMapImporter.generatedId = 0L;
 	openStreetMapImporter.process();
 	assertEquals(4L,openStreetMapDao.count());
-	OpenStreetMap openStreetMap = openStreetMapDao.getByGid(1L);
+	openStreetMapDao.getAll();
+	OpenStreetMap openStreetMap = openStreetMapDao.getByGid(1L+openStreetMapImporter.featureIdIncrement);
 	assertTrue("The oneWay attribute is not correct",openStreetMap.isOneWay());
 	assertEquals("The countryCode is not correct ","FR",openStreetMap.getCountryCode());
 	assertEquals("The streetType is not correct",StreetType.RESIDENTIAL, openStreetMap.getStreetType());
@@ -165,32 +167,16 @@ public class OpenStreetMapImporterTest extends AbstractIntegrationHttpSolrTestCa
     
     @Test
     public void testSetup(){
-	Long savedGeneratedId = OpenStreetMapImporter.generatedId;
-    	OpenStreetMapImporter.generatedId = 1000L;
-    	
-    	IOpenStreetMapDao openStreetMapDao = createMock(IOpenStreetMapDao.class);
-    	openStreetMapDao.createSpatialIndexes();
-    	replay(openStreetMapDao);
-    	
-    	IInternationalisationService internationalisationService = createMock(IInternationalisationService.class);
-    	expect(internationalisationService.getString((String)anyObject())).andStubReturn("localizedString");
-    	replay(internationalisationService);
-    	
-    	
     	OpenStreetMapImporter importer = new OpenStreetMapImporter();
-    	importer.setOpenStreetMapDao(openStreetMapDao);
-    	importer.setInternationalisationService(internationalisationService);
+    	IGisFeatureDao gisFeatureDao = EasyMock.createMock(IGisFeatureDao.class);
+    	long maxFeatureId = 123456L;
+    	EasyMock.expect(gisFeatureDao.getMaxFeatureId()).andReturn(maxFeatureId);
+    	EasyMock.replay(gisFeatureDao);
+    	
+    	importer.setGisFeatureDao(gisFeatureDao);
     	
     	importer.setup();
-    	long generatedId = OpenStreetMapImporter.generatedId;
-    	assertEquals("The generatedId should be reset to 0 before import",0L, generatedId);
-    	assertEquals("statusMessage should be set to empty string at the end  of the setup method","", importer.getStatusMessage());
-    	
-    	
-    	EasyMock.verify(openStreetMapDao);
-    	
-    	//restore the last value
-    	OpenStreetMapImporter.generatedId = savedGeneratedId;
+    	Assert.assertEquals("The generatedId should be reset to 0 before import",maxFeatureId+importer.featureIdIncrement, importer.generatedId.longValue());
     }
     
     @Test
@@ -244,12 +230,14 @@ public class OpenStreetMapImporterTest extends AbstractIntegrationHttpSolrTestCa
 	    public boolean shouldBeSkipped() {throw new RuntimeException("errormessage");};
 	};
 	IOpenStreetMapDao dao = createMock(IOpenStreetMapDao.class);
+	openStreetMapDao.createSpatialIndexes();
 	dao.clearPartialSearchName();
 	EasyMock.replay(dao);
 	importer.setOpenStreetMapDao(dao);
 	
-	IInternationalisationService internationalisationService = createMock(IInternationalisationService.class);
-    	expect(internationalisationService.getString("import.openstreetmap.cleanDatabase")).andStubReturn("localizedString");
+		IInternationalisationService internationalisationService = createMock(IInternationalisationService.class);
+		expect(internationalisationService.getString("import.message.createIndex")).andReturn("localizedString");
+    	expect(internationalisationService.getString("import.openstreetmap.cleanDatabase")).andReturn("localizedString");
     	replay(internationalisationService);
     	importer.setInternationalisationService(internationalisationService);
 	
@@ -259,7 +247,8 @@ public class OpenStreetMapImporterTest extends AbstractIntegrationHttpSolrTestCa
 		
 	    }
 	    Assert.assertTrue(importer.getStatusMessage().contains("errormessage"));
-	    org.easymock.EasyMock.verify(dao);
+	    EasyMock.verify(dao);
+	    EasyMock.verify(internationalisationService);
     }
     }
 }

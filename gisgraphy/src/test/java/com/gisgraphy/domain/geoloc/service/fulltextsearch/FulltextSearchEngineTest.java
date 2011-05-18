@@ -46,11 +46,15 @@ import com.gisgraphy.domain.geoloc.entity.Adm;
 import com.gisgraphy.domain.geoloc.entity.AlternateName;
 import com.gisgraphy.domain.geoloc.entity.City;
 import com.gisgraphy.domain.geoloc.entity.GisFeature;
+import com.gisgraphy.domain.geoloc.entity.OpenStreetMap;
+import com.gisgraphy.domain.geoloc.entity.Street;
 import com.gisgraphy.domain.geoloc.entity.ZipCode;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.spell.ISpellCheckerIndexer;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.spell.SpellCheckerConfig;
+import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetType;
 import com.gisgraphy.domain.repository.IAdmDao;
 import com.gisgraphy.domain.repository.ICityDao;
+import com.gisgraphy.domain.repository.OpenStreetMapDao;
 import com.gisgraphy.domain.valueobject.AlternateNameSource;
 import com.gisgraphy.domain.valueobject.FulltextResultsDto;
 import com.gisgraphy.domain.valueobject.Output;
@@ -58,11 +62,15 @@ import com.gisgraphy.domain.valueobject.Pagination;
 import com.gisgraphy.domain.valueobject.Output.OutputStyle;
 import com.gisgraphy.fulltext.service.exception.FullTextSearchException;
 import com.gisgraphy.helper.FileHelper;
+import com.gisgraphy.helper.GeolocHelper;
+import com.gisgraphy.helper.URLUtils;
 import com.gisgraphy.serializer.OutputFormat;
 import com.gisgraphy.service.IStatsUsageService;
 import com.gisgraphy.stats.StatsUsageType;
 import com.gisgraphy.test.FeedChecker;
 import com.gisgraphy.test.GeolocTestHelper;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 
 public class FulltextSearchEngineTest extends
 	AbstractIntegrationHttpSolrTestCase {
@@ -73,6 +81,9 @@ public class FulltextSearchEngineTest extends
 
     @Resource
     IStatsUsageService statsUsageService;
+    
+    @Resource
+    private OpenStreetMapDao openStreetMapDao;
 
     @Resource
     private ISpellCheckerIndexer spellCheckerIndexer;
@@ -205,6 +216,98 @@ public class FulltextSearchEngineTest extends
 
 	}
     }
+    
+    @Test
+    public void testExecuteAndSerializeForStreet() {
+    	Double length = 3.5D;
+    	boolean oneWay = true;
+    	StreetType streetType = StreetType.PATH;
+    	String countryCode= "FR";
+    	String name= "peter martin";
+    	long featureId =12345l;
+    	Float latitude = 4.5F;
+		Float longitude=3.9F;
+		Point location = GeolocHelper.createPoint(longitude, latitude);
+		LineString shape = GeolocHelper.createLineString("LINESTRING (30.001 30.001, 40 40)");
+    	
+		OpenStreetMap street = new OpenStreetMap();
+    	street.setName(name);
+    	street.setLength(length);
+    	street.setOneWay(oneWay);
+    	street.setStreetType(streetType);
+    	street.setCountryCode(countryCode);
+    	street.setGid(featureId);
+    	street.setLocation(location);
+    	street.setShape(shape);
+   
+
+    	openStreetMapDao.save(street);
+
+        this.solRSynchroniser.commit();
+        File tempDir = FileHelper.createTempDir(this.getClass()
+		.getSimpleName());
+	File file = new File(tempDir.getAbsolutePath()
+		+ System.getProperty("file.separator") + "serialize.txt");
+
+	OutputStream outputStream = null;
+	try {
+	    outputStream = new FileOutputStream(file);
+	} catch (FileNotFoundException e1) {
+	    fail();
+	}
+
+	try {
+	    Pagination pagination = paginate().from(1).to(10);
+	    Output output = Output.withFormat(OutputFormat.XML)
+		    .withLanguageCode("FR").withStyle(OutputStyle.FULL)
+		    .withIndentation();
+	    FulltextQuery fulltextQuery = new FulltextQuery(name,
+		    pagination, output, new Class[]{Street.class},null).withoutSpellChecking();
+	    fullTextSearchEngine.executeAndSerialize(fulltextQuery,
+		    outputStream);
+	} catch (FullTextSearchException e) {
+	    fail("error during search : " + e.getMessage());
+	}
+
+	String content = "";
+	try {
+	    content = GeolocTestHelper.readFileAsString(file.getAbsolutePath());
+	} catch (IOException e) {
+	    fail("can not get content of file " + file.getAbsolutePath());
+	}
+
+	FeedChecker.assertQ("The query return incorrect values",
+		content,
+		"//*[@numFound='1']",
+		"//*[@name='status'][.='0']"
+		// name
+		,
+		"//*[@name='" + FullTextFields.ONE_WAY.getValue()
+			+ "'][.='"+street.isOneWay()+"']",
+		"//*[@name='" + FullTextFields.LENGTH.getValue()
+			+ "'][.='"+street.getLength()+"']",
+		"//*[@name='" + FullTextFields.LAT.getValue()
+			+ "'][.='"+street.getLatitude()+"']",
+			"//*[@name='" + FullTextFields.LONG.getValue()
+			+ "'][.='"+street.getLongitude()+"']",
+			"//*[@name='" + FullTextFields.NAME.getValue()
+			+ "'][.='"+street.getName()+"']",
+			"//*[@name='" + FullTextFields.STREET_TYPE.getValue()
+			+ "'][.='"+street.getStreetType()+"']",
+			"//*[@name='" + FullTextFields.COUNTRYCODE.getValue()
+			+ "'][.='"+street.getCountryCode()+"']",
+			"//*[@name='" + FullTextFields.COUNTRY_FLAG_URL.getValue()
+			+ "'][.='"+URLUtils.createCountryFlagUrl(street.getCountryCode())+"']",
+			"//*[@name='" + FullTextFields.PLACETYPE.getValue()
+			+ "'][.='"+Street.class.getSimpleName()+"']"
+		
+	);
+
+	// delete temp dir
+	assertTrue("the tempDir has not been deleted", GeolocTestHelper
+		.DeleteNonEmptyDirectory(tempDir));
+    }
+
 
     @Test
     public void testExecuteAndSerializeShouldSerialize() {

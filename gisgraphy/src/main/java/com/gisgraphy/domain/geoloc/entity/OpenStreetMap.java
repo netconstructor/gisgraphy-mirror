@@ -30,6 +30,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -320,6 +321,36 @@ public class OpenStreetMap {
     @Column(name = OpenStreetMap.LOCATION_COLUMN_NAME)
     public Point getLocation() {
 	return location;
+    }
+    
+    /**
+     * @return Returns the latitude (north-south) from the Location
+     *         {@link #getLocation()}.
+     * @see #getLongitude()
+     * @see #getLocation()
+     */
+    @Transient
+    public Double getLatitude() {
+	Double latitude = null;
+	if (this.location != null) {
+	    latitude = this.location.getY();
+	}
+	return latitude;
+    }
+    
+    /**
+     * @return Returns the longitude (east-west) from the Location
+     *         {@link #getLocation()}.
+     * @see #getLongitude()
+     * @see #getLocation()
+     */
+    @Transient
+    public Double getLongitude() {
+	Double longitude = null;
+	if (this.location != null) {
+	    longitude = this.location.getX();
+	}
+	return longitude;
     }
 
     /**

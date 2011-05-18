@@ -68,6 +68,9 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 
     protected long generatedFeatureId = 0;
 
+    /**
+     * shift value to allow the addition of geonames features after import
+     */ 
     protected final long featureIdIncrement = 2000000;
 
 
@@ -114,9 +117,8 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 
 	//check required field
 	if (!isEmptyField(fields, 2, true)) {
+		//nothing to do just check
 	}
-
-	
 
 	if (!isEmptyField(fields, 11, false)) {
 	    accuracy = new Integer(fields[11]);
@@ -232,6 +234,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	city.addZipCode(new ZipCode(fields[1]));
 
 	cityDao.save(city);
+	//we do not return the saved entity for test purpose
 	return city;
     }
 

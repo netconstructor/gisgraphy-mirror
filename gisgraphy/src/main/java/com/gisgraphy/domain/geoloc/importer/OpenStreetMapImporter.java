@@ -27,9 +27,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.FlushMode;
+import org.springframework.beans.factory.annotation.Required;
 
 import com.gisgraphy.domain.geoloc.entity.OpenStreetMap;
 import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetType;
+import com.gisgraphy.domain.repository.IGisFeatureDao;
 import com.gisgraphy.domain.repository.IOpenStreetMapDao;
 import com.gisgraphy.domain.valueobject.GisgraphyConfig;
 import com.gisgraphy.domain.valueobject.NameValueDTO;
@@ -45,11 +47,19 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class OpenStreetMapImporter extends AbstractImporterProcessor {
 	
+	 private IGisFeatureDao gisFeatureDao;
 	
     
-    public static Long generatedId = 0L;
+    protected Long generatedId = 0L;
     
     private IOpenStreetMapDao openStreetMapDao;
+    
+    protected long generatedFeatureId = 0;
+
+    /**
+     * shift value to allow the addition of Geonames features after import
+     */ 
+    protected final long featureIdIncrement = 2000000;
 
     /* (non-Javadoc)
      * @see com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#flushAndClear()
@@ -64,11 +74,13 @@ public class OpenStreetMapImporter extends AbstractImporterProcessor {
     protected void setup() {
         super.setup();
         logger.info("reseting Openstreetmap generatedId");
-        OpenStreetMapImporter.generatedId = 0L;
-        statusMessage = internationalisationService.getString("import.message.createIndex");
-        openStreetMapDao.createSpatialIndexes();
-        statusMessage="";
+        initFeatureIdGenerator();
     }
+    
+    protected void initFeatureIdGenerator() {
+    	generatedId = gisFeatureDao.getMaxFeatureId();
+    	generatedId = generatedId + featureIdIncrement;
+        }
 
     /* (non-Javadoc)
      * @see com.gisgraphy.domain.geoloc.importer.AbstractImporterProcessor#getFiles()
@@ -230,6 +242,9 @@ public class OpenStreetMapImporter extends AbstractImporterProcessor {
     protected void tearDown() {
         super.tearDown();
         String savedMessage =this.statusMessage;
+        this.statusMessage = internationalisationService.getString("import.message.createIndex");
+        openStreetMapDao.createSpatialIndexes();
+        this.statusMessage="";
         this.statusMessage=internationalisationService.getString("import.openstreetmap.cleanDatabase"); 
         try {
             if (GisgraphyConfig.PARTIAL_SEARH_EXPERIMENTAL){
@@ -239,6 +254,15 @@ public class OpenStreetMapImporter extends AbstractImporterProcessor {
             //we restore message in case of error
         this.statusMessage=savedMessage;
         }
+    }
+    
+    /**
+     * @param gisFeatureDao
+     *            The GisFeatureDao to set
+     */
+    @Required
+    public void setGisFeatureDao(IGisFeatureDao gisFeatureDao) {
+	this.gisFeatureDao = gisFeatureDao;
     }
     
 }

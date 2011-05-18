@@ -364,6 +364,10 @@ remove the ability to search for 'no name street'
 						<release version="3.0" date="2010-XX"
 			description="improvements of v2.1">
 
+			<action dev="David Masclet" type="add">
+				extract some common libraries (gisgraphy-commons, gisgraphy-utils,universalserialiser)
+				 to reuse it in client and anywhere else
+			</action>
 			
 			<action dev="David Masclet" type="add">
 				migrate to solr 1.4
@@ -440,6 +444,11 @@ remove the ability to search for 'no name street'
 			
 			<action dev="David Masclet" type="update">
 				consider zipcode as keyword (not tokenized, not split for whitespace, and so on , case insensitive)
+			</action>
+			
+			<action dev="David Masclet" type="update">
+				We can now do a fulltext search on openstreetmap (new specific fields added : street_type,one_way, length).
+				The 'openstreetmap street' are included in a fulltext search on any placetype.
 			</action>
 			
 			
