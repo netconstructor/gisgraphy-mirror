@@ -7,6 +7,7 @@ format
 tests
 upload maven repo
 refaire les feed d'exemples
+verifier dans le pom qu'il n'y a pas de snapshots
 
 modifier http://www.gisgraphy.com/news/getnews.php to tell new version and obsolete
 site
