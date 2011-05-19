@@ -75,6 +75,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 
 
     protected int[] accuracyToDistance = { 50000, 50000, 40000, 10000, 10000, 5000, 3000 };
+    
 
     /*
      * (non-Javadoc)
@@ -120,6 +121,8 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 		//nothing to do just check
 	}
 
+	
+
 	if (!isEmptyField(fields, 11, false)) {
 	    accuracy = new Integer(fields[11]);
 	}
@@ -130,10 +133,15 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	}
 
 	Long featureId = findFeature(fields, zipPoint, getAccurateDistance(accuracy));
+	GisFeature gisFeature;
 	if (featureId != null) {
-	    addAndSaveZipCodeToFeature(code, featureId);
+	    logger.info(fields +" returns "+ featureId );
+	    gisFeature = addAndSaveZipCodeToFeature(code, featureId);
+	    logger.info("Adding zip " + fields[1] +" to "+gisFeature);
 	} else {
-	    addNewEntityAndZip(fields);
+	    logger.error(fields +" returns nothings ");
+	    gisFeature = addNewEntityAndZip(fields);
+	    logger.info("Adding new zip " + fields[1] +" to "+gisFeature);
 	}
     }
 
@@ -189,10 +197,10 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	    } else {
 		double distance = GeolocHelper.distance(zipPoint, dtoPoint);
 		if (distance > maxDistance) {
-		    logger.debug(dto.getFeature_id() + " is too far and is not candidate");
+		    logger.info(dto.getFeature_id() + " is too far and is not candidate");
 		} else {
 		    if (distance < nearestDistance) {
-			logger.debug(dto.getFeature_id() + "is nearest than " + nearestFeatureId);
+			logger.info(dto.getFeature_id() + "is nearest than " + nearestFeatureId);
 			nearestFeatureId = dto.getFeature_id();
 			nearestDistance = distance;
 		    }
@@ -223,7 +231,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	Adm adm;
 	if (importerConfig.isTryToDetectAdmIfNotFound()) {
 	    adm = this.admDao.suggestMostAccurateAdm(fields[0], fields[4], fields[6], fields[8], null, city);
-	    logger.debug("suggestAdm=" + adm);
+	    logger.info("suggestAdm=" + adm);
 	} else {
 	    adm = this.admDao.getAdm(fields[0], fields[4], fields[6], fields[8], null);
 	}
@@ -378,6 +386,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	this.gisFeatureDao.setFlushMode(FlushMode.COMMIT);
 	this.cityDao.setFlushMode(FlushMode.COMMIT);
 	this.admDao.setFlushMode(FlushMode.COMMIT);
+	this.zipCodeDao.setFlushMode(FlushMode.COMMIT);
     }
 
     /*
@@ -392,6 +401,7 @@ public class GeonamesZipCodeImporter extends AbstractImporterProcessor {
 	this.gisFeatureDao.flushAndClear();
 	this.cityDao.flushAndClear();
 	this.admDao.flushAndClear();
+	this.zipCodeDao.flushAndClear();
     }
 
     /*

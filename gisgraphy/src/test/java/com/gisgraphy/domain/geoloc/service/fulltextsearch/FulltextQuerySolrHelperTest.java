@@ -160,7 +160,7 @@ public class FulltextQuerySolrHelperTest {
 		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery("foo",
-		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "FR").withAllwordsRequired(false);
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "FR").withAllWordsRequired(false);
 	// split parameters
 	HashMap<String, String> parameters = GeolocTestHelper.splitURLParams(
 		FulltextQuerySolrHelper.toQueryString(fulltextQuery), "&");

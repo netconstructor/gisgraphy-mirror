@@ -33,6 +33,7 @@ import com.gisgraphy.domain.geoloc.entity.OpenStreetMap;
 import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetType;
 import com.gisgraphy.domain.repository.IGisFeatureDao;
 import com.gisgraphy.domain.repository.IOpenStreetMapDao;
+import com.gisgraphy.domain.repository.ISolRSynchroniser;
 import com.gisgraphy.domain.valueobject.GisgraphyConfig;
 import com.gisgraphy.domain.valueobject.NameValueDTO;
 import com.gisgraphy.helper.GeolocHelper;
@@ -55,6 +56,8 @@ public class OpenStreetMapImporter extends AbstractImporterProcessor {
     private IOpenStreetMapDao openStreetMapDao;
     
     protected long generatedFeatureId = 0;
+    
+    private ISolRSynchroniser solRSynchroniser;
 
     /**
      * shift value to allow the addition of Geonames features after import
@@ -244,8 +247,8 @@ public class OpenStreetMapImporter extends AbstractImporterProcessor {
         String savedMessage =this.statusMessage;
         this.statusMessage = internationalisationService.getString("import.message.createIndex");
         openStreetMapDao.createSpatialIndexes();
-        this.statusMessage="";
-        this.statusMessage=internationalisationService.getString("import.openstreetmap.cleanDatabase"); 
+        this.statusMessage=internationalisationService.getString("import.fulltext.optimize");
+        solRSynchroniser.optimize();
         try {
             if (GisgraphyConfig.PARTIAL_SEARH_EXPERIMENTAL){
         	openStreetMapDao.clearPartialSearchName();
@@ -263,6 +266,11 @@ public class OpenStreetMapImporter extends AbstractImporterProcessor {
     @Required
     public void setGisFeatureDao(IGisFeatureDao gisFeatureDao) {
 	this.gisFeatureDao = gisFeatureDao;
+    }
+
+    @Required
+    public void setSolRSynchroniser(ISolRSynchroniser solRSynchroniser) {
+        this.solRSynchroniser = solRSynchroniser;
     }
     
 }

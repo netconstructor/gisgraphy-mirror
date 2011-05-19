@@ -101,6 +101,9 @@ public class OpenStreetMapDao extends GenericDao<OpenStreetMap, Long> implements
 	if (name != null && streetSearchMode==null){
 		throw new IllegalArgumentException("streetSearchmode can not be null if name is provided");
 	}
+	if (point == null && streetSearchMode==StreetSearchMode.CONTAINS){
+		throw new IllegalArgumentException("you must specify lat/lng when streetsearchmode = "+StreetSearchMode.CONTAINS);
+	}
 	return (List<StreetDistance>) this.getHibernateTemplate().execute(
 		new HibernateCallback() {
 

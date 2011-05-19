@@ -311,7 +311,7 @@ public class FulltextQuery extends AbstractGisQuery {
 	 * @param allRequired if all the query terms are mandatory
 	 * @return The current query to chain methods
 	 */
-	public FulltextQuery withAllwordsRequired(boolean allWordsRequired) {
+	public FulltextQuery withAllWordsRequired(boolean allWordsRequired) {
 		this.allWordsRequired = allWordsRequired;
 		return this;
 	}

@@ -194,7 +194,7 @@ public class OpenStreetMapDaoTest extends AbstractIntegrationHttpSolrTestCase{
 	assertTrue("result should be sorted by distance : "+firstDist +"  should be < " +secondDist ,firstDist < secondDist);
 	
 	//test nullpoint
-	nearestStreet = openStreetMapDao.getNearestAndDistanceFrom(null, 10000, 1, 1, null, null,"John",StreetSearchMode.CONTAINS,true);
+	nearestStreet = openStreetMapDao.getNearestAndDistanceFrom(null, 10000, 1, 1, null, null,"John",StreetSearchMode.FULLTEXT,true);
 	assertEquals(1,nearestStreet.size());
 	assertEquals(streetOSM2.getGid(),nearestStreet.get(0).getGid());
 	Assert.assertNull("When the point is null, distance field should be null",nearestStreet.get(0).getDistance());
@@ -392,7 +392,6 @@ public class OpenStreetMapDaoTest extends AbstractIntegrationHttpSolrTestCase{
 
     @Test
     public void testDeleteAllShouldCallEventManager(){
-	OpenStreetMap openStreetMap = GeolocTestHelper.createOpenStreetMapForPeterMartinStreet();
 	OpenStreetMapDao openStreetMapDao = new OpenStreetMapDao();
 	
 	EventManager mockEventManager = EasyMock.createMock(EventManager.class);
@@ -413,6 +412,17 @@ public class OpenStreetMapDaoTest extends AbstractIntegrationHttpSolrTestCase{
 	EasyMock.verify(mockEventManager);
 	EasyMock.verify(mockHibernateTemplate);
 	
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testPointIsMandatoryWhenSearchModeEqualsContains() {
+	try {
+	    openStreetMapDao.getNearestAndDistanceFrom(null, 1D, 1, 10, StreetType.BRIDLEWAY, true, "foo", StreetSearchMode.CONTAINS, true);
+	    fail("Point is required when searchmode= " + StreetSearchMode.CONTAINS+". An exception should have been thrown");
+	} catch (IllegalArgumentException e) {
+	    // OK
+	}
+
     }
 
     

@@ -40,6 +40,7 @@ import com.gisgraphy.domain.geoloc.service.fulltextsearch.AbstractIntegrationHtt
 import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetType;
 import com.gisgraphy.domain.repository.IGisFeatureDao;
 import com.gisgraphy.domain.repository.IOpenStreetMapDao;
+import com.gisgraphy.domain.repository.ISolRSynchroniser;
 import com.gisgraphy.domain.valueobject.GisgraphyConfig;
 import com.gisgraphy.domain.valueobject.ImporterStatus;
 import com.gisgraphy.domain.valueobject.NameValueDTO;
@@ -235,9 +236,14 @@ public class OpenStreetMapImporterTest extends AbstractIntegrationHttpSolrTestCa
 	EasyMock.replay(dao);
 	importer.setOpenStreetMapDao(dao);
 	
+	ISolRSynchroniser solRSynchroniser = EasyMock.createMock(ISolRSynchroniser.class);
+	solRSynchroniser.optimize();
+	EasyMock.replay(solRSynchroniser);
+	importer.setSolRSynchroniser(solRSynchroniser);
+	
 		IInternationalisationService internationalisationService = createMock(IInternationalisationService.class);
 		expect(internationalisationService.getString("import.message.createIndex")).andReturn("localizedString");
-    	expect(internationalisationService.getString("import.openstreetmap.cleanDatabase")).andReturn("localizedString");
+    	expect(internationalisationService.getString("import.fulltext.optimize")).andReturn("localizedString");
     	replay(internationalisationService);
     	importer.setInternationalisationService(internationalisationService);
 	
@@ -249,6 +255,7 @@ public class OpenStreetMapImporterTest extends AbstractIntegrationHttpSolrTestCa
 	    Assert.assertTrue(importer.getStatusMessage().contains("errormessage"));
 	    EasyMock.verify(dao);
 	    EasyMock.verify(internationalisationService);
+	    EasyMock.verify(solRSynchroniser);
     }
     }
 }

@@ -259,10 +259,12 @@ public class StreetSearchQueryTest  {
    public void testToString(){
        StreetSearchQuery query = new StreetSearchQuery(GENERIC_POINT,StreetType.UNCLASSIFIED);
        assertFalse("ToString should not contains GeolocQuery and should be overide",query.toString().contains("GeolocQuery"));
-       
-       
-       
-       
+   }
+   
+   @Test
+   public void testToStringWithNullPoint(){
+       StreetSearchQuery query = new StreetSearchQuery("toto");
+       query.toString();
    }
 
 }

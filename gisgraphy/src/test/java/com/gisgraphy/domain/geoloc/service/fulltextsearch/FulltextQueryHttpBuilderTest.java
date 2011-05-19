@@ -304,6 +304,37 @@ public class FulltextQueryHttpBuilderTest {
 		query.isOutputIndented());
 	
 	
+	// test allwordsRequired
+	// with no value specified
+	request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	request.removeParameter(FulltextServlet.ALLWORDSREQUIRED_PARAMETER);
+	query = buildQuery(request);
+	assertTrue("When no " + FulltextServlet.ALLWORDSREQUIRED_PARAMETER
+		+ " is specified, the  parameter should be set to default"
+		,query.isAllwordsRequired());
+	// with wrong value
+	request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	request.setParameter(FulltextServlet.ALLWORDSREQUIRED_PARAMETER, "UNK");
+	query = buildQuery(request);
+	assertTrue("When wrong " + FulltextServlet.ALLWORDSREQUIRED_PARAMETER
+		+ " is specified, the  parameter should be set to default",
+		query.isAllwordsRequired());
+	// test case sensitive
+	request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	request.setParameter(FulltextServlet.ALLWORDSREQUIRED_PARAMETER, "False");
+	query = buildQuery(request);
+	assertFalse(FulltextServlet.ALLWORDSREQUIRED_PARAMETER
+		+ " should be case insensitive  ", query.isAllwordsRequired());
+	// test with on value
+	request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	request.setParameter(FulltextServlet.ALLWORDSREQUIRED_PARAMETER, "oN");
+	query = buildQuery(request);
+	assertTrue(
+		FulltextServlet.ALLWORDSREQUIRED_PARAMETER
+			+ " should be true for 'on' value (case insensitive and on value)  ",
+		query.isAllwordsRequired());
+	
+	
 	// test spellchecking
 	// with no value specified
 	request = GeolocTestHelper.createMockHttpServletRequestForFullText();

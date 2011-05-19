@@ -243,8 +243,10 @@ public class StreetSearchQuery extends GeolocQuery {
      */
     @Override
     public String toString() {
+	Double lat = getPoint()==null?null:getPoint().getY();
+	Double lng = getPoint()==null?null:getPoint().getY();
 	String asString = "StreetSearchQuery (lat='"
-		+ getPoint().getY() + "',long='" + getPoint().getX() + "') and name="+this.name+" and streetsearchmode="+this.streetSearchMode+" and radius="
+		+ lat + "',long='" + lng + "') and name="+this.name+" and streetsearchmode="+this.streetSearchMode+" and radius="
 		+ getRadius() + " for streetType="+streetType+" and oneWay="+this.oneWay;
 	asString += " with " + getOutput() + " and " + pagination +" and distance = "+this.hasDistanceField();
 	return asString;

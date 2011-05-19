@@ -112,7 +112,7 @@ public class GeocodingService implements IGeocodingService {
 
     protected SolrResponseDto findCityInText(String text, String countryCode) {
 	FulltextQuery query = new FulltextQuery(text, Pagination.DEFAULT_PAGINATION, Output.DEFAULT_OUTPUT, com.gisgraphy.fulltext.Constants.CITY_AND_CITYSUBDIVISION_PLACETYPE, countryCode);
-	query.withAllwordsRequired(false);
+	query.withAllWordsRequired(false);
 	FulltextResultsDto results = fullTextSearchEngine.executeQuery(query);
 	if (results.getResultsSize() >= 1) {
 	    return results.getResults().get(0);

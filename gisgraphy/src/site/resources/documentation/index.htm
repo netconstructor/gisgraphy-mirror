@@ -1194,6 +1194,11 @@ The following languages are supported :
 </ul>
 </li>
 <br/>
+<a name="allwordsrequiredfulltext"></a>
+<li>All words required (optional): Wether the fulltext engine should considers all the words pecified as required. Default to true. possible values are true|false (or "on" when used with the rest service)
+</li>
+<br/>
+
 <a name="startindex"></a>
 <li>Start pagination index (optional) : The first pagination index. Numbered from 1. If the number is < 1 or not specified, it will be set to the default value : 1.</li>
 <br/>
@@ -1266,7 +1271,7 @@ See a full list and explanation of placetype : <a href="http://www.gisgraphy.com
 
 <br/>
 <a name="indent"></a>
-<li>The indentation (optional) : indents the results. Default to false. the possible values are true|false (or "on" when used with the rest service <a href="#indentonfulltext">see more</a></li>) Georss and Atom won't be indented for performance reason
+<li>The indentation (optional) : indents the results. Default to false. the possible values are true|false (or "on" when used with the rest service <a href="#indentonfulltext">see more</a>) Georss and Atom won't be indented for performance reasons
 <br/><br/>
 
 <br/>
@@ -1293,6 +1298,7 @@ Here is a summary of the Web parameters mapping : <br/>
 <table class="mediumsizetable smartborder">
 <th>Parameter name</th><th>Web parameter name</th><th>comment</th>
 <tr><td>The searched text</td><td>q</td><td></td></tr>
+<tr><td>allWordsrequired</td><td>allwordsrequired</td><td></td></tr>
 <tr><td>Start pagination index</td><td>from</td><td></td></tr>
 <tr><td>End pagination index</td><td>to</td><td></td></tr>
 <tr><td>Output format</td><td>format</td><td></td></tr>
@@ -1419,6 +1425,7 @@ The fulltext API looks like this
 					
 			FulltextQuery fulltextQuery = new FulltextQuery("<a href="#searchedtext">SEARCHEDTEXT</a>",
 					pagination, output, <a href="#placetype">PLACETYPE</a>.class, <a href="#countrycode">COUNTRYCODE</a>);
+					fulltextQuery.<a href="#indent">withAllWordsRequired</a>(true);
 			String result = fullTextSearchEngine.executeQueryToString(fulltextQuery);
 </pre>
 </div>

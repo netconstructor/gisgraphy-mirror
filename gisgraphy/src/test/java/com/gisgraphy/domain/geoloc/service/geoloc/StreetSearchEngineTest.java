@@ -124,6 +124,29 @@ public class StreetSearchEngineTest extends AbstractIntegrationHttpSolrTestCase 
 	assertEquals(street.getName(), results.getResult().get(0).getName());
     }
     
+    @Test(expected=IllegalArgumentException.class)
+    public void testPointIsMandatoryWithContainsMode() {
+	OpenStreetMap street = GeolocTestHelper.createOpenStreetMapForJohnKenedyStreet();
+	
+
+	this.openStreetMapDao.save(street);
+
+	Pagination pagination = paginate().from(1).to(15);
+	Output output = Output.withFormat(OutputFormat.XML).withIndentation();
+	StreetSearchQuery query = new StreetSearchQuery("hn ken");
+	query.withOutput(output);
+	query.withPagination(pagination);
+	query.withStreetSearchMode(StreetSearchMode.CONTAINS);
+	
+	try {
+	    StreetSearchResultsDto results = streetSearchEngine.executeQuery(query);
+	    fail("Point is required when searchmode= " + StreetSearchMode.CONTAINS+". An exception should have been thrown");
+	} catch (IllegalArgumentException e) {
+	    // OK
+	}
+	
+    }
+    
     
     
     @Test

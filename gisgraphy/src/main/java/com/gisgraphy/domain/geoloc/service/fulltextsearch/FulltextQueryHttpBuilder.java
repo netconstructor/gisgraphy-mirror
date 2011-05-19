@@ -147,7 +147,17 @@ public class FulltextQueryHttpBuilder {
 	else if ("false".equalsIgnoreCase(req.getParameter(FulltextServlet.SPELLCHECKING_PARAMETER))) {
 		query.withoutSpellChecking();
 	}
+	
+	if ("true".equalsIgnoreCase(req
+		.getParameter(FulltextServlet.ALLWORDSREQUIRED_PARAMETER))
+		|| "on".equalsIgnoreCase(req
+			.getParameter(FulltextServlet.ALLWORDSREQUIRED_PARAMETER))) {
+	    query.withAllWordsRequired(true);
+	}
+	else if ("false".equalsIgnoreCase(req.getParameter(FulltextServlet.ALLWORDSREQUIRED_PARAMETER))) {
+	query.withAllWordsRequired(false);}
 
+	
 	query.withPagination(pagination);
 	query.withPlaceTypes(clazzs);
 	query.withOutput(output);

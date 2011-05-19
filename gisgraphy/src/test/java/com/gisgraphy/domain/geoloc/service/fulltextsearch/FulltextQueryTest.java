@@ -220,7 +220,7 @@ public class FulltextQueryTest {
     public void testwithAllWordsRequired(){
     	FulltextQuery query = new FulltextQuery("foo");
     	Assert.assertTrue(query.isAllwordsRequired());
-    	query.withAllwordsRequired(false);
+    	query.withAllWordsRequired(false);
     	Assert.assertFalse(query.isAllwordsRequired());
     }
     
