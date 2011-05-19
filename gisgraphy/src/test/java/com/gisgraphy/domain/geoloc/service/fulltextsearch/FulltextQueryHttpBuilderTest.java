@@ -309,15 +309,16 @@ public class FulltextQueryHttpBuilderTest {
 	request = GeolocTestHelper.createMockHttpServletRequestForFullText();
 	request.removeParameter(FulltextServlet.ALLWORDSREQUIRED_PARAMETER);
 	query = buildQuery(request);
-	assertTrue("When no " + FulltextServlet.ALLWORDSREQUIRED_PARAMETER
+	assertEquals("When no " + FulltextServlet.ALLWORDSREQUIRED_PARAMETER
 		+ " is specified, the  parameter should be set to default"
-		,query.isAllwordsRequired());
+		,FulltextQuery.ALL_WORDS_REQUIRED_DEFAULT_OPTION,query.isAllwordsRequired());
 	// with wrong value
 	request = GeolocTestHelper.createMockHttpServletRequestForFullText();
 	request.setParameter(FulltextServlet.ALLWORDSREQUIRED_PARAMETER, "UNK");
 	query = buildQuery(request);
-	assertTrue("When wrong " + FulltextServlet.ALLWORDSREQUIRED_PARAMETER
+	assertEquals("When wrong " + FulltextServlet.ALLWORDSREQUIRED_PARAMETER
 		+ " is specified, the  parameter should be set to default",
+		FulltextQuery.ALL_WORDS_REQUIRED_DEFAULT_OPTION,
 		query.isAllwordsRequired());
 	// test case sensitive
 	request = GeolocTestHelper.createMockHttpServletRequestForFullText();
