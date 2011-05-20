@@ -133,7 +133,7 @@ This documentation is for the last version of gisgraphy (snapshots, nightly buil
 <a name="about"></a>
 <div align="right"><a href="#top">[top]</a></div>
 <h3>About</h3>
-Gisgraphy is a free and open source framework. Gisgraphy goal is to provide tools to use free GIS Data on the Web. Actually it manage <a href="http://www.geonames.org/" target="_blank">Geonames</a> and <a href="www.openstreetmap.org" target="_blank">OpenStreetMap</a> (42 million entries). it provides an importer to inject the data into a strongly typed Postgres / Postgis database and use them via webservices : worldwide geocoding, worldwide reverse geocoding, fulltext and find nearby. Results can be output in XML, Atom, RSS, JSON, PHP, Ruby, YAML and Python. Here are the main functionalities  :
+Gisgraphy is a free and open source framework. Gisgraphy goal is to provide tools to use free GIS Data on the Web. Actually it manage <a href="http://www.geonames.org/" target="_blank">Geonames</a> and <a href="http://www.openstreetmap.org" target="_blank">OpenStreetMap</a> (42 million entries). it provides an importer to inject the data into a strongly typed Postgres / Postgis database and use them via webservices : worldwide geocoding, worldwide reverse geocoding, fulltext and find nearby. Results can be output in XML, Atom, RSS, JSON, PHP, Ruby, YAML and Python. Here are the main functionalities  :
 <ul>
 <li> Importers from geonames CSV files. Just give the country(ies) you wish to import and / or the <a href="/placetype.htm">placetypes</a>, and Gisgraphy download the files  and import them with all the alternateNames (optional), and sync the database with the fulltext search engine</li>
 <li> Importers for Openstreetmap data in csv format (view <a href="http://www.gisgraphy.com/download/download_data.htm"> data</a>)
@@ -1349,7 +1349,7 @@ Here is a description of all the output fields :<br/>
 <tr><td>feature_id</td><td>A unique id that identify the feature</td><td>SHORT</td></tr>
 <tr><td>name</td><td>The name of the feature</td><td>SHORT</td></tr>
 <tr><td>fully_qualified_name</td><td>A name of the form : (adm1Name et adm2Name are printed) Paris, D&eacute;partement de Ville-De-Paris, Ile-De-France, (FR)</td><td>SHORT</td></tr>
-<tr><td>placetype</td><td>The <a href="placetype.htm">place Type</a> of the Feature</td><td>SHORT</td></tr>
+<tr><td>placetype</td><td>The <a href="/placetype.htm">place Type</a> of the Feature</td><td>SHORT</td></tr>
 <tr><td>country_code</td><td>The <a href="http://en.wikipedia.org/wiki/ISO_3166">ISO 3166</a> country code</td><td>SHORT</td></tr>
 <tr><td>country_name</td><td>The name of the country the features belongs to</td><td>SHORT</td></tr>
 
@@ -1473,7 +1473,7 @@ The geolocalisation service allows to search for features around earth location.
 you can
 <ul>
 	<li> Specify GPS position</li>
-	<li> Limit the results to a specific <a href="placetype.htm">place type</a> (e.g : search all monuments around a point)</li>
+	<li> Limit the results to a specific <a href="/placetype.htm">place type</a> (e.g : search all monuments around a point)</li>
 	<li> Limit the results to a specified radius</li>
 	<li> Paginate the results</li>
 	<li> Tells if you want the output to be indented (currently, apply only for XML, not json for performance reasons. may change in next version) </li> 
@@ -1567,7 +1567,7 @@ For performance reasons, it is highly recommended to specify a placetype (if you
 
 <br/>
 <div class="tip greentip">
-See a full list and explanation of placetype : <a href="placetype.htm">here</a>.
+See a full list and explanation of placetype : <a href="/placetype.htm">here</a>.
 </div>
 <br/>
 
