@@ -308,6 +308,67 @@ public class FulltextSearchEngineTest extends
 		.DeleteNonEmptyDirectory(tempDir));
     }
 
+    
+    @Test
+    public void testExecuteAndSerializeWithAllWordRequiredFalse() {
+	File tempDir = FileHelper.createTempDir(this.getClass()
+		.getSimpleName());
+	File file = new File(tempDir.getAbsolutePath()
+		+ System.getProperty("file.separator") + "serialize.txt");
+
+	Long featureId = 1001L;
+	GisFeature gisFeature = GeolocTestHelper.createCity("Saint-André",
+		1.5F, 2F, featureId);
+	AlternateName alternateName = new AlternateName();
+	alternateName.setName("alteré");
+	alternateName.setGisFeature(gisFeature);
+	alternateName.setSource(AlternateNameSource.ALTERNATENAMES_FILE);
+	gisFeature.addAlternateName(alternateName);
+	City paris = new City(gisFeature);
+	paris.addZipCode(new ZipCode("50263"));
+
+	// save cities and check it is saved
+	this.cityDao.save(paris);
+	assertNotNull(this.cityDao.getByFeatureId(featureId));
+	// commit changes
+	this.solRSynchroniser.commit();
+
+	OutputStream outputStream = null;
+	try {
+	    outputStream = new FileOutputStream(file);
+	} catch (FileNotFoundException e1) {
+	    fail();
+	}
+
+	try {
+	    Pagination pagination = paginate().from(1).to(10);
+	    Output output = Output.withFormat(OutputFormat.XML)
+		    .withLanguageCode("FR").withStyle(OutputStyle.SHORT)
+		    .withIndentation();
+	    FulltextQuery fulltextQuery = new FulltextQuery("Saint André foo",
+		    pagination, output, com.gisgraphy.fulltext.Constants.ONLY_CITY_PLACETYPE, "fr").withAllWordsRequired(false);
+	    fullTextSearchEngine.executeAndSerialize(fulltextQuery,
+		    outputStream);
+	} catch (FullTextSearchException e) {
+	    fail("error during search : " + e.getMessage());
+	}
+
+	String content = "";
+	try {
+	    content = GeolocTestHelper.readFileAsString(file.getAbsolutePath());
+	} catch (IOException e) {
+	    fail("can not get content of file " + file.getAbsolutePath());
+	}
+	FeedChecker.assertQ("The query return incorrect values", content,
+		"//*[@numFound='1']", "//*[@name='status'][.='0']",
+		"//*[@name='" + FullTextFields.FULLY_QUALIFIED_NAME.getValue()
+			+ "'][.='" + paris.getFullyQualifiedName(false) + "']");
+
+	// delete temp dir
+	assertTrue("the tempDir has not been deleted", GeolocTestHelper
+		.DeleteNonEmptyDirectory(tempDir));
+
+    }
 
     @Test
     public void testExecuteAndSerializeShouldSerialize() {
