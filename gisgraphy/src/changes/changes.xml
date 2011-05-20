@@ -451,7 +451,9 @@ remove the ability to search for 'no name street'
 				The 'openstreetmap street' are included in a fulltext search on any placetype.
 			</action>
 			
-			
+			<action dev="David Masclet" type="update">
+				importerConfig.importGisFeatureEmbededAlternateNames=true by default
+			</action>
 			
 			
 			</release>
