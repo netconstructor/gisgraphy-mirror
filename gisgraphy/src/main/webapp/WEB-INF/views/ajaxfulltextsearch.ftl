@@ -68,6 +68,11 @@
 		<span class="advancedsearchcat"><@s.text name="search.moreCriteria"/></span>
 		<hr/>
 		<span class="searchfield">
+			<span class="searchfieldlabel"><@s.text name="search.allwordsrequired"/></span> : <@s.radio name="allwordsrequired" list="%{#@java.util.LinkedHashMap@{'true' : getText('global.yes'), 'false': getText('global.no')}}"  />
+		</span>
+		<div class="clear"></div>
+		<hr/>
+		<span class="searchfield">
 			<span class="searchfieldlabel"><@s.text name="global.placetype"/> : </span>
 			<@s.select headerKey="" headerValue="--Any place--"  name="placetype" list="placetypes"  multiple="true" size="5" required="false"  labelposition="left" theme="simple"/>
 			<br/><br/>
@@ -75,6 +80,7 @@
 			<br/>
 		</span>
 		<div class="clear"></div>
+		<hr/>
 		<span class="searchfield">
 			<span class="searchfieldlabel"><@s.text name="global.country"/> : </span><@s.select label="In " listKey="iso3166Alpha2Code" listValue="name" name="country" list="countries" headerValue="--All countries--" headerKey="" multiple="false" required="false" labelposition="left" theme="simple" /> 
 			<br/>
