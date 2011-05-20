@@ -63,20 +63,12 @@
 			<@s.text name="global.useshifttoselectmore"/>
 			<br/>
 		</span>
-		
 		<div class="clear"></div>
-		<hr/>
-		<span class="searchfield">
-			<span class="searchfieldlabel"><@s.text name="search.allwordsrequired"/></span> : <@s.radio name="allwordsrequired" list="%{#@java.util.LinkedHashMap@{'true' : getText('global.yes'), 'false': getText('global.no')}}"  />
-		</span>
-		<div class="clear"></div>
-		<hr/>
 		<span class="searchfield">
 			<span class="searchfieldlabel"><@s.text name="global.country"/> : </span><@s.select label="In " listKey="iso3166Alpha2Code" listValue="name" name="country" list="countries" headerValue="--All countries--" headerKey="" multiple="false" required="false" labelposition="left" theme="simple" /> 
 			<br/>
 		</span>
 		<div class="clear"></div>
-		<hr/>
 		<span class="searchfield">
 			<span class="searchfieldlabel"><@s.text name="search.spellChecking"/> : </span><@s.checkbox label="spellchecking" labelposition="left" name="spellchecking" theme="simple" />
 		</span>

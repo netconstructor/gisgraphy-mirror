@@ -50,8 +50,6 @@ public class FulltextQuery extends AbstractGisQuery {
 	
     public final static int QUERY_MAX_LENGTH = 200;
     
-    public final static boolean ALL_WORDS_REQUIRED_DEFAULT_OPTION = true;
-    
     /**
      * The logger
      */
@@ -74,7 +72,7 @@ public class FulltextQuery extends AbstractGisQuery {
 
     private String query = "";
     private String countryCode;
-    private boolean allWordsRequired = ALL_WORDS_REQUIRED_DEFAULT_OPTION;
+    private boolean allWordsRequired = true;
     
     private boolean spellchecking = SpellCheckerConfig.activeByDefault;
 
@@ -195,8 +193,7 @@ public class FulltextQuery extends AbstractGisQuery {
      */
     @Override
     public String toString() {
-    	String allwordsRequiredString = allWordsRequired?" with all words required ":" without all words required ";
-		String asString = "FullTextQuery '" + this.query + "' "+allwordsRequiredString+" for ";
+		String asString = "FullTextQuery '" + this.query + "' for ";
 		if (this.placeTypes == null) {
 			asString += "all placeType";
 		} else {

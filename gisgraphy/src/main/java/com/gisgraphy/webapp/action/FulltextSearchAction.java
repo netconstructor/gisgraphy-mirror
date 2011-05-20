@@ -65,8 +65,6 @@ public class FulltextSearchAction extends SearchAction {
     private FulltextResultsDto responseDTO;
 
     private String placetype;
-    
-    private boolean allwordsrequired = FulltextQuery.ALL_WORDS_REQUIRED_DEFAULT_OPTION;
 
     // form parameters
 
@@ -294,19 +292,5 @@ public class FulltextSearchAction extends SearchAction {
     public void setSpellchecking(boolean spellchecking) {
         this.spellchecking = spellchecking;
     }
-
-	/**
-	 * @return the allwordsrequired
-	 */
-	public boolean isAllwordsrequired() {
-		return allwordsrequired;
-	}
-
-	/**
-	 * @param allwordsrequired the allwordsrequired to set
-	 */
-	public void setAllwordsrequired(boolean allwordsrequired) {
-		this.allwordsrequired = allwordsrequired;
-	}
 
 }
