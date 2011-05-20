@@ -16,8 +16,6 @@
 #-----------------------------------------------------------------------
 # a couple of test stopwords to test that the words are really being
 # configured from this file:
-stopworda
-stopwordb
 
 #Standard english stop words taken from Lucene's StopAnalyzer
 #an
@@ -33,13 +31,13 @@ stopwordb
 #in
 #into
 #is
-vit
+#vit
 #no
 vnot
-of
+#of
 #on
 #or
-s
+#s
 #such
 #t
 #that

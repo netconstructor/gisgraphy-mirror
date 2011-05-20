@@ -117,10 +117,7 @@ public final class StringUtil {
      */
     public static String decodeString(String str) {
 	Base64 dec = new Base64();
-	try {
-	    return String.valueOf(dec.decode(str));
-	} catch (DecoderException de) {
-	    throw new RuntimeException(de.getMessage(), de.getCause());
-	}
+	return String.valueOf(dec.decode(str));
+	   
     }
 }

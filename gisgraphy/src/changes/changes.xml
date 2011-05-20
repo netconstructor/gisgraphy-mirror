@@ -369,8 +369,8 @@ remove the ability to search for 'no name street'
 				 to reuse it in client and anywhere else
 			</action>
 			
-			<action dev="David Masclet" type="add">
-				migrate to solr 1.4
+			<action dev="David Masclet" type="update">
+				migrate to solr 3.1
 			</action>
 			
 			<action dev="David Masclet" type="update">
