@@ -31,6 +31,8 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
 
 import com.gisgraphy.domain.geoloc.entity.Adm;
@@ -38,15 +40,19 @@ import com.gisgraphy.domain.geoloc.entity.AlternateName;
 import com.gisgraphy.domain.geoloc.entity.City;
 import com.gisgraphy.domain.geoloc.entity.Country;
 import com.gisgraphy.domain.geoloc.entity.Language;
+import com.gisgraphy.domain.geoloc.entity.OpenStreetMap;
+import com.gisgraphy.domain.geoloc.service.geoloc.street.StreetType;
 import com.gisgraphy.domain.repository.IAdmDao;
 import com.gisgraphy.domain.repository.ICountryDao;
 import com.gisgraphy.domain.repository.ILanguageDao;
+import com.gisgraphy.domain.repository.IOpenStreetMapDao;
 import com.gisgraphy.domain.valueobject.AlternateNameSource;
 import com.gisgraphy.domain.valueobject.FulltextResultsDto;
 import com.gisgraphy.domain.valueobject.Output;
 import com.gisgraphy.domain.valueobject.Pagination;
 import com.gisgraphy.domain.valueobject.SolrResponseDto;
 import com.gisgraphy.domain.valueobject.Output.OutputStyle;
+import com.gisgraphy.helper.GeolocHelper;
 import com.gisgraphy.helper.URLUtils;
 import com.gisgraphy.serializer.OutputFormat;
 import com.gisgraphy.test.GeolocTestHelper;
@@ -61,6 +67,9 @@ public class SolrUnmarshallerTest extends AbstractIntegrationHttpSolrTestCase {
     
     @Resource
     private ILanguageDao languageDao;
+    
+    @Resource
+    private IOpenStreetMapDao openStreetMapDao;
     
     @Resource
     private IAdmDao admDao;
@@ -155,7 +164,7 @@ public class SolrUnmarshallerTest extends AbstractIntegrationHttpSolrTestCase {
 
     @Test
     public void testUnmarshallSolrDocumentShouldReallyUnmarshallCountry() {
-	Country country = geolocTestHelper
+	Country country = GeolocTestHelper
 		.createFullFilledCountry();
 	
 	Language lang = new Language("french", "FR", "FRA");
@@ -295,6 +304,45 @@ public class SolrUnmarshallerTest extends AbstractIntegrationHttpSolrTestCase {
 	assertNotNull(result.getAdm2_code());
 	assertEquals(adm.getAdm2Code(), result.getAdm2_code());
 	assertEquals("Level should be fill when an Adm is saved ",adm.getLevel(), result.getLevel());
+	
+	
+    }
+    
+    @Test
+    public void testUnmarshallSolrDocumentShouldReallyUnmarshallStreet() {
+	OpenStreetMap street = GeolocTestHelper.createOpenStreetMapForPeterMartinStreet();
+	street.setOneWay(true);
+	StreetType streetType = StreetType.BRIDLEWAY;
+	street.setStreetType(streetType);
+	double length = 1.6D;
+	street.setLength(length);
+	openStreetMapDao.save(street);
+	
+	this.solRSynchroniser.commit();
+	Pagination pagination = paginate().from(1).to(10);
+	Output output = Output.withFormat(OutputFormat.XML).withStyle(OutputStyle.FULL).withIndentation();
+	FulltextQuery query = new FulltextQuery(street.getName(), pagination,
+		output, null, null);
+	FulltextResultsDto response = this.fullTextSearchEngine
+		.executeQuery(query);
+	List<SolrResponseDto> results = response.getResults();
+	assertNotNull(
+		"There should have a result for a fulltextSearch for "
+			+ street.getName()
+			+ " and even If no results are return: an empty list should be return,  not null ",
+		results);
+	assertTrue("There should have a result for a fulltextSearch for "
+		+ street.getName(), results.size() == 1);
+	SolrResponseDto result = results.get(0);
+	assertNotNull(result.getName());
+	 Assert.assertEquals("The results are not correct", street.getName(),
+		 result.getName());
+	    Assert.assertEquals("The length is not correct", length,
+		    result.getLength());
+	    Assert.assertEquals("The one_way is not correct", true,
+		    result.getOne_way().booleanValue());
+	    Assert.assertEquals("The street type is not correct", streetType.toString(),
+		    result.getStreet_type().toString());
 	
 	
     }

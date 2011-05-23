@@ -7,7 +7,7 @@
 	<groupId>com.gisgraphy</groupId>
 	<artifactId>gisgraphy</artifactId>
 	<packaging>war</packaging>
-	<version>2.1-final</version>
+	<version>3.0-beta</version>
 	<name>gisgraphy</name>
 	<url>http://www.gisgraphy.com</url>
 

@@ -154,6 +154,14 @@ public class SolrResponseDto {
 		    FullTextFields.AREA.getValue());
 	    this.level= getFieldAsInteger(solrDocument,
 		    FullTextFields.LEVEL.getValue());
+	    
+	    //street specific
+	    this.one_way = getFieldAsBoolean(solrDocument,
+		    FullTextFields.ONE_WAY.getValue());
+	    this.length = getFieldAsDouble(solrDocument,
+		    FullTextFields.LENGTH.getValue());
+	    this.street_type = getFieldAsString(solrDocument,
+		    FullTextFields.STREET_TYPE.getValue());
 	}
     }
 
@@ -204,6 +212,21 @@ public class SolrResponseDto {
 	    return null;
 	} else if (o instanceof Integer) {
 	    return (Integer) o;
+	} else {
+	    throw new RepositoryException(fieldname
+		    + " is not an Integer but a "
+		    + o.getClass().getSimpleName());
+	}
+    }
+    
+
+    private Boolean getFieldAsBoolean(SolrDocument solrDocument,
+	    String fieldname) {
+	Object o = solrDocument.getFieldValue(fieldname);
+	if (o == null) {
+	    return null;
+	} else if (o instanceof Boolean) {
+	    return (Boolean) o;
 	} else {
 	    throw new RepositoryException(fieldname
 		    + " is not an Integer but a "
@@ -321,6 +344,10 @@ public class SolrResponseDto {
     private String country_flag_url;
     private String google_map_url;
     private String yahoo_map_url;
+    
+    private Boolean one_way;
+    private Double length;
+    private String  street_type;
 
     /**
      * @return the name
@@ -660,6 +687,18 @@ public class SolrResponseDto {
     
     public Integer getLevel() {
         return level;
+    }
+
+    public Boolean getOne_way() {
+        return one_way;
+    }
+
+    public Double getLength() {
+        return length;
+    }
+
+    public String getStreet_type() {
+        return street_type;
     }
 
 }

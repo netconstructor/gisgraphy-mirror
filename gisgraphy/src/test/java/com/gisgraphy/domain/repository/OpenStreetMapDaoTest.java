@@ -205,15 +205,17 @@ public class OpenStreetMapDaoTest extends AbstractIntegrationHttpSolrTestCase{
     @Test
     public void testCountEstimate(){
 	OpenStreetMap streetOSM = GeolocTestHelper.createOpenStreetMapForPeterMartinStreet();
-	streetOSM.setGid(1L);
-	streetOSM.setGid(3L);
-	
 	OpenStreetMap streetOSM2 = GeolocTestHelper.createOpenStreetMapForJohnKenedyStreet();
+	long minGid = 1000L;
+	streetOSM.setGid(minGid);
+	long maxGid = 1500L;
+	streetOSM2.setGid(maxGid);
+	
 	openStreetMapDao.save(streetOSM);
 	openStreetMapDao.save(streetOSM2);
 	
 	long estimateCount = openStreetMapDao.countEstimate();
-	Assert.assertEquals("countestimate should return the max gid, the estimation is based on the fact that the importer start the gid to 0",3L, estimateCount);
+	Assert.assertEquals("countestimate should return the max gid, the estimation is based on the fact that gid are sequential)",maxGid-minGid+1, estimateCount);
 	
     }
     

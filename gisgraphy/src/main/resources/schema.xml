@@ -176,8 +176,8 @@
  <fields>
    
   <!-- Medium --><field name="street_type" type="string" indexed="true" stored="true"/>
-  <!-- Medium --><field name="one_way" type="boolean" indexed="true" stored="true"/>
-  <!-- Medium --><field name="length" type="integer" indexed="true" stored="true"/>
+  <!-- Medium --><field name="one_way" type="boolean" indexed="false" stored="true"/>
+  <!-- Medium --><field name="length" type="double" indexed="false" stored="true"/>
   
   
    <field name="feature_id" type="long" indexed="true" stored="true"/>

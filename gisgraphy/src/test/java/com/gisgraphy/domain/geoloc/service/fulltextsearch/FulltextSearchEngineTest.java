@@ -837,6 +837,50 @@ public class FulltextSearchEngineTest extends
     }
     
     @Test
+    public void testExecuteQueryForStreet() {
+	OpenStreetMap street = GeolocTestHelper.createOpenStreetMapForPeterMartinStreet();
+	street.setOneWay(true);
+	StreetType streetType = StreetType.BRIDLEWAY;
+	street.setStreetType(streetType);
+	double length = 1.6D;
+	street.setLength(length);
+	this.openStreetMapDao.save(street);
+	// commit changes
+	this.solRSynchroniser.commit();
+
+	try {
+	    Pagination pagination = paginate().from(1).to(10);
+	    Output output = Output.withFormat(OutputFormat.XML)
+		    .withLanguageCode("FR").withStyle(OutputStyle.FULL)
+		    .withIndentation();
+	    FulltextQuery fulltextQuery = new FulltextQuery(street.getName(),
+		    pagination, output, null, null);
+	    
+	    FulltextResultsDto results = fullTextSearchEngine
+		    .executeQuery(fulltextQuery);
+	    Assert.assertTrue("Qtime should be set", results.getQTime() != 0);
+	    Assert.assertEquals("resultSize should have a correct value", 1,
+		    results.getResultsSize());
+	    Assert.assertEquals("resultSize should be equals to result.size()",
+		    results.getResults().size(), results.getResultsSize());
+	    Assert.assertEquals("numFound should be set ", 1, results
+		    .getNumFound());
+	    Assert.assertTrue("maxScore should be set ",
+		    results.getMaxScore() != 0);
+	    Assert.assertEquals("The results are not correct", street.getName(),
+		    results.getResults().get(0).getName());
+	    Assert.assertEquals("The length is not correct", length,
+		    results.getResults().get(0).getLength());
+	    Assert.assertEquals("The one_way is not correct", true,
+		    results.getResults().get(0).getOne_way().booleanValue());
+	    Assert.assertEquals("The street type is not correct", streetType.toString(),
+		    results.getResults().get(0).getStreet_type());
+	} catch (FullTextSearchException e) {
+	    fail("error during search : " + e.getMessage());
+	}
+    }
+    
+    @Test
     public void testExecuteQueryWithSpellCheckingAndWithSpellResults() {
 	City city = GeolocTestHelper.createCity("Saint-Andre", 1.5F, 2F, 1001L);
 	this.cityDao.save(city);

@@ -363,6 +363,9 @@ The featureid of Aland Islands is still 661882 (ADM)and should be 661883 (ISLAND
 The featureid of Faroe Islands is still 2622320 (ADM) and should be 2622009 (ISLAND) 
 
 
-
+ajout d'un champs FT:
+fulltextfields
+schema.
+solrresposeDTO
   
 

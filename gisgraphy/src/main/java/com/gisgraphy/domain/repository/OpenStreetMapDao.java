@@ -335,7 +335,7 @@ public class OpenStreetMapDao extends GenericDao<OpenStreetMap, Long> implements
 
 		    public Object doInHibernate(Session session)
 			    throws PersistenceException {
-			String queryString = "select max(gid) from "
+			String queryString = "select max(gid)-min(gid)+1 from "
 				+ persistentClass.getSimpleName();
 
 			Query qry = session.createQuery(queryString);
