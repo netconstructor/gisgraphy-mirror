@@ -54,13 +54,13 @@ public class GeocodingService implements IGeocodingService {
 	 * @see com.gisgraphy.geocoding.IGeocodingService#geocode(java.lang.String)
 	 */
 	public AddressResultsDto geocode(String rawAddress, String countryCode) throws GeocodingException {
-		Long startTime = System.currentTimeMillis();
 		if (rawAddress == null || "".equals(rawAddress.trim())) {
 			throw new GeocodingException("Can not geocode a null or empty address");
 		}
 		if (countryCode == null || "".equals(countryCode.trim()) || countryCode.length() != 2) {
 			throw new GeocodingException("wrong countrycode : " + countryCode);
 		}
+		Long startTime = System.currentTimeMillis();
 		AddressQuery addressQuery = new AddressQuery(rawAddress, countryCode);
 		AddressResultsDto address;
 		try {
@@ -87,7 +87,7 @@ public class GeocodingService implements IGeocodingService {
 				streetSearchQuery.withDistanceField(false);
 				streetSearchQuery.withStreetSearchMode(StreetSearchMode.FULLTEXT);
 				StreetSearchResultsDto streetSearchResultsDto = streetSearchEngine.executeQuery(streetSearchQuery);
-				AddressResultsDto results = buildAddressResultDto(streetSearchResultsDto, city);
+				AddressResultsDto results = buildAddressResultDtoForStreetDistance(streetSearchResultsDto.getResult(), city);
 				Long endTime = System.currentTimeMillis();
 				results.setQTime(endTime - startTime);
 				return results;
@@ -105,6 +105,49 @@ public class GeocodingService implements IGeocodingService {
 		 * geocode(Address)
 		 */
 		// TODO Auto-generated method stub
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.gisgraphy.geocoding.IGeocodingService#geocode(com.gisgraphy.addressparser
+	 * .Address)
+	 */
+	public AddressResultsDto geocode(Address address, String countryCode) throws GeocodingException {
+		if (address == null) {
+			throw new GeocodingException("Can not geocode a null address");
+		}
+		if (countryCode == null || "".equals(countryCode.trim()) || countryCode.length() != 2) {
+			throw new GeocodingException("wrong countrycode : " + countryCode);
+		}
+		if (address.getStreetName()==null && address.getCity()==null && address.getZipCode()==null){
+			throw new GeocodingException("city street name and zip is null, we got too less information to geocode : ");
+		}
+		if (isIntersection(address)){
+			throw new GeocodingException("street intersection is not managed yet");
+		}
+		Long startTime = System.currentTimeMillis();
+		if (address.getCity() == null && address.getZipCode()==null){
+			List<SolrResponseDto> streets = findStreetInText(address.getStreetName(), countryCode);
+			AddressResultsDto results = buildAddressResultDto(streets, null);
+			Long endTime = System.currentTimeMillis();
+			results.setQTime(endTime - startTime);
+			return results;
+		}
+		/*
+        		 * 	else find city (city state zip)with all word required false
+        		 * 			if not null
+                                 * pour toute les ville de meme nom exactement
+                        		 * 				find street in fulltext around
+                        		 * 		  			if null
+                        * 			 				find street in contains around
+							if null
+								Find street in text
+								
+		 * 
+		 */
+		return null;
 	}
 
 	protected AddressResultsDto buildAddressResultDto(List<SolrResponseDto> streets, SolrResponseDto city) {
@@ -139,6 +182,8 @@ public class GeocodingService implements IGeocodingService {
 			if (city != null) {
 				//the best we can do is city
 				address.setGeocodingLevel(GeocodingLevels.CITY);
+				address.setLat(city.getLat());
+				address.setLng(city.getLng());
 				populateAddressFromCity(city, address);
 				addresses.add(address);
 			}
@@ -146,9 +191,8 @@ public class GeocodingService implements IGeocodingService {
 		return new AddressResultsDto(addresses, 0L);
 	}
 
-	protected AddressResultsDto buildAddressResultDto(StreetSearchResultsDto streets, SolrResponseDto city) {
+	protected AddressResultsDto buildAddressResultDtoForStreetDistance(List<StreetDistance> streetDistances, SolrResponseDto city) {
 		List<Address> addresses = new ArrayList<Address>();
-		List<StreetDistance> streetDistances = streets.getResult();
 		Point cityLocation = null;
 		if (city!=null){
 			cityLocation = GeolocHelper.createPoint(city.getLng().floatValue(),city.getLat().floatValue());
@@ -165,7 +209,7 @@ public class GeocodingService implements IGeocodingService {
 				address.setGeocodingLevel(GeocodingLevels.STREET);
 				address.setStreetName(streetDistance.getName());
 				if (streetDistance.getStreetType() != null) {
-					address.setStreetType(streetDistance.getStreetType().name().toLowerCase());//TODO tell in the doc that street type can be highway or parsed street type
+					address.setStreetType(streetDistance.getStreetType().name());//TODO tell in the doc that street type can be highway or parsed street type
 				}
 				populateAddressFromCity(city, address);
 				addresses.add(address);
@@ -175,6 +219,8 @@ public class GeocodingService implements IGeocodingService {
 			Address address = new Address();
 			if (city != null) {
 				address.setGeocodingLevel(GeocodingLevels.CITY);
+				address.setLat(city.getLat());
+				address.setLng(city.getLng());
 				populateAddressFromCity(city, address);
 				addresses.add(address);
 			}
@@ -197,31 +243,10 @@ public class GeocodingService implements IGeocodingService {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see
-	 * com.gisgraphy.geocoding.IGeocodingService#geocode(com.gisgraphy.addressparser
-	 * .Address)
-	 */
-	public AddressResultsDto geocode(Address address, String countryCode) throws GeocodingException {
-		if (address == null) {
-			throw new GeocodingException("Can not geocode a null address");
-		}
-		if (countryCode == null || "".equals(countryCode.trim()) || countryCode.length() != 2) {
-			throw new GeocodingException("wrong countrycode : " + countryCode);
-		}
-		/*
-		 * if address==null=>throw if pobox
-		 * 
-		 * else if intersection find city zip+name+state si pas null else if
-		 * city || zip ==null find street in fulltext else find city (city state
-		 * zip) if not null pour toute les ville de meme nom exactement find
-		 * street in fulltext if null if null find street in contains find
-		 * street in fulltext
-		 */
-		// TODO Auto-generated method stub
-		return null;
+	
+
+	private boolean isIntersection(Address address) {
+		return address.getStreetNameIntersection()!=null ;
 	}
 
 	protected SolrResponseDto findCityInText(String text, String countryCode) {

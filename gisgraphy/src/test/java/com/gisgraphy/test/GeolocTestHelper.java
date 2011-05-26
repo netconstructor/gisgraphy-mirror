@@ -848,6 +848,17 @@ public class GeolocTestHelper {
     	EasyMock.replay(street);
     	return street;
 	}
+	
+	public static StreetDistance createStreetSearchDtoForStreet() {
+		StreetDistance street = EasyMock.createMock(StreetDistance.class);
+    	EasyMock.expect(street.getLat()).andStubReturn(1.53D);
+    	EasyMock.expect(street.getLng()).andStubReturn(2.35D);
+    	EasyMock.expect(street.getLocation()).andStubReturn(GeolocHelper.createPoint(2.35F, 1.53F));
+    	EasyMock.expect(street.getName()).andStubReturn("street Name");
+    	EasyMock.expect(street.getStreetType()).andStubReturn(StreetType.MOTORWAY);
+    	EasyMock.replay(street);
+    	return street;
+	}
 
     
     public static int countLinesInFileThatStartsWith(File file, String text) {

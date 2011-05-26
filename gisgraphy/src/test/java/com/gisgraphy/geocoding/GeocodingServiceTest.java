@@ -24,7 +24,9 @@ import com.gisgraphy.test.GeolocTestHelper;
 
 public class GeocodingServiceTest {
 
-    public  boolean called = false;
+    public  boolean findCityCalled = false;
+    public  boolean findStreetCalled = false;
+    public  boolean GeocodeAdressCalled = false;
     
     @Test(expected = GeocodingException.class)
     public void geocodeRawAdressShouldThrowIfAddressIsNull() {
@@ -70,11 +72,11 @@ public class GeocodingServiceTest {
     
     @Test
     public void geocodeRawAdressShouldCallGeocodeAdressIfParsedAddressIsSuccess() {
-	called=false;
+    	GeocodeAdressCalled=false;
 	GeocodingService geocodingService = new GeocodingService(){
 	    @Override
 	    public AddressResultsDto geocode(Address address, String countryCode) throws GeocodingException {
-	        called= true;
+	    	GeocodeAdressCalled= true;
 		return null;
 	    }
 	};
@@ -90,22 +92,24 @@ public class GeocodingServiceTest {
 	geocodingService.setAddressParser(mockAddressParserService);
 	String rawAddress = "t";
 	    geocodingService.geocode(rawAddress, "ac");
-	    Assert.assertTrue(called);
+	    Assert.assertTrue(GeocodeAdressCalled);
     }
 
     @Test
     public void geocodeRawAdressShouldCallFindCityInTextIfParsedAddressIsNull() {
-	called= false;
+    	findCityCalled= false;
+    	findStreetCalled=false;
 	GeocodingService geocodingService = new GeocodingService(){
 	   
 	    @Override
 	    protected SolrResponseDto findCityInText(String text, String countryCode) {
-	        called =true;
+	    	findCityCalled =true;
 		return null;
 	    }
 	    
 	    @Override
 	    protected List<SolrResponseDto> findStreetInText(String text, String countryCode) {
+	    	findStreetCalled =true;
 	    	return null;
 	    }
 	};
@@ -115,7 +119,7 @@ public class GeocodingServiceTest {
 	geocodingService.setAddressParser(mockAddressParserService);
 	String rawAddress = "t";
 	geocodingService.geocode(rawAddress, "ac");
-	Assert.assertTrue(called);
+	Assert.assertTrue(findCityCalled);
     }
 
     @Test
@@ -361,13 +365,52 @@ public class GeocodingServiceTest {
     	Assert.assertEquals("city name is not correct",city.getName(), address.getCity());
     	Assert.assertEquals("Adm Name should be the deeper one",city.getAdm2_name(), address.getState());
     }
+    
+    @Test
+    public void geocodeAdressShouldCallFindStreetInTextIfCityIsNull() {
+    	findStreetCalled=false;
+	GeocodingService geocodingService = new GeocodingService(){
+	   
+	    
+	    @Override
+	    protected List<SolrResponseDto> findStreetInText(String text, String countryCode) {
+	    	findStreetCalled =true;
+	    	return null;
+	    }
+	};
+	IAddressParserService mockAddressParserService = EasyMock.createMock(IAddressParserService.class);
+	EasyMock.expect(mockAddressParserService.execute((AddressQuery) EasyMock.anyObject())).andStubReturn(null);
+	EasyMock.replay(mockAddressParserService);
+	geocodingService.setAddressParser(mockAddressParserService);
+	Address address = new Address();
+	address.setStreetName("foo");
+	
+	geocodingService.geocode(address, "ac");
+	Assert.assertTrue(findStreetCalled);
+    }
 	
     @Test(expected = GeocodingException.class)
     public void geocodeAddressShouldThrowIfAddressIsNull() {
 	IGeocodingService geocodingService = new GeocodingService();
-	Address address = new Address();
-	geocodingService.geocode(address, null);
+	Address address = null;
+	geocodingService.geocode(address, "DE");
     }
+    
+    @Test(expected = GeocodingException.class)
+    public void geocodeAddressShouldThrowIfStreetNameCityAndZipAreNull() {
+	IGeocodingService geocodingService = new GeocodingService();
+	Address address = new Address();
+	geocodingService.geocode(address, "De");
+    }
+    
+    @Test(expected = GeocodingException.class)
+    public void geocodeAddressShouldThrowIfStreetIntersection() {
+	IGeocodingService geocodingService = new GeocodingService();
+	Address address = new Address();
+	address.setStreetNameIntersection("intersection");
+	geocodingService.geocode(address, "De");
+    }
+    
 
     @Test(expected = GeocodingException.class)
     public void geocodeAddressShouldThrowIfCountryCodeIsNull() {
