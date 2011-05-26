@@ -60,6 +60,7 @@ import com.gisgraphy.domain.valueobject.FulltextResultsDto;
 import com.gisgraphy.domain.valueobject.Output;
 import com.gisgraphy.domain.valueobject.Pagination;
 import com.gisgraphy.domain.valueobject.Output.OutputStyle;
+import com.gisgraphy.fulltext.Constants;
 import com.gisgraphy.fulltext.service.exception.FullTextSearchException;
 import com.gisgraphy.helper.FileHelper;
 import com.gisgraphy.helper.GeolocHelper;
@@ -854,7 +855,7 @@ public class FulltextSearchEngineTest extends
 		    .withLanguageCode("FR").withStyle(OutputStyle.FULL)
 		    .withIndentation();
 	    FulltextQuery fulltextQuery = new FulltextQuery(street.getName(),
-		    pagination, output, null, null);
+		    pagination, output, Constants.STREET_PLACETYPE, null);
 	    
 	    FulltextResultsDto results = fullTextSearchEngine
 		    .executeQuery(fulltextQuery);

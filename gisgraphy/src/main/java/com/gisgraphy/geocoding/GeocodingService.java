@@ -1,24 +1,32 @@
 package com.gisgraphy.geocoding;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.gisgraphy.addressparser.Address;
 import com.gisgraphy.addressparser.AddressQuery;
 import com.gisgraphy.addressparser.AddressResultsDto;
+import com.gisgraphy.addressparser.GeocodingLevels;
 import com.gisgraphy.addressparser.IAddressParserService;
 import com.gisgraphy.addressparser.exception.AddressParserException;
-import com.gisgraphy.domain.geoloc.service.fulltextsearch.FullTextSearchEngine;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.FulltextQuery;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.IFullTextSearchEngine;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.StreetSearchMode;
+import com.gisgraphy.domain.geoloc.service.geoloc.GeolocSearchEngine;
+import com.gisgraphy.domain.geoloc.service.geoloc.IStreetSearchEngine;
 import com.gisgraphy.domain.geoloc.service.geoloc.StreetSearchQuery;
 import com.gisgraphy.domain.valueobject.FulltextResultsDto;
 import com.gisgraphy.domain.valueobject.Output;
 import com.gisgraphy.domain.valueobject.Pagination;
 import com.gisgraphy.domain.valueobject.SolrResponseDto;
-import com.gisgraphy.domain.valueobject.Output.OutputStyle;
+import com.gisgraphy.domain.valueobject.StreetDistance;
+import com.gisgraphy.domain.valueobject.StreetSearchResultsDto;
 import com.gisgraphy.helper.GeolocHelper;
-import com.gisgraphy.serializer.OutputFormat;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * 
@@ -29,107 +37,225 @@ import com.gisgraphy.serializer.OutputFormat;
  */
 public class GeocodingService implements IGeocodingService {
 
-    private IAddressParserService addressParser;
-    private IFullTextSearchEngine fullTextSearchEngine;
+	private IAddressParserService addressParser;
+	private IFullTextSearchEngine fullTextSearchEngine;
+	private IStreetSearchEngine streetSearchEngine;
+	public final static int ACCEPT_DISTANCE_BETWEEN_CITY_AND_STREET=30000;
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see com.gisgraphy.geocoding.IGeocodingService#geocode(java.lang.String)
+	 /**
+     * The logger
      */
-    public AddressResultsDto geocode(String rawAddress, String countryCode) throws GeocodingException {
-	if (rawAddress == null || "".equals(rawAddress.trim())) {
-	    throw new GeocodingException("Can not geocode a null or empty address");
-	}
-	if (countryCode == null || "".equals(countryCode.trim()) || countryCode.length() != 2) {
-	    throw new GeocodingException("wrong countrycode : " + countryCode);
-	}
-	AddressQuery addressQuery = new AddressQuery(rawAddress, countryCode);
-	AddressResultsDto address;
-	try {
-	    address = addressParser.execute(addressQuery);
-	} catch (AddressParserException e) {
-	    throw new GeocodingException("An error occurs during parsing of address" + e.getMessage(), e);
-	}
-	if (address != null && address.getResult().size()>=1) {
-	    return geocode(address.getResult().get(0), countryCode);
-	} else {
-	    SolrResponseDto city = null;
-	    if (address == null) {
-		city = findCityInText(rawAddress, countryCode);
-	    }
-	    if (city == null) {
-		// fulltext street wo position=>not managed yet
-	    } else {
-		StreetSearchQuery streetSearchQuery = new StreetSearchQuery(
-			GeolocHelper.createPoint(city.getLng().floatValue(),city.getLat().floatValue())
-			);
-		streetSearchQuery.withDistanceField(false);
-		streetSearchQuery.withStreetSearchMode(StreetSearchMode.FULLTEXT);
-		/*
-		 * find street with fulltext optionnal if null return null else
-		 * return list
-		 */
-	    }
-	}
+    protected static final Logger logger = LoggerFactory
+	    .getLogger(GeocodingService.class);
+	
 	/*
-	 * if rawAddress == null throw parseAddress() if address==null=>
-	 * findcityIntext( fulltext city or subdivision with allwords required =
-	 * false) if city =null fulltext street wo position else find street
-	 * with fulltext optionnal if null return null else return list else
-	 * geocode(Address)
-	 */
-	// TODO Auto-generated method stub
-	return null;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.gisgraphy.geocoding.IGeocodingService#geocode(com.gisgraphy.addressparser
-     * .Address)
-     */
-    public AddressResultsDto geocode(Address address, String countryCode) throws GeocodingException {
-	if (address == null) {
-	    throw new GeocodingException("Can not geocode a null address");
-	}
-	if (countryCode == null || "".equals(countryCode.trim()) || countryCode.length() != 2) {
-	    throw new GeocodingException("wrong countrycode : " + countryCode);
-	}
-	/*
-	 * if address==null=>throw if pobox
+	 * (non-Javadoc)
 	 * 
-	 * else if intersection find city zip+name+state si pas null else if
-	 * city || zip ==null find street in fulltext else find city (city state
-	 * zip) if not null pour toute les ville de meme nom exactement find
-	 * street in fulltext if null if null find street in contains find
-	 * street in fulltext
+	 * @see com.gisgraphy.geocoding.IGeocodingService#geocode(java.lang.String)
 	 */
-	// TODO Auto-generated method stub
-	return null;
-    }
+	public AddressResultsDto geocode(String rawAddress, String countryCode) throws GeocodingException {
+		Long startTime = System.currentTimeMillis();
+		if (rawAddress == null || "".equals(rawAddress.trim())) {
+			throw new GeocodingException("Can not geocode a null or empty address");
+		}
+		if (countryCode == null || "".equals(countryCode.trim()) || countryCode.length() != 2) {
+			throw new GeocodingException("wrong countrycode : " + countryCode);
+		}
+		AddressQuery addressQuery = new AddressQuery(rawAddress, countryCode);
+		AddressResultsDto address;
+		try {
+			address = addressParser.execute(addressQuery);
+		} catch (AddressParserException e) {
+			throw new GeocodingException("An error occurs during parsing of address" + e.getMessage(), e);
+		}
+		if (address != null && address.getResult().size() >= 1) {
+			return geocode(address.getResult().get(0), countryCode);
+		} else {
+			SolrResponseDto city = null;
+			if (address == null) {
+				city = findCityInText(rawAddress, countryCode);
+			}
+			if (city == null) {
+				List<SolrResponseDto> streets = findStreetInText(rawAddress, countryCode);
+				AddressResultsDto results = buildAddressResultDto(streets, city);
+				Long endTime = System.currentTimeMillis();
+				results.setQTime(endTime - startTime);
+				return results;
 
-    protected SolrResponseDto findCityInText(String text, String countryCode) {
-	FulltextQuery query = new FulltextQuery(text, Pagination.DEFAULT_PAGINATION, Output.DEFAULT_OUTPUT, com.gisgraphy.fulltext.Constants.CITY_AND_CITYSUBDIVISION_PLACETYPE, countryCode);
-	query.withAllWordsRequired(false);
-	FulltextResultsDto results = fullTextSearchEngine.executeQuery(query);
-	if (results.getResultsSize() >= 1) {
-	    return results.getResults().get(0);
-	} else {
-	    return null;
+			} else {
+				StreetSearchQuery streetSearchQuery = new StreetSearchQuery(GeolocHelper.createPoint(city.getLng().floatValue(), city.getLat().floatValue()));
+				streetSearchQuery.withDistanceField(false);
+				streetSearchQuery.withStreetSearchMode(StreetSearchMode.FULLTEXT);
+				StreetSearchResultsDto streetSearchResultsDto = streetSearchEngine.executeQuery(streetSearchQuery);
+				AddressResultsDto results = buildAddressResultDto(streetSearchResultsDto, city);
+				Long endTime = System.currentTimeMillis();
+				results.setQTime(endTime - startTime);
+				return results;
+				/*
+				 * find street with fulltext optionnal if null return null else
+				 * return list
+				 */
+			}
+		}
+		/*
+		 * if rawAddress == null throw parseAddress() if address==null=>
+		 * findcityIntext( fulltext city or subdivision with allwords required =
+		 * false) if city =null fulltext street wo position else find street
+		 * with fulltext optionnal if null return null else return list else
+		 * geocode(Address)
+		 */
+		// TODO Auto-generated method stub
 	}
 
-    }
+	protected AddressResultsDto buildAddressResultDto(List<SolrResponseDto> streets, SolrResponseDto city) {
+		List<Address> addresses = new ArrayList<Address>();
+		Point cityLocation = null;
+		if (city!=null){
+			cityLocation = GeolocHelper.createPoint(city.getLng().floatValue(),city.getLat().floatValue());
+		}
+		if (streets != null && streets.size() > 0) {
+			for (SolrResponseDto street : streets) {
+				Address address = new Address();
+				//todo don't add if too far from city
+				Point streetLocation = GeolocHelper.createPoint(street.getLng().floatValue(),street.getLat().floatValue());
+				if (cityLocation!= null && GeolocHelper.distance(streetLocation, cityLocation)>=ACCEPT_DISTANCE_BETWEEN_CITY_AND_STREET){
+					logger.debug("city is too for from street, ignoring street");
+					continue;
+				}
+				address.setLat(street.getLat());
+				address.setLng(street.getLng());
+				
+				address.setGeocodingLevel(GeocodingLevels.STREET);
+				address.setStreetName(street.getName());
+				if (street.getStreet_type() != null) {
+					address.setStreetType(street.getStreet_type());//TODO tell in the doc that street type can be highway or parsed street type
+				}
+				populateAddressFromCity(city, address);
+				addresses.add(address);
 
-    @Autowired
-    public void setAddressParser(IAddressParserService addressParser) {
-	this.addressParser = addressParser;
-    }
+			}
+		} else {
+			Address address = new Address();
+			if (city != null) {
+				//the best we can do is city
+				address.setGeocodingLevel(GeocodingLevels.CITY);
+				populateAddressFromCity(city, address);
+				addresses.add(address);
+			}
+		}
+		return new AddressResultsDto(addresses, 0L);
+	}
 
-    @Autowired
-    public void setFullTextSearchEngine(IFullTextSearchEngine fullTextSearchEngine) {
-	this.fullTextSearchEngine = fullTextSearchEngine;
-    }
+	protected AddressResultsDto buildAddressResultDto(StreetSearchResultsDto streets, SolrResponseDto city) {
+		List<Address> addresses = new ArrayList<Address>();
+		List<StreetDistance> streetDistances = streets.getResult();
+		Point cityLocation = null;
+		if (city!=null){
+			cityLocation = GeolocHelper.createPoint(city.getLng().floatValue(),city.getLat().floatValue());
+		}
+		if (streetDistances != null && streetDistances.size() > 0) {
+			for (StreetDistance streetDistance : streetDistances) {
+				Address address = new Address();
+				if (cityLocation!= null && GeolocHelper.distance(streetDistance.getLocation(), cityLocation)>=ACCEPT_DISTANCE_BETWEEN_CITY_AND_STREET){
+					logger.debug("city is too for from street, ignoring street");
+					continue;
+				}
+				address.setLat(streetDistance.getLat());
+				address.setLng(streetDistance.getLng());
+				address.setGeocodingLevel(GeocodingLevels.STREET);
+				address.setStreetName(streetDistance.getName());
+				if (streetDistance.getStreetType() != null) {
+					address.setStreetType(streetDistance.getStreetType().name().toLowerCase());//TODO tell in the doc that street type can be highway or parsed street type
+				}
+				populateAddressFromCity(city, address);
+				addresses.add(address);
+
+			}
+		} else {
+			Address address = new Address();
+			if (city != null) {
+				address.setGeocodingLevel(GeocodingLevels.CITY);
+				populateAddressFromCity(city, address);
+				addresses.add(address);
+			}
+			//the best we can do is city
+		}
+		return new AddressResultsDto(addresses, 0L);
+	}
+
+	private void populateAddressFromCity(SolrResponseDto city, Address address) {
+		if (city!=null){
+			address.setCity(city.getName());
+			if (city.getAdm2_name() != null) {
+				address.setState(city.getAdm2_name());
+			} else if (city.getAdm1_name() != null) {
+				address.setState(city.getAdm1_name());
+			}
+			if (city.getZipcodes() != null && city.getZipcodes().size() > 0) {
+				address.setZipCode(city.getZipcodes().get(0));
+			}
+		}
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.gisgraphy.geocoding.IGeocodingService#geocode(com.gisgraphy.addressparser
+	 * .Address)
+	 */
+	public AddressResultsDto geocode(Address address, String countryCode) throws GeocodingException {
+		if (address == null) {
+			throw new GeocodingException("Can not geocode a null address");
+		}
+		if (countryCode == null || "".equals(countryCode.trim()) || countryCode.length() != 2) {
+			throw new GeocodingException("wrong countrycode : " + countryCode);
+		}
+		/*
+		 * if address==null=>throw if pobox
+		 * 
+		 * else if intersection find city zip+name+state si pas null else if
+		 * city || zip ==null find street in fulltext else find city (city state
+		 * zip) if not null pour toute les ville de meme nom exactement find
+		 * street in fulltext if null if null find street in contains find
+		 * street in fulltext
+		 */
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	protected SolrResponseDto findCityInText(String text, String countryCode) {
+		FulltextQuery query = new FulltextQuery(text, Pagination.DEFAULT_PAGINATION, Output.DEFAULT_OUTPUT, com.gisgraphy.fulltext.Constants.CITY_AND_CITYSUBDIVISION_PLACETYPE, countryCode);
+		query.withAllWordsRequired(false);
+		FulltextResultsDto results = fullTextSearchEngine.executeQuery(query);
+		if (results.getResultsSize() >= 1) {
+			return results.getResults().get(0);
+		} else {
+			return null;
+		}
+	}
+
+	protected List<SolrResponseDto> findStreetInText(String text, String countryCode) {
+		FulltextQuery query = new FulltextQuery(text, Pagination.DEFAULT_PAGINATION, Output.DEFAULT_OUTPUT, com.gisgraphy.fulltext.Constants.STREET_PLACETYPE, countryCode);
+		query.withAllWordsRequired(false);
+		FulltextResultsDto results = fullTextSearchEngine.executeQuery(query);
+		return results.getResults();
+
+	}
+
+	@Autowired
+	public void setAddressParser(IAddressParserService addressParser) {
+		this.addressParser = addressParser;
+	}
+
+	@Autowired
+	public void setFullTextSearchEngine(IFullTextSearchEngine fullTextSearchEngine) {
+		this.fullTextSearchEngine = fullTextSearchEngine;
+	}
+
+	@Autowired
+	public void setStreetSearchEngine(IStreetSearchEngine streetSearchEngine) {
+		this.streetSearchEngine = streetSearchEngine;
+	}
 
 }

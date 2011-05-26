@@ -42,6 +42,7 @@ import javax.annotation.Resource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.easymock.classextension.EasyMock;
 import org.joda.time.DateTime;
 import org.springframework.mock.web.MockHttpServletRequest;
 
@@ -65,6 +66,7 @@ import com.gisgraphy.domain.valueobject.Constants;
 import com.gisgraphy.domain.valueobject.GISSource;
 import com.gisgraphy.domain.valueobject.GeolocResultsDto;
 import com.gisgraphy.domain.valueobject.GisFeatureDistance;
+import com.gisgraphy.domain.valueobject.SolrResponseDto;
 import com.gisgraphy.domain.valueobject.StreetDistance;
 import com.gisgraphy.domain.valueobject.StreetDistance.StreetDistanceBuilder;
 import com.gisgraphy.domain.valueobject.StreetSearchResultsDto;
@@ -808,6 +810,45 @@ public class GeolocTestHelper {
 	return request;
     }
     
+    public static SolrResponseDto createSolrResponseDtoForCity() {
+		SolrResponseDto street = EasyMock.createMock(SolrResponseDto.class);
+    	EasyMock.expect(street.getAdm1_name()).andStubReturn("adm1 Name");
+    	EasyMock.expect(street.getAdm2_name()).andStubReturn("adm2 Name");
+    	EasyMock.expect(street.getLat()).andStubReturn(1.55D);
+    	EasyMock.expect(street.getLng()).andStubReturn(2.36D);
+    	EasyMock.expect(street.getName()).andStubReturn("Name");
+    	List<String> zipcodes = new ArrayList<String>();
+    	zipcodes.add("zip1");
+    	EasyMock.expect(street.getZipcodes()).andStubReturn(zipcodes);
+    	EasyMock.replay(street);
+    	return street;
+	}
+    public static SolrResponseDto createSolrResponseDtoForCityFarFarAway() {
+		SolrResponseDto street = EasyMock.createMock(SolrResponseDto.class);
+    	EasyMock.expect(street.getAdm1_name()).andStubReturn("adm1 Name");
+    	EasyMock.expect(street.getAdm2_name()).andStubReturn("adm2 Name");
+    	EasyMock.expect(street.getLat()).andStubReturn(80.55D);
+    	EasyMock.expect(street.getLng()).andStubReturn(80.36D);
+    	EasyMock.expect(street.getName()).andStubReturn("Name");
+    	List<String> zipcodes = new ArrayList<String>();
+    	zipcodes.add("zip1");
+    	EasyMock.expect(street.getZipcodes()).andStubReturn(zipcodes);
+    	EasyMock.replay(street);
+    	return street;
+	}
+	
+	public static SolrResponseDto createSolrResponseDtoForStreet() {
+		SolrResponseDto street = EasyMock.createMock(SolrResponseDto.class);
+    	EasyMock.expect(street.getAdm1_name()).andStubReturn("adm1 Name");
+    	EasyMock.expect(street.getAdm2_name()).andStubReturn("adm2 Name");
+    	EasyMock.expect(street.getLat()).andStubReturn(1.53D);
+    	EasyMock.expect(street.getLng()).andStubReturn(2.35D);
+    	EasyMock.expect(street.getName()).andStubReturn("street Name");
+    	EasyMock.expect(street.getStreet_type()).andStubReturn("street type");
+    	EasyMock.replay(street);
+    	return street;
+	}
+
     
     public static int countLinesInFileThatStartsWith(File file, String text) {
 	int count = 0;
