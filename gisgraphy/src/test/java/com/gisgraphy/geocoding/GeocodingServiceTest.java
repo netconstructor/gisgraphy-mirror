@@ -19,6 +19,7 @@ import com.gisgraphy.domain.valueobject.FulltextResultsDto;
 import com.gisgraphy.domain.valueobject.Output;
 import com.gisgraphy.domain.valueobject.Pagination;
 import com.gisgraphy.domain.valueobject.SolrResponseDto;
+import com.gisgraphy.domain.valueobject.StreetDistance;
 import com.gisgraphy.test.GeolocTestHelper;
 
 public class GeocodingServiceTest {
@@ -191,6 +192,31 @@ public class GeocodingServiceTest {
     }
     
     @Test
+    public void buildAddressResultDtoFromSolrResponseDtoWithNullCity(){
+    	//setup
+    	GeocodingService geocodingService = new GeocodingService();
+    	List<SolrResponseDto> streets = new ArrayList<SolrResponseDto>();
+    	SolrResponseDto street = GeolocTestHelper.createSolrResponseDtoForStreet();
+    	streets.add(street);
+    	SolrResponseDto city = null;
+    	//exercise
+    	AddressResultsDto addressResultsDto = geocodingService.buildAddressResultDto(streets, city);
+    	
+    	//verify
+    	Assert.assertNotNull("qtime should not be null",addressResultsDto.getQTime());
+    	Assert.assertNotNull("results should not be null, but at least empty list",addressResultsDto.getResult());
+    	Assert.assertEquals(1, addressResultsDto.getResult().size());
+    	Address address = addressResultsDto.getResult().get(0);
+    	Assert.assertEquals("latitude is not correct",street.getLat(), address.getLat());
+    	Assert.assertEquals("longitude is not correct",street.getLng(), address.getLng());
+    	Assert.assertEquals("geocoding level is not correct",GeocodingLevels.STREET, address.getGeocodingLevel());
+    	Assert.assertEquals("street name is not correct",street.getName(), address.getStreetName());
+    	Assert.assertEquals("street type is not correct",street.getStreet_type(), address.getStreetType());
+    	Assert.assertNull("city name is not correct", address.getCity());
+    	Assert.assertNull("Adm Name should be the deeper one", address.getState());
+    }
+    
+    @Test
     public void buildAddressResultDtoFromSolrResponseDtoWithStreetTooForFromCity(){
     	//setup
     	GeocodingService geocodingService = new GeocodingService();
@@ -221,8 +247,8 @@ public class GeocodingServiceTest {
     	Assert.assertNotNull("results should not be null, but at least empty list",addressResultsDto.getResult());
     	Assert.assertEquals(1, addressResultsDto.getResult().size());
     	Address address = addressResultsDto.getResult().get(0);
-    	Assert.assertNull("latitude is not correct", address.getLat());
-    	Assert.assertNull("longitude is not correct", address.getLng());
+    	Assert.assertEquals("latitude is not correct", city.getLat(),city.getLat());
+    	Assert.assertEquals("longitude is not correct", city.getLng(),address.getLng());
     	Assert.assertEquals("geocoding level is not correct",GeocodingLevels.CITY, address.getGeocodingLevel());
     	Assert.assertNull("street name is not correct", address.getStreetName());
     	Assert.assertNull("street type is not correct", address.getStreetType());
@@ -245,6 +271,96 @@ public class GeocodingServiceTest {
     	Assert.assertEquals(0, addressResultsDto.getResult().size());
     }
 
+    
+    @Test
+    public void buildAddressResultDtoFromStreetResponseDto(){
+    	//setup
+    	GeocodingService geocodingService = new GeocodingService();
+    	List<StreetDistance> streets = new ArrayList<StreetDistance>();
+    	StreetDistance street = GeolocTestHelper.createStreetSearchDtoForStreet();
+    	streets.add(street);
+    	SolrResponseDto city = GeolocTestHelper.createSolrResponseDtoForCity();
+    	//exercise
+    	AddressResultsDto addressResultsDto = geocodingService.buildAddressResultDtoForStreetDistance(streets, city);
+    	
+    	//verify
+    	Assert.assertNotNull("qtime should not be null",addressResultsDto.getQTime());
+    	Assert.assertNotNull("results should not be null, but at least empty list",addressResultsDto.getResult());
+    	Assert.assertEquals(1, addressResultsDto.getResult().size());
+    	Address address = addressResultsDto.getResult().get(0);
+    	Assert.assertEquals("latitude is not correct",street.getLat(), address.getLat());
+    	Assert.assertEquals("longitude is not correct",street.getLng(), address.getLng());
+    	Assert.assertEquals("geocoding level is not correct",GeocodingLevels.STREET, address.getGeocodingLevel());
+    	Assert.assertEquals("street name is not correct",street.getName(), address.getStreetName());
+    	Assert.assertEquals("street type is not correct",street.getStreetType().name(), address.getStreetType());
+    	Assert.assertEquals("city name is not correct",city.getName(), address.getCity());
+    	Assert.assertEquals("Adm Name should be the deeper one",city.getAdm2_name(), address.getState());
+    }
+    
+    @Test
+    public void buildAddressResultDtoFromStreetResponseDtoWithStreetTooFarForStreet(){
+    	//setup
+    	GeocodingService geocodingService = new GeocodingService();
+    	List<StreetDistance> streets = new ArrayList<StreetDistance>();
+    	StreetDistance street = GeolocTestHelper.createStreetSearchDtoForStreet();
+    	streets.add(street);
+    	SolrResponseDto city = GeolocTestHelper.createSolrResponseDtoForCityFarFarAway();
+    	//exercise
+    	AddressResultsDto addressResultsDto = geocodingService.buildAddressResultDtoForStreetDistance(streets, city);
+    	
+    	//verify
+    	Assert.assertNotNull("qtime should not be null",addressResultsDto.getQTime());
+    	Assert.assertNotNull("results should not be null, but at least empty list",addressResultsDto.getResult());
+    	Assert.assertEquals(0, addressResultsDto.getResult().size());
+    }
+    
+    @Test
+    public void buildAddressResultDtoFromStreetResponseDtoWithNullCity(){
+    	//setup
+    	GeocodingService geocodingService = new GeocodingService();
+    	List<StreetDistance> streets = new ArrayList<StreetDistance>();
+    	StreetDistance street = GeolocTestHelper.createStreetSearchDtoForStreet();
+    	streets.add(street);
+    	SolrResponseDto city = null;
+    	//exercise
+    	AddressResultsDto addressResultsDto = geocodingService.buildAddressResultDtoForStreetDistance(streets, city);
+    	
+    	//verify
+    	Assert.assertNotNull("qtime should not be null",addressResultsDto.getQTime());
+    	Assert.assertNotNull("results should not be null, but at least empty list",addressResultsDto.getResult());
+    	Assert.assertEquals(1, addressResultsDto.getResult().size());
+    	Address address = addressResultsDto.getResult().get(0);
+    	Assert.assertEquals("latitude is not correct",street.getLat(), address.getLat());
+    	Assert.assertEquals("longitude is not correct",street.getLng(), address.getLng());
+    	Assert.assertEquals("geocoding level is not correct",GeocodingLevels.STREET, address.getGeocodingLevel());
+    	Assert.assertEquals("street name is not correct",street.getName(), address.getStreetName());
+    	Assert.assertEquals("street type is not correct",street.getStreetType().name(), address.getStreetType());
+    	Assert.assertNull("city name is not correct", address.getCity());
+    	Assert.assertNull("Adm Name should be the deeper one", address.getState());
+    }
+    
+    @Test
+    public void buildAddressResultDtoFromStreetResponseDtoWithNullStreet(){
+    	//setup
+    	GeocodingService geocodingService = new GeocodingService();
+    	List<StreetDistance> streets = null;
+    	SolrResponseDto city = GeolocTestHelper.createSolrResponseDtoForCity();
+    	//exercise
+    	AddressResultsDto addressResultsDto = geocodingService.buildAddressResultDtoForStreetDistance(streets, city);
+    	
+    	//verify
+    	Assert.assertNotNull("qtime should not be null",addressResultsDto.getQTime());
+    	Assert.assertNotNull("results should not be null, but at least empty list",addressResultsDto.getResult());
+    	Assert.assertEquals(1, addressResultsDto.getResult().size());
+    	Address address = addressResultsDto.getResult().get(0);
+    	Assert.assertEquals("latitude is not correct",city.getLat(),address.getLat());
+    	Assert.assertEquals("longitude is not correct", city.getLng(),address.getLng());
+    	Assert.assertEquals("geocoding level is not correct", GeocodingLevels.CITY,address.getGeocodingLevel());
+    	Assert.assertNull("street name is not correct",address.getStreetName());
+    	Assert.assertNull("street type is not correct", address.getStreetType());
+    	Assert.assertEquals("city name is not correct",city.getName(), address.getCity());
+    	Assert.assertEquals("Adm Name should be the deeper one",city.getAdm2_name(), address.getState());
+    }
 	
     @Test(expected = GeocodingException.class)
     public void geocodeAddressShouldThrowIfAddressIsNull() {
