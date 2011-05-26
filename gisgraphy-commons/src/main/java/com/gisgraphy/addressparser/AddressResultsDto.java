@@ -123,5 +123,12 @@ public class AddressResultsDto {
 		return true;
 	}
 
+	/**
+	 * @param time the time the execution of the query took
+	 */
+	public void setQTime(Long time) {
+		QTime = time;
+	}
+
    
 }
