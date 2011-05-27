@@ -61,6 +61,9 @@ public class FulltextServlet extends GisgraphyServlet {
     public static final String QUERY_PARAMETER = "q";
     public static final String ALLWORDSREQUIRED_PARAMETER = "allwordsrequired";
     public static final String SPELLCHECKING_PARAMETER = "spellchecking";
+    public static final String LAT_PARAMETER = "lat";
+    public static final String LONG_PARAMETER = "lng";
+    public static final String RADIUS_PARAMETER = "radius";
 
 
     /*

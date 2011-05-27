@@ -27,14 +27,18 @@ package com.gisgraphy.domain.geoloc.service.fulltextsearch;
 
 import java.util.regex.Pattern;
 
+import javax.persistence.Transient;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.Assert;
 
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.spell.SpellCheckerConfig;
+import com.gisgraphy.domain.geoloc.service.geoloc.GeolocQuery;
 import com.gisgraphy.domain.valueobject.Output;
 import com.gisgraphy.domain.valueobject.Pagination;
 import com.gisgraphy.service.AbstractGisQuery;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * A fulltext Query
@@ -53,6 +57,14 @@ public class FulltextQuery extends AbstractGisQuery {
     public final static boolean ALL_WORDS_REQUIRED_DEFAULT_OPTION = true;
     
     /**
+     * Default radius in meters
+     */
+    public static final double DEFAULT_RADIUS = 10000;
+
+    protected Point point;
+    private double radius = DEFAULT_RADIUS;
+    
+    /**
      * The logger
      */
     public static final Logger logger = LoggerFactory
@@ -64,6 +76,71 @@ public class FulltextQuery extends AbstractGisQuery {
     @SuppressWarnings("unused")
     private FulltextQuery() {
 	super();
+    }
+    
+    /**
+     * @param point
+     *                The point to search around
+     *                @see #withRadius(double)
+     */
+    public FulltextQuery around(Point point) {
+	    this.point = point;
+	    return this;
+    }
+    
+    /**
+     * @return The radius
+     */
+    public Point getPoint() {
+    	return this.point;
+    }
+    
+    /**
+     * @param radius
+     *                The radius to set in meters. Limit the query to the specified
+     *                radius, if the radius is <=0 , it will be set to the
+     *                default radius.
+     */
+    public FulltextQuery withRadius(double radius) {
+	if (radius <= 0) {
+	    this.radius = DEFAULT_RADIUS;
+	} else {
+	    this.radius = radius;
+	}
+	return this;
+    }
+    
+    /**
+     * @return The radius
+     */
+    public double getRadius() {
+	return this.radius;
+    }
+    
+    /**
+     * @return The latitude (north-south) .
+     * @see #getLongitude()
+     */
+    @Transient
+    public Double getLatitude() {
+	Double latitude = null;
+	if (this.point != null) {
+	    latitude = this.point.getY();
+	}
+	return latitude;
+    }
+
+    /**
+     * @return Returns the longitude (east-West).
+     * @see #getLongitude()
+     */
+    @Transient
+    public Double getLongitude() {
+	Double longitude = null;
+	if (this.point != null) {
+	    longitude = this.point.getX();
+	}
+	return longitude;
     }
 
     /**

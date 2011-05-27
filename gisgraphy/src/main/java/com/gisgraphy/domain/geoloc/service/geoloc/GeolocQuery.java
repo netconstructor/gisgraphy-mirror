@@ -206,11 +206,11 @@ public class GeolocQuery extends AbstractGisQuery {
 
     /**
      * @param radius
-     *                The radius to set. Limit the query to the specified
+     *                The radius to set in meters. Limit the query to the specified
      *                radius, if the radius is <=0 , it will be set to the
      *                default radius.
      */
-    protected GeolocQuery withRadius(double radius) {
+    public GeolocQuery withRadius(double radius) {
 	if (radius <= 0) {
 	    this.radius = DEFAULT_RADIUS;
 	} else {

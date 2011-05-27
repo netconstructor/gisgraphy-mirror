@@ -17,7 +17,6 @@ import org.springframework.mock.web.MockHttpServletRequest;
 
 import com.gisgraphy.domain.geoloc.entity.Adm;
 import com.gisgraphy.domain.geoloc.entity.City;
-import com.gisgraphy.domain.geoloc.entity.GisFeature;
 import com.gisgraphy.domain.geoloc.service.fulltextsearch.spell.SpellCheckerConfig;
 import com.gisgraphy.domain.valueobject.Output;
 import com.gisgraphy.domain.valueobject.Pagination;
@@ -32,9 +31,196 @@ public class FulltextQueryHttpBuilderTest {
 
     @Test
     public void testFulltextQueryFromAnHttpServletRequest() {
-	MockHttpServletRequest request = GeolocTestHelper
+    	
+    	MockHttpServletRequest request = GeolocTestHelper
 		.createMockHttpServletRequestForFullText();
-	FulltextQuery query = buildQuery(request);
+    	FulltextQuery query = buildQuery(request);
+    	
+    	
+    	 // test Point
+	    // with empty lat
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.LAT_PARAMETER, "");
+	    try {
+		query = buildQuery(request);
+		fail("When there is empty latitude, query should throw");
+	    } catch (RuntimeException e) {
+	    }
+	    // With wrong lat
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.LAT_PARAMETER, "a");
+	    try {
+		query = buildQuery(request);
+		fail("A null lat should throw");
+	    } catch (RuntimeException e) {
+	    }
+	    // With too small lat
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.LAT_PARAMETER, "-92");
+	    try {
+		query = buildQuery(request);
+		fail("latitude should not accept latitude < -90");
+	    } catch (RuntimeException e) {
+	    }
+
+	    // With too high lat
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.LAT_PARAMETER, "92");
+	    try {
+		query = buildQuery(request);
+		fail("latitude should not accept latitude > 90");
+	    } catch (RuntimeException e) {
+	    }
+
+	    // with empty long
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.LONG_PARAMETER, "");
+	    try {
+		query = buildQuery(request);
+		fail("When there is empty longitude, query should throw");
+	    } catch (RuntimeException e) {
+	    }
+	    // With wrong Long
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.LONG_PARAMETER, "a");
+	    try {
+		query = buildQuery(request);
+		fail("A null lat should throw");
+	    } catch (RuntimeException e) {
+	    }
+
+	    // with too small long
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.LONG_PARAMETER, "-182");
+	    try {
+		query = buildQuery(request);
+		fail("longitude should not accept longitude < -180");
+	    } catch (RuntimeException e) {
+	    }
+
+	    // with too high long
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.LONG_PARAMETER, "182");
+	    try {
+		query = buildQuery(request);
+		fail("longitude should not accept longitude > 180");
+	    } catch (RuntimeException e) {
+	    }
+
+	    // with long with comma
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.LONG_PARAMETER, "10,3");
+	    try {
+		query = buildQuery(request);
+		Assert.assertEquals(
+			"request should accept longitude with comma", 10.3D,
+			query.getLongitude().doubleValue(), 0.1);
+
+	    } catch (RuntimeException e) {
+	    }
+
+	    // with long with point
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.LONG_PARAMETER, "10.3");
+	    try {
+		query = buildQuery(request);
+		Assert.assertEquals(
+			"request should accept longitude with comma", 10.3D,
+			query.getLongitude().doubleValue(), 0.1);
+
+	    } catch (RuntimeException e) {
+	    }
+
+	    // with lat with comma
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.LAT_PARAMETER, "10,3");
+	    try {
+		query = buildQuery(request);
+		Assert.assertEquals(
+			"request should accept latitude with comma", 10.3D,
+			query.getLatitude().doubleValue(), 0.1);
+
+	    } catch (RuntimeException e) {
+	    }
+
+	    // with lat with point
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.LAT_PARAMETER, "10.3");
+	    try {
+		query = buildQuery(request);
+		Assert.assertEquals(
+			"request should accept latitude with point", 10.3D,
+			query.getLatitude().doubleValue(), 0.1);
+
+	    } catch (RuntimeException e) {
+	    }
+
+	    // test radius
+	    // with missing radius
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.removeParameter(FulltextServlet.RADIUS_PARAMETER);
+	    query = buildQuery(request);
+	    assertEquals("When no " + FulltextServlet.RADIUS_PARAMETER
+		    + " is specified, the  parameter should be set to  "
+		    + FulltextQuery.DEFAULT_RADIUS, FulltextQuery.DEFAULT_RADIUS,
+		    query.getRadius(), 0.1);
+	    // With wrong radius
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.RADIUS_PARAMETER, "a");
+	    query = buildQuery(request);
+	    assertEquals("When wrong " + FulltextServlet.RADIUS_PARAMETER
+		    + " is specified, the  parameter should be set to  "
+		    + FulltextQuery.DEFAULT_RADIUS, FulltextQuery.DEFAULT_RADIUS,
+		    query.getRadius(), 0.1);
+	    // radius with comma
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.RADIUS_PARAMETER, "1,4");
+	    query = buildQuery(request);
+	    assertEquals("Radius should accept comma as decimal separator",
+		    1.4D, query.getRadius(), 0.1);
+
+	    // radius with point
+	    request = GeolocTestHelper.createMockHttpServletRequestForFullText();
+	    request.setParameter(FulltextServlet.RADIUS_PARAMETER, "1.4");
+	    query = buildQuery(request);
+	    assertEquals("Radius should accept point as decimal separator",
+		    1.4D, query.getRadius(), 0.1);
+	    
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+    	
+	
+	request = GeolocTestHelper
+		.createMockHttpServletRequestForFullText();
+    query = buildQuery(request);
 	int firstPaginationIndex = 3;
 	assertEquals(firstPaginationIndex, query.getFirstPaginationIndex());
 	assertEquals(DEFAULT_MAX_RESULTS+firstPaginationIndex-1, query.getLastPaginationIndex());

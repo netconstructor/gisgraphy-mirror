@@ -28,16 +28,20 @@ package com.gisgraphy.domain.geoloc.service.fulltextsearch;
 import javax.servlet.http.HttpServletRequest;
 
 import com.gisgraphy.domain.geoloc.entity.GisFeature;
+import com.gisgraphy.domain.geoloc.service.geoloc.GeolocQuery;
 import com.gisgraphy.domain.valueobject.GisgraphyServiceType;
 import com.gisgraphy.domain.valueobject.Output;
 import com.gisgraphy.domain.valueobject.Pagination;
 import com.gisgraphy.domain.valueobject.Output.OutputStyle;
 import com.gisgraphy.fulltext.service.exception.FullTextSearchException;
+import com.gisgraphy.geoloc.service.exception.GeolocSearchException;
 import com.gisgraphy.helper.GeolocHelper;
 import com.gisgraphy.helper.OutputFormatHelper;
 import com.gisgraphy.serializer.OutputFormat;
 import com.gisgraphy.servlet.FulltextServlet;
+import com.gisgraphy.servlet.GeolocServlet;
 import com.gisgraphy.servlet.GisgraphyServlet;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * A Fulltext Query builder. it build Fulltext query from HTTP Request
@@ -73,6 +77,62 @@ public class FulltextQueryHttpBuilder {
 	    throw new FullTextSearchException("query is limited to "
 		    + FulltextQuery.QUERY_MAX_LENGTH + "characters");
 	}
+	
+	// point
+	Float latitude=null;
+	Float longitude=null;
+	// lat
+	try {
+			String latParameter = req.getParameter(FulltextServlet.LAT_PARAMETER);
+				if (latParameter!=null){
+					
+					latitude = GeolocHelper.parseInternationalDouble(latParameter);
+					if (latitude < -90 || latitude > 90){
+						throw new GeolocSearchException("latitude is not correct"); 
+					}
+				} 
+		} catch (Exception e) {
+			throw new GeolocSearchException("latitude is not correct");
+		}
+
+	// long
+	try {
+	    String longParameter = req
+		    .getParameter(FulltextServlet.LONG_PARAMETER);
+	    if (longParameter!=null){
+	    	longitude = GeolocHelper.parseInternationalDouble(longParameter);
+	    	if (latitude < -180 || latitude > 180){
+				throw new GeolocSearchException("latitude is not correct"); 
+			}
+	    } 
+	} catch (Exception e) {
+	    throw new GeolocSearchException(
+		    "longitude is not correct ");
+	}
+	
+	
+	// point
+	
+	Point point = null ;
+	try {
+		if (latitude!=null && longitude!=null ){
+			point = GeolocHelper.createPoint(longitude, latitude);
+		} 
+	} catch (RuntimeException e1) {
+	    	throw new GeolocSearchException("can not determine Point");
+	}
+	query.around(point);
+	
+	// radius
+	double radius;
+	try {
+	    radius = GeolocHelper.parseInternationalDouble(req
+		    .getParameter(FulltextServlet.RADIUS_PARAMETER));
+	} catch (Exception e) {
+	    radius = GeolocQuery.DEFAULT_RADIUS;
+	}
+	query.withRadius(radius);
+	
 	// pagination
 	Pagination pagination = null;
 	int from;

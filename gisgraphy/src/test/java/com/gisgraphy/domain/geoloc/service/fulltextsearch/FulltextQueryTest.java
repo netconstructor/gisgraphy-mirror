@@ -43,7 +43,14 @@ import com.gisgraphy.serializer.OutputFormat;
 
 public class FulltextQueryTest {
 
-   
+   @Test
+   public void withradius(){
+	   FulltextQuery query = new FulltextQuery("foo");
+	   query.withRadius(-1);
+	   Assert.assertEquals(FulltextQuery.DEFAULT_RADIUS, query.getRadius(),0.00001);
+	   query.withRadius(1);
+	   Assert.assertEquals(1, query.getRadius(),0.00001);
+   }
 
     @Test
     public void testFulltextQueryStringPaginationOutputClassOfQextendsGisFeature() {
