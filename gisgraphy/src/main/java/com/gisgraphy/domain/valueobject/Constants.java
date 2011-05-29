@@ -147,6 +147,23 @@ public class Constants {
      */
     public static final String SPELLCHECKER_QUERY_PARAMETER = "spellcheck.q";
     
+    /**
+     * The parameter name to define the filter query to use (Solr parameter name)
+     */
+    public static final String FILTER_QUERY_PARAMETER = "fq";
+    
+    /**
+     * The parameter name to define the spatial fields (Solr parameter name)
+     */
+    public static final String SPATIAL_FIELD_PARAMETER = "sfield";
+    
+    /**
+     * The parameter name to define the point to search around (Solr parameter name)
+     */
+    public static final String POINT_PARAMETER = "sfield";
+    
+    
+    
 
     /**
      * A string that is used to load a class from a string with class.forName()

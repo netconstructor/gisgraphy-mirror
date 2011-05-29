@@ -296,6 +296,7 @@ public class SolRSynchroniser implements ISolRSynchroniser {
 				.toUTF8(gisFeature.getName()));
 			ex.setField(FullTextFields.LAT.getValue(), gisFeature.getLatitude());
 			ex.setField(FullTextFields.LONG.getValue(), gisFeature.getLongitude());
+			ex.setField(FullTextFields.LOCATION.getValue(), gisFeature.getLatitude().toString()+","+gisFeature.getLongitude().toString());
 			
 			String placetype = ClassNameHelper.stripEnhancerClass(gisFeature
 					.getClass().getSimpleName());

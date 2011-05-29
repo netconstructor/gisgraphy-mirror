@@ -54,6 +54,7 @@ public enum FullTextFields {
 	ADM4NAME("adm4_name"),
 	//City only
 	ZIPCODE("zipcode"),
+	LOCATION("location"),
 	//end City only
 	COUNTRYCODE("country_code"),
 	COUNTRYNAME("country_name"),
